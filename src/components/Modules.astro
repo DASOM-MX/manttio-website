@@ -1,0 +1,314 @@
+---
+import { Icon } from 'astro-icon/components';
+import { MODULES } from '../data/modules';
+import FauxFrame from './FauxFrame.astro';
+
+const steps = MODULES.length;
+---
+
+<section id="modulos" class="scene" style={`--steps:${steps}`}>
+	<div class="scene-inner">
+		<div class="shell">
+			<div class="mb-8 lg:mb-10">
+				<p class="label" data-reveal>Los módulos</p>
+				<h2 class="measure-head mt-3 text-h1 font-semibold tracking-[-0.025em]" data-reveal>
+					Once piezas. Enciendes las que usas.
+				</h2>
+				<p class="measure mt-4 text-lead text-ink-muted" data-reveal>
+					No es un CRM al que le colgaron reportes. Cada módulo resuelve una parte real del trabajo y se
+					activa por separado.
+				</p>
+			</div>
+
+			<div class="grid gap-6 lg:grid-cols-[minmax(210px,270px)_1fr] lg:gap-10">
+				<!-- rail -->
+				<div class="rail" role="tablist" aria-label="Módulos de Manttio">
+					{
+						MODULES.map((m, i) => (
+							<button
+								type="button"
+								role="tab"
+								id={`tab-${m.id}`}
+								aria-controls={`panel-${m.id}`}
+								aria-selected={i === 0 ? 'true' : 'false'}
+								tabindex={i === 0 ? 0 : -1}
+								class="rail-item"
+								data-rail-item
+								data-index={i}
+							>
+								<Icon name={m.icon} class="size-[17px] shrink-0" />
+								<span class="whitespace-nowrap">{m.name}</span>
+								{!m.shipped && <span class="soon">Próximamente</span>}
+							</button>
+						))
+					}
+				</div>
+
+				<!-- stage -->
+				<div class="stage">
+					{
+						MODULES.map((m, i) => (
+							<div
+								class="panel"
+								id={`panel-${m.id}`}
+								role="tabpanel"
+								aria-labelledby={`tab-${m.id}`}
+								data-panel
+								data-index={i}
+								aria-hidden={i === 0 ? 'false' : 'true'}
+							>
+								<FauxFrame module={m} />
+							</div>
+						))
+					}
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<style>
+	/* Desktop: one tall section with a sticky stage; scroll progress selects the
+	   module. Mobile: no scene at all — a snap carousel, which is what a thumb
+	   actually wants. */
+	.scene-inner {
+		padding-block: 4rem;
+	}
+	.rail {
+		display: flex;
+		gap: 0.5rem;
+		overflow-x: auto;
+		scroll-snap-type: x mandatory;
+		padding-bottom: 0.5rem;
+		scrollbar-width: none;
+	}
+	.rail::-webkit-scrollbar {
+		display: none;
+	}
+	.rail-item {
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
+		flex: 0 0 auto;
+		scroll-snap-align: start;
+		border-radius: 999px;
+		padding: 0.6rem 1rem;
+		color: var(--color-ink-muted);
+		background: var(--color-paper);
+		box-shadow: var(--shadow-ring);
+		cursor: pointer;
+		transition:
+			color 200ms ease,
+			box-shadow 200ms ease;
+	}
+	.rail-item[aria-selected='true'] {
+		color: var(--color-ink);
+		box-shadow: var(--shadow-e1);
+	}
+	.rail-item .soon {
+		font-size: 0.6875rem;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		color: var(--color-ink-faint);
+		background: var(--color-mist);
+		border-radius: 999px;
+		padding: 0.05rem 0.45rem;
+	}
+	.stage {
+		display: flex;
+		gap: 1rem;
+		overflow-x: auto;
+		scroll-snap-type: x mandatory;
+		scrollbar-width: none;
+	}
+	.stage::-webkit-scrollbar {
+		display: none;
+	}
+	.panel {
+		flex: 0 0 100%;
+		/* flex items default to min-width:auto, which lets the frame's intrinsic
+		   width push past the basis and overflow the viewport. */
+		min-width: 0;
+		scroll-snap-align: center;
+	}
+
+	@media (min-width: 1024px) {
+		.scene {
+			height: calc(100vh + var(--steps) * 42vh);
+		}
+		.scene-inner {
+			position: sticky;
+			top: 0;
+			display: flex;
+			min-height: 100vh;
+			align-items: center;
+			padding-block: 6rem 4rem;
+		}
+		.rail {
+			flex-direction: column;
+			gap: 2px;
+			overflow: visible;
+			padding-bottom: 0;
+		}
+		.rail-item {
+			position: relative;
+			border-radius: 12px;
+			background: transparent;
+			box-shadow: none;
+			padding: 0.65rem 0.85rem;
+		}
+		.rail-item:hover {
+			color: var(--color-ink);
+			background: var(--color-paper);
+		}
+		.rail-item[aria-selected='true'] {
+			background: var(--color-paper);
+			box-shadow: var(--shadow-e1);
+		}
+		.rail-item[aria-selected='true']::before {
+			content: '';
+			position: absolute;
+			left: -0.55rem;
+			top: 25%;
+			bottom: 25%;
+			width: 3px;
+			border-radius: 3px;
+			background: var(--color-brand-500);
+			transition: background-color 1200ms ease;
+		}
+		.rail-item .soon {
+			margin-left: auto;
+		}
+		.stage {
+			display: grid;
+			overflow: visible;
+			margin-inline: 0;
+			padding-inline: 0;
+		}
+		.panel {
+			grid-area: 1 / 1;
+			opacity: 0;
+			transform: translateY(14px);
+			transition:
+				opacity 320ms ease,
+				transform 320ms var(--ease-out);
+			pointer-events: none;
+		}
+		.panel[data-active] {
+			opacity: 1;
+			transform: none;
+			pointer-events: auto;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.panel {
+			transition: none;
+		}
+	}
+</style>
+
+<script>
+	import { reveal, scrollProgress } from '../scripts/motion';
+
+	reveal('[data-reveal]');
+
+	const section = document.getElementById('modulos');
+	const items = Array.from(document.querySelectorAll<HTMLElement>('[data-rail-item]'));
+	const panels = Array.from(document.querySelectorAll<HTMLElement>('[data-panel]'));
+	const desktop = window.matchMedia('(min-width: 1024px)');
+	const count = panels.length;
+	let current = -1;
+
+	function select(i: number, focusRail = false) {
+		const next = Math.max(0, Math.min(count - 1, i));
+		if (next === current) return;
+		current = next;
+
+		items.forEach((el, idx) => {
+			const on = idx === next;
+			el.setAttribute('aria-selected', String(on));
+			el.tabIndex = on ? 0 : -1;
+			if (on && focusRail) el.focus();
+			// keep the active chip in view on mobile
+			if (on && !desktop.matches) el.scrollIntoView({ block: 'nearest', inline: 'center' });
+		});
+
+		panels.forEach((el, idx) => {
+			const on = idx === next;
+			el.toggleAttribute('data-active', on);
+			// on mobile every panel is visible in the carousel, so never hide them
+			el.setAttribute('aria-hidden', desktop.matches ? String(!on) : 'false');
+		});
+	}
+
+	select(0);
+
+	// Desktop: scroll drives the scene.
+	if (section && desktop.matches) {
+		scrollProgress(section, (p) => {
+			select(Math.floor(p * count * 0.999));
+		});
+	}
+
+	// Clicking a rail item scrolls the scene to that module (desktop) or snaps
+	// the carousel (mobile).
+	items.forEach((el, i) => {
+		el.addEventListener('click', () => {
+			if (section && desktop.matches) {
+				const start = section.offsetTop;
+				const travel = section.offsetHeight - window.innerHeight;
+				window.scrollTo({
+					top: start + (travel * (i + 0.5)) / count,
+					behavior: 'smooth',
+				});
+			} else {
+				panels[i]?.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+				select(i);
+			}
+		});
+		el.addEventListener('keydown', (e) => {
+			let next: number | null = null;
+			if (e.key === 'ArrowDown' || e.key === 'ArrowRight') next = (i + 1) % count;
+			if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') next = (i - 1 + count) % count;
+			if (next !== null) {
+				e.preventDefault();
+				select(next, true);
+			}
+		});
+	});
+
+	// Crossing the breakpoint changes which panels should be visible.
+	desktop.addEventListener('change', () => {
+		const active = current;
+		current = -1;
+		select(active);
+	});
+
+	// Mobile: the carousel is the source of truth for which chip is lit.
+	const stage = document.querySelector<HTMLElement>('.stage');
+	if (stage) {
+		let raf = 0;
+		stage.addEventListener(
+			'scroll',
+			() => {
+				if (desktop.matches || raf) return;
+				raf = requestAnimationFrame(() => {
+					raf = 0;
+					const mid = stage.scrollLeft + stage.clientWidth / 2;
+					let best = 0;
+					let bestD = Infinity;
+					panels.forEach((p, i) => {
+						const d = Math.abs(p.offsetLeft + p.offsetWidth / 2 - mid);
+						if (d < bestD) {
+							bestD = d;
+							best = i;
+						}
+					});
+					select(best);
+				});
+			},
+			{ passive: true },
+		);
+	}
+</script>

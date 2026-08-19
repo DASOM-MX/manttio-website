@@ -1,141 +1,231 @@
-/*
-  The CSS in this style tag is based off of Bear Blog's default CSS.
-  https://github.com/HermanMartinus/bearblog/blob/297026a877bc2ab2b3bdfbd6b9f7961c350917dd/templates/styles/blog/default.css
-  License MIT: https://github.com/HermanMartinus/bearblog/blob/master/LICENSE.md
- */
+@import 'tailwindcss';
 
-:root {
-	--accent: #2337ff;
-	--accent-dark: #000d8a;
-	--black: 15, 18, 25;
-	--gray: 96, 115, 159;
-	--gray-light: 229, 233, 240;
-	--gray-dark: 34, 41, 57;
-	--gray-gradient: rgba(var(--gray-light), 50%), #fff;
-	--box-shadow:
-		0 2px 6px rgba(var(--gray), 25%), 0 8px 24px rgba(var(--gray), 33%),
-		0 16px 32px rgba(var(--gray), 33%);
-}
-body {
-	font-family: var(--font-atkinson);
-	margin: 0;
-	padding: 0;
-	text-align: left;
-	background: linear-gradient(var(--gray-gradient)) no-repeat;
-	background-size: 100% 600px;
-	word-wrap: break-word;
-	overflow-wrap: break-word;
-	color: rgb(var(--gray-dark));
-	font-size: 20px;
-	line-height: 1.7;
-}
-main {
-	width: 720px;
-	max-width: calc(100% - 2em);
-	margin: auto;
-	padding: 3em 1em;
-}
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-	margin: 0 0 0.5rem 0;
-	color: rgb(var(--black));
-	line-height: 1.2;
-}
-h1 {
-	font-size: 3.052em;
-}
-h2 {
-	font-size: 2.441em;
-}
-h3 {
-	font-size: 1.953em;
-}
-h4 {
-	font-size: 1.563em;
-}
-h5 {
-	font-size: 1.25em;
-}
-strong,
-b {
-	font-weight: 700;
-}
-a {
-	color: var(--accent);
-}
-a:hover {
-	color: var(--accent);
-}
-p {
-	margin-bottom: 1em;
-}
-.prose p {
-	margin-bottom: 2em;
-}
-textarea {
-	width: 100%;
-	font-size: 16px;
-}
-input {
-	font-size: 16px;
-}
-table {
-	width: 100%;
-}
-img {
-	max-width: 100%;
-	height: auto;
-	border-radius: 8px;
-}
-code {
-	padding: 2px 5px;
-	background-color: rgb(var(--gray-light));
-	border-radius: 2px;
-}
-pre {
-	padding: 1.5em;
-	border-radius: 8px;
-}
-pre > code {
-	all: unset;
-}
-blockquote {
-	border-left: 4px solid var(--accent);
-	padding: 0 0 0 20px;
-	margin: 0;
-	font-size: 1.333em;
-}
-hr {
-	border: none;
-	border-top: 1px solid rgb(var(--gray-light));
-}
-@media (max-width: 720px) {
-	body {
-		font-size: 18px;
-	}
-	main {
-		padding: 1em;
-	}
+/* ============================================================
+   Brand rotation — plan §3.2. `data-brand` on <html> selects the
+   active hue; every brand token below reads through it, so one
+   attribute flip re-skins the whole page.
+   ============================================================ */
+
+/* Brand scales — generated, do not hand-edit.
+   Step 500 is the owner's exact hex; the ladder is built around it in oklch.
+   `ink` = lightest step reaching 4.5:1 on white (WCAG AA body text). */
+
+/* rojizo · base #c96b65 · H 24.8° · on white 3.64:1 · ink step 600 */
+[data-brand='rojizo'] {
+  --b-50: oklch(0.980 0.016 24.8);  /* #fff5f3  1.07:1 */
+  --b-100: oklch(0.947 0.029 24.8);  /* #ffe7e4  1.18:1 */
+  --b-200: oklch(0.879 0.053 24.8);  /* #f9cac6  1.47:1 */
+  --b-300: oklch(0.808 0.079 24.8);  /* #efada7  1.87:1 */
+  --b-400: oklch(0.731 0.105 24.8);  /* #e28d87  2.50:1 */
+  --b-500: oklch(0.634 0.120 24.8);  /* #c96b65  3.64:1 */
+  --b-600: oklch(0.535 0.124 24.8);  /* #a94c48  5.51:1 */
+  --b-700: oklch(0.449 0.114 24.8);  /* #893633  7.96:1 */
+  --b-800: oklch(0.368 0.097 24.8);  /* #692624  11.03:1 */
+  --b-900: oklch(0.289 0.079 24.8);  /* #4b1716  14.65:1 */
+  --b-950: oklch(0.250 0.066 24.8);  /* #3c1211  16.32:1 */
+  --b-ink: var(--b-600);
 }
 
-.sr-only {
-	border: 0;
-	padding: 0;
-	margin: 0;
-	position: absolute !important;
-	height: 1px;
-	width: 1px;
-	overflow: hidden;
-	/* IE6, IE7 - a 0 height clip, off to the bottom right of the visible 1px box */
-	clip: rect(1px 1px 1px 1px);
-	/* maybe deprecated but we need to support legacy browsers */
-	clip: rect(1px, 1px, 1px, 1px);
-	/* modern browsers, clip-path works inwards from each corner */
-	clip-path: inset(50%);
-	/* added line to stop words getting smushed together (as they go onto separate lines and some screen readers do not understand line feeds as a space */
-	white-space: nowrap;
+/* indigo · base #6574c9 · H 274.1° · on white 4.29:1 · ink step 600 */
+[data-brand='indigo'] {
+  --b-50: oklch(0.980 0.017 274.1);  /* #f5f8ff  1.06:1 */
+  --b-100: oklch(0.942 0.031 274.1);  /* #e5ebff  1.19:1 */
+  --b-200: oklch(0.865 0.058 274.1);  /* #c7d1f9  1.51:1 */
+  --b-300: oklch(0.784 0.086 274.1);  /* #a7b5f0  2.00:1 */
+  --b-400: oklch(0.696 0.114 274.1);  /* #8797e4  2.77:1 */
+  --b-500: oklch(0.586 0.131 274.1);  /* #6574c9  4.29:1 */
+  --b-600: oklch(0.499 0.135 274.1);  /* #4d5aaf  6.18:1 */
+  --b-700: oklch(0.424 0.124 274.1);  /* #3b4591  8.59:1 */
+  --b-800: oklch(0.353 0.106 274.1);  /* #2c3471  11.43:1 */
+  --b-900: oklch(0.284 0.086 274.1);  /* #1e2454  14.63:1 */
+  --b-950: oklch(0.250 0.072 274.1);  /* #181d43  16.21:1 */
+  --b-ink: var(--b-600);
+}
+
+/* verde · base #69bf6d · H 144.9° · on white 2.26:1 · ink step 700 */
+[data-brand='verde'] {
+  --b-50: oklch(0.980 0.019 144.9);  /* #f1fcf1  1.05:1 */
+  --b-100: oklch(0.956 0.034 144.9);  /* #e3f7e3  1.12:1 */
+  --b-200: oklch(0.907 0.063 144.9);  /* #c7ecc7  1.29:1 */
+  --b-300: oklch(0.856 0.094 144.9);  /* #a9e0aa  1.51:1 */
+  --b-400: oklch(0.800 0.124 144.9);  /* #89d38b  1.79:1 */
+  --b-500: oklch(0.730 0.143 144.9);  /* #69bf6d  2.26:1 */
+  --b-600: oklch(0.606 0.147 144.9);  /* #3e9845  3.63:1 */
+  --b-700: oklch(0.499 0.136 144.9);  /* #22762b  5.68:1 */
+  --b-800: oklch(0.397 0.116 144.9);  /* #0e5619  8.88:1 */
+  --b-900: oklch(0.298 0.094 144.9);  /* #003908  13.22:1 */
+  --b-950: oklch(0.250 0.079 144.9);  /* #002b05  15.58:1 */
+  --b-ink: var(--b-700);
+}
+
+/* violeta · base #9b4ede · H 305.3° · on white 4.63:1 · ink step 500 */
+[data-brand='violeta'] {
+  --b-50: oklch(0.980 0.028 305.3);  /* #fdf4ff  1.07:1 */
+  --b-100: oklch(0.943 0.051 305.3);  /* #f4e4ff  1.21:1 */
+  --b-200: oklch(0.865 0.093 305.3);  /* #e1c4ff  1.55:1 */
+  --b-300: oklch(0.784 0.140 305.3);  /* #cea0ff  2.08:1 */
+  --b-400: oklch(0.696 0.185 305.3);  /* #b97af7  2.92:1 */
+  --b-500: oklch(0.586 0.212 305.3);  /* #9b4ede  4.63:1 */
+  --b-600: oklch(0.500 0.219 305.3);  /* #822cc3  6.78:1 */
+  --b-700: oklch(0.424 0.202 305.3);  /* #6a17a3  9.27:1 */
+  --b-800: oklch(0.353 0.172 305.3);  /* #520c80  12.19:1 */
+  --b-900: oklch(0.284 0.140 305.3);  /* #3b055f  15.30:1 */
+  --b-950: oklch(0.250 0.117 305.3);  /* #2f074d  16.69:1 */
+  --b-ink: var(--b-500);
+}
+
+/* Free-hex override written by the whitelabel picker (§6.6). It only needs to
+   move 500/ink/50 — the picker is a demo of the idea, not a scale generator. */
+[data-brand='custom'] {
+  --b-50: color-mix(in oklab, var(--b-500) 8%, white);
+  --b-100: color-mix(in oklab, var(--b-500) 16%, white);
+  --b-200: color-mix(in oklab, var(--b-500) 30%, white);
+  --b-300: color-mix(in oklab, var(--b-500) 50%, white);
+  --b-400: color-mix(in oklab, var(--b-500) 75%, white);
+  --b-600: color-mix(in oklab, var(--b-500) 82%, black);
+  --b-700: color-mix(in oklab, var(--b-500) 64%, black);
+  --b-800: color-mix(in oklab, var(--b-500) 48%, black);
+  --b-900: color-mix(in oklab, var(--b-500) 34%, black);
+  --b-950: color-mix(in oklab, var(--b-500) 26%, black);
+  --b-ink: var(--b-700);
+}
+
+@theme {
+  /* ---- type: one family, four weights ---- */
+  --font-sans: var(--font-figtree), ui-sans-serif, system-ui, sans-serif;
+
+  /* Modular scale, ratio 1.25 from a 1rem base. Fluid only where the plan
+     calls for it (marketing headings); body stays fixed so zoom behaves. */
+  --text-caption: 0.8rem;
+  --text-caption--line-height: 1.45;
+  --text-body: 1rem;
+  --text-body--line-height: 1.6;
+  --text-lead: 1.25rem;
+  --text-lead--line-height: 1.55;
+  --text-h3: 1.5625rem;
+  --text-h3--line-height: 1.25;
+  --text-h2: clamp(1.953rem, 1.55rem + 1.7vw, 2.441rem);
+  --text-h2--line-height: 1.15;
+  --text-h1: clamp(2.441rem, 1.7rem + 3.2vw, 3.815rem);
+  --text-h1--line-height: 1.08;
+  --text-display: clamp(2.75rem, 1.5rem + 5.2vw, 4.768rem);
+  --text-display--line-height: 1.02;
+
+  /* ---- neutrals: hue-agnostic, because the accent hue moves ---- */
+  --color-paper: #ffffff;
+  --color-mist: #fafbfc;
+  --color-ground: #f4f5f8;
+  --color-night: #0d1017;
+  --color-ink: #12151c;
+  --color-ink-muted: #575e6e;
+  --color-ink-faint: #6e7484;
+  --color-hair: oklch(0.2 0.01 265 / 0.07);
+  --color-hair-soft: oklch(0.2 0.01 265 / 0.045);
+
+  /* ---- brand, read through the rotation ---- */
+  --color-brand-50: var(--b-50);
+  --color-brand-100: var(--b-100);
+  --color-brand-200: var(--b-200);
+  --color-brand-300: var(--b-300);
+  --color-brand-400: var(--b-400);
+  --color-brand-500: var(--b-500);
+  --color-brand-600: var(--b-600);
+  --color-brand-700: var(--b-700);
+  --color-brand-800: var(--b-800);
+  --color-brand-900: var(--b-900);
+  --color-brand-950: var(--b-950);
+  /* Never paint text with brand-500 — see the contrast rule in the plan. */
+  --color-brand-ink: var(--b-ink);
+
+  /* ---- status: separate from the accent, and stable while it rotates ---- */
+  --color-ok: #12805c;
+  --color-ok-soft: oklch(0.55 0.11 165 / 0.12);
+
+  /* ---- elevation: shadows carry depth, borders do not ---- */
+  --shadow-e1: 0 1px 2px oklch(0.2 0.01 265 / 0.05), 0 0 0 1px oklch(0.2 0.01 265 / 0.035);
+  --shadow-e2: 0 2px 4px oklch(0.2 0.01 265 / 0.035), 0 14px 30px oklch(0.2 0.01 265 / 0.06),
+    0 0 0 1px oklch(0.2 0.01 265 / 0.028);
+  --shadow-e3: 0 10px 20px oklch(0.2 0.01 265 / 0.05), 0 30px 64px oklch(0.2 0.01 265 / 0.1),
+    0 0 0 1px oklch(0.2 0.01 265 / 0.03);
+  --shadow-ring: 0 0 0 1px oklch(0.2 0.01 265 / 0.035);
+
+  --radius-card: 22px;
+  --radius-frame: 18px;
+  --radius-soft: 16px;
+
+  --ease-out: cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    /* the sticky nav must not cover anchor targets */
+    scroll-padding-top: 5.5rem;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+  }
+
+  body {
+    background: var(--color-ground);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: 1.6;
+    font-kerning: normal;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3 { text-wrap: balance; }
+  p { text-wrap: pretty; }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brand-ink);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+}
+
+/* Page shell — 80% of the viewport, per owner direction 2026-08-19. Reading
+   measures (below) still cap paragraph width so wide screens don't produce
+   200-character lines. */
+@utility shell {
+  width: 80%;
+  margin-inline: auto;
+}
+
+@utility measure { max-width: 65ch; }
+@utility measure-lead { max-width: 52ch; }
+@utility measure-head { max-width: 19ch; }
+
+/* Uppercase micro-label — the one place letter-spacing opens up. */
+@utility label {
+  font-size: var(--text-caption);
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-ink-faint);
+}
+
+@utility nums { font-variant-numeric: tabular-nums; }
+
+/* Anything painted with a brand token carries the 1.2 s cross-fade, so the
+   whole page changes hue as one object rather than element by element. */
+@utility tint {
+  transition:
+    background-color 1200ms ease,
+    color 1200ms ease,
+    box-shadow 1200ms ease,
+    border-color 1200ms ease,
+    fill 1200ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

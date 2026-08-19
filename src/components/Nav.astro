@@ -1,0 +1,100 @@
+---
+import { Icon } from 'astro-icon/components';
+import { SITE_TITLE } from '../consts';
+
+const links = [
+	{ href: '#modulos', label: 'Módulos' },
+	{ href: '#como-funciona', label: 'Cómo funciona' },
+	{ href: '#preguntas', label: 'Preguntas' },
+];
+---
+
+<header
+	id="nav"
+	class="fixed inset-x-0 top-0 z-40 transition-[background-color,box-shadow,backdrop-filter] duration-300"
+	data-nav
+>
+	<nav class="shell flex items-center gap-6 py-4" aria-label="Principal">
+		<a href="/" class="flex items-center gap-2.5 font-bold tracking-tight">
+			<span class="tint size-6 rounded-lg bg-brand-500 shadow-[0_4px_12px_color-mix(in_oklab,var(--b-500)_35%,transparent)]"
+			></span>
+			<span class="text-lead">{SITE_TITLE}</span>
+		</a>
+
+		<div class="ml-auto hidden items-center gap-7 md:flex">
+			{
+				links.map((l) => (
+					<a href={l.href} class="text-ink-muted transition-colors hover:text-ink">
+						{l.label}
+					</a>
+				))
+			}
+			<a
+				href="#contacto"
+				class="tint rounded-full bg-brand-ink px-5 py-2.5 font-medium text-paper shadow-[0_6px_18px_color-mix(in_oklab,var(--b-500)_30%,transparent)] transition-transform hover:-translate-y-px"
+			>
+				Solicitar demo
+			</a>
+		</div>
+
+		<button
+			type="button"
+			class="ml-auto rounded-full bg-paper p-2.5 shadow-e1 md:hidden"
+			aria-expanded="false"
+			aria-controls="menu-movil"
+			aria-label="Abrir menú"
+			data-menu-btn
+		>
+			<Icon name="lucide:menu" class="size-5" />
+		</button>
+	</nav>
+
+	<div id="menu-movil" class="shell hidden pb-4 md:hidden" data-menu>
+		<div class="flex flex-col gap-1 rounded-card bg-paper p-3 shadow-e2">
+			{
+				links.map((l) => (
+					<a href={l.href} class="rounded-soft px-4 py-3 text-ink-muted hover:bg-mist hover:text-ink" data-menu-link>
+						{l.label}
+					</a>
+				))
+			}
+			<a href="#contacto" class="tint mt-1 rounded-full bg-brand-ink px-5 py-3 text-center font-medium text-paper" data-menu-link>
+				Solicitar demo
+			</a>
+		</div>
+	</div>
+</header>
+
+<script>
+	const nav = document.querySelector('[data-nav]') as HTMLElement | null;
+	const btn = document.querySelector('[data-menu-btn]') as HTMLButtonElement | null;
+	const menu = document.querySelector('[data-menu]') as HTMLElement | null;
+
+	if (nav) {
+		const solid = () => {
+			const on = window.scrollY > 80;
+			nav.classList.toggle('bg-paper/80', on);
+			nav.classList.toggle('backdrop-blur-lg', on);
+			nav.classList.toggle('shadow-e1', on);
+		};
+		solid();
+		window.addEventListener('scroll', solid, { passive: true });
+	}
+
+	if (btn && menu) {
+		const close = () => {
+			menu.classList.add('hidden');
+			btn.setAttribute('aria-expanded', 'false');
+			btn.setAttribute('aria-label', 'Abrir menú');
+		};
+		btn.addEventListener('click', () => {
+			const open = menu.classList.toggle('hidden') === false;
+			btn.setAttribute('aria-expanded', String(open));
+			btn.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
+		});
+		menu.querySelectorAll('[data-menu-link]').forEach((l) => l.addEventListener('click', close));
+		document.addEventListener('keydown', (e) => {
+			if (e.key === 'Escape') close();
+		});
+	}
+</script>

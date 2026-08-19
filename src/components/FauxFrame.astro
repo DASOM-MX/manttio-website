@@ -1,0 +1,62 @@
+---
+/**
+ * Faux product UI — plan §6.5. Built from the same tokens as the real app so it
+ * animates per element, stays crisp at any DPR, and follows the brand rotation.
+ * Deliberately not a screenshot.
+ */
+import type { Module } from '../data/modules';
+
+interface Props {
+	module: Module;
+	class?: string;
+}
+
+const { module, class: className = '' } = Astro.props;
+
+const chipClass: Record<string, string> = {
+	ok: 'bg-ok-soft text-ok',
+	act: 'bg-brand-50 text-brand-ink tint',
+	wait: 'bg-mist text-ink-muted',
+};
+---
+
+<article class={`overflow-hidden rounded-frame bg-paper shadow-e3 ${className}`}>
+	<div class="flex items-center gap-2.5 bg-mist px-4 py-2.5">
+		<span class="flex gap-1.5" aria-hidden="true">
+			<i class="block size-2 rounded-full bg-hair"></i>
+			<i class="block size-2 rounded-full bg-hair"></i>
+			<i class="block size-2 rounded-full bg-hair"></i>
+		</span>
+		<span class="text-caption text-ink-muted">{module.crumb}</span>
+	</div>
+
+	<div class="flex flex-col gap-4 px-5 pt-5 pb-6">
+		<div>
+			<h3 class="text-h3 font-semibold tracking-tight">{module.name}</h3>
+			<p class="mt-1.5 max-w-[56ch] text-caption text-ink-muted sm:text-body">{module.claim}</p>
+		</div>
+
+		<div class="flex flex-wrap gap-2.5">
+			{
+				module.stats.map((s) => (
+					<div class="min-w-[104px] rounded-soft bg-mist px-3.5 py-2 shadow-ring">
+						<div class={`nums text-h3 font-semibold ${s.hi ? 'text-brand-ink tint' : ''}`}>{s.value}</div>
+						<div class="label">{s.label}</div>
+					</div>
+				))
+			}
+		</div>
+
+		<div class="flex flex-col">
+			{
+				module.rows.map((r) => (
+					<div class="flex items-center gap-3 border-t border-hair-soft py-2.5 text-caption sm:text-body">
+						<span class="min-w-0 truncate">{r.title}</span>
+						<span class={`shrink-0 rounded-full px-2.5 py-0.5 text-caption ${chipClass[r.state]}`}>{r.chip}</span>
+						<span class="nums ml-auto shrink-0 text-caption text-ink-faint">{r.meta}</span>
+					</div>
+				))
+			}
+		</div>
+	</div>
+</article>

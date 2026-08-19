@@ -1,0 +1,108 @@
+---
+const modules = [
+	{ label: 'Reportes', locked: true },
+	{ label: 'Clientes', locked: true },
+	{ label: 'CRM', locked: false },
+	{ label: 'Equipos', locked: false },
+	{ label: 'Cotizaciones', locked: false },
+	{ label: 'Órdenes', locked: false },
+	{ label: 'Calendario', locked: false },
+	{ label: 'Almacén', locked: false },
+	{ label: 'Contratos', locked: false },
+	{ label: 'Facturación', locked: false },
+];
+---
+
+<section class="shell py-16 sm:py-24">
+	<div class="rounded-card bg-paper p-6 shadow-e2 sm:p-10">
+		<div class="grid gap-10 lg:grid-cols-[1fr_1fr] lg:items-center">
+			<div>
+				<p class="label">Modularidad</p>
+				<h2 class="measure-head mt-3 text-h1 font-semibold tracking-[-0.025em]">Activa solo lo que necesitas.</h2>
+				<p class="measure mt-4 text-lead text-ink-muted">
+					Una empresa de tres técnicos no necesita almacén ni contratos. Reportes y clientes son la base;
+					el resto se enciende cuando tu operación lo pide, y el menú de tu equipo se encoge con ello.
+				</p>
+				<p class="mt-4 text-caption text-ink-faint">
+					Pruébalo: apaga módulos y mira cómo queda el menú.
+				</p>
+			</div>
+
+			<div class="grid gap-4 sm:grid-cols-[1fr_auto] sm:items-start">
+				<div class="flex flex-wrap gap-2">
+					{
+						modules.map((m) => (
+							<button
+								type="button"
+								class="toggle"
+								data-toggle
+								data-locked={m.locked ? 'true' : 'false'}
+								aria-pressed="true"
+								disabled={m.locked}
+							>
+								{m.label}
+							</button>
+						))
+					}
+				</div>
+
+				<div class="w-full rounded-frame bg-mist p-3 shadow-ring sm:w-44">
+					<p class="label mb-2 px-1">Menú</p>
+					<ul class="flex flex-col gap-1" data-menu-preview></ul>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<style>
+	.toggle {
+		border-radius: 999px;
+		padding: 0.5rem 1rem;
+		font-size: 0.9rem;
+		background: var(--color-brand-50);
+		color: var(--color-brand-ink);
+		box-shadow: var(--shadow-ring);
+		cursor: pointer;
+		transition:
+			background-color 1200ms ease,
+			color 1200ms ease,
+			opacity 200ms ease;
+	}
+	.toggle[aria-pressed='false'] {
+		background: var(--color-mist);
+		color: var(--color-ink-faint);
+		text-decoration: line-through;
+	}
+	.toggle:disabled {
+		cursor: default;
+	}
+</style>
+
+<script>
+	const toggles = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-toggle]'));
+	const preview = document.querySelector<HTMLElement>('[data-menu-preview]');
+
+	function render() {
+		if (!preview) return;
+		preview.innerHTML = '';
+		toggles
+			.filter((t) => t.getAttribute('aria-pressed') === 'true')
+			.forEach((t) => {
+				const li = document.createElement('li');
+				li.className = 'rounded-lg bg-paper px-3 py-1.5 text-caption shadow-ring';
+				li.textContent = t.textContent!.trim();
+				preview.appendChild(li);
+			});
+	}
+
+	toggles.forEach((t) => {
+		t.addEventListener('click', () => {
+			if (t.dataset.locked === 'true') return;
+			t.setAttribute('aria-pressed', String(t.getAttribute('aria-pressed') !== 'true'));
+			render();
+		});
+	});
+
+	render();
+</script>

@@ -1,0 +1,71 @@
+---
+import { Icon } from 'astro-icon/components';
+import { CONTACT, SITE_TITLE } from '../consts';
+
+const year = new Date().getFullYear();
+const wa = CONTACT.whatsapp.replace(/[^0-9]/g, '');
+---
+
+<section id="contacto" class="bg-night text-paper">
+	<div class="shell py-20 sm:py-28">
+		<div class="grid gap-12 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
+			<div>
+				<p class="label !text-white/55">Solicitar demo</p>
+				<h2 class="measure-head mt-3 text-h1 font-semibold tracking-[-0.025em]">
+					Te la enseñamos con tus propios servicios.
+				</h2>
+				<p class="measure mt-5 text-lead text-white/65">
+					Media hora, sin presentación genérica: llegamos con tu catálogo cargado y te mostramos cómo se
+					vería tu operación adentro. Si no encaja, te lo decimos ahí mismo.
+				</p>
+
+				<div class="mt-10 flex flex-col gap-3 sm:flex-row">
+					<a
+						href={`https://wa.me/${wa}`}
+						class="inline-flex items-center justify-center gap-2.5 rounded-full bg-paper px-7 py-3.5 font-medium text-ink transition-transform hover:-translate-y-px"
+					>
+						<Icon name="lucide:message-circle" class="size-4" />
+						Escríbenos por WhatsApp
+					</a>
+					<a
+						href={`mailto:${CONTACT.email}`}
+						class="inline-flex items-center justify-center gap-2.5 rounded-full bg-white/10 px-7 py-3.5 font-medium text-paper ring-1 ring-white/15 transition-colors hover:bg-white/15"
+					>
+						<Icon name="lucide:mail" class="size-4" />
+						{CONTACT.email}
+					</a>
+				</div>
+				<!-- TODO(plan CP-4): formulario /demo + captura UTM cuando se decida el destino del lead. -->
+			</div>
+
+			<dl class="grid grid-cols-2 gap-x-6 gap-y-8 self-start rounded-card bg-white/[0.04] p-7 ring-1 ring-white/10">
+				<div>
+					<dt class="label !text-white/55">Implementación</dt>
+					<dd class="mt-1.5 font-medium">Con tus datos cargados</dd>
+				</div>
+				<div>
+					<dt class="label !text-white/55">Marca</dt>
+					<dd class="mt-1.5 font-medium">La tuya, en todo</dd>
+				</div>
+				<div>
+					<dt class="label !text-white/55">Campo</dt>
+					<dd class="mt-1.5 font-medium">Funciona sin señal</dd>
+				</div>
+				<div>
+					<dt class="label !text-white/55">Módulos</dt>
+					<dd class="mt-1.5 font-medium">Enciendes los que usas</dd>
+				</div>
+			</dl>
+		</div>
+
+		<footer class="mt-20 flex flex-col gap-4 border-t border-white/10 pt-8 text-caption text-white/55 sm:flex-row sm:items-center sm:justify-between">
+			<p>© {year} {SITE_TITLE}. Todos los derechos reservados.</p>
+			<nav class="flex flex-wrap gap-x-6 gap-y-2" aria-label="Pie de página">
+				<a href="#modulos" class="hover:text-white/80">Módulos</a>
+				<a href="#tu-marca" class="hover:text-white/80">Tu marca</a>
+				<a href="#preguntas" class="hover:text-white/80">Preguntas</a>
+				<a href="/aviso-de-privacidad" class="hover:text-white/80">Aviso de privacidad</a>
+			</nav>
+		</footer>
+	</div>
+</section>
