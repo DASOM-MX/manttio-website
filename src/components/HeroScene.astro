@@ -6,8 +6,9 @@
  * scroll, and locks as the exact frame the module rail then drives — so the
  * hero doesn't hand off to the showcase, it *becomes* it.
  *
- * Desktop only. On a phone the scene collapses to plain flow: full-height hero,
- * then the rail as chips over a snap carousel.
+ * On a phone there is no grow phase: the hero stays in normal flow and the
+ * modules get their own sticky scene below it — locked to the viewport,
+ * full-bleed, one panel per screenful of scroll.
  */
 import { Icon } from 'astro-icon/components';
 import { MODULES } from '../data/modules';
@@ -18,13 +19,15 @@ const steps = MODULES.length;
 /** Scroll budget, in vh, for each phase after the initial viewport. */
 const GROW = 60;
 const STEP = 38;
+/** Mobile has no grow phase, just one locked viewport per module. */
+const MSTEP = 42;
 
 ---
 
 <section
 	id="inicio"
 	class="scene"
-	style={`--steps:${steps}; --grow:${GROW}; --step:${STEP}`}
+	style={`--steps:${steps}; --grow:${GROW}; --step:${STEP}; --mstep:${MSTEP}`}
 	data-scene
 	data-scene-grow={GROW}
 	data-scene-step={STEP}
@@ -66,56 +69,81 @@ const STEP = 38;
 			</div>
 		</div>
 
-		<!-- ---------- module rail (fades in once the frame locks) ---------- -->
-		<div class="rail-wrap shell" data-rail-wrap>
-			<div class="rail-inner">
-				<div class="mb-7">
-					<p class="label">Los módulos</p>
-					<h2 id="modulos" class="mt-3 text-h2 font-semibold tracking-[-0.025em]">
-						Once piezas. Enciendes las que usas.
-					</h2>
-				</div>
-
-				<div class="rail" role="tablist" aria-label="Módulos de Manttio">
-					{
-						MODULES.map((m, i) => (
-							<button
-								type="button"
-								role="tab"
-								id={`tab-${m.id}`}
-								aria-controls={`panel-${m.id}`}
-								aria-selected={i === 0 ? 'true' : 'false'}
-								tabindex={i === 0 ? 0 : -1}
-								class="rail-item"
-								data-rail-item
-							>
-								<Icon name={m.icon} class="size-[17px] shrink-0" />
-								<span class="whitespace-nowrap">{m.name}</span>
-								{!m.shipped && <span class="soon">Próximamente</span>}
-							</button>
-						))
-					}
-				</div>
-			</div>
-		</div>
-
-		<!-- ---------- the frame: small in the hero, locked as the stage ---------- -->
-		<div class="frame-slot shell" aria-hidden="false">
-			<div class="frame" data-frame>
-				{
-					MODULES.map((m, i) => (
-						<div
-							class="panel"
-							id={`panel-${m.id}`}
-							role="tabpanel"
-							aria-labelledby={`tab-${m.id}`}
-							data-panel
-							aria-hidden={i === 0 ? 'false' : 'true'}
-						>
-							<AppShot module={m} loading={i === 0 ? 'eager' : 'lazy'} />
+		<!-- ---------- modules: rail + frame ----------
+		     Desktop: the wrappers are display:contents, so both children keep
+		     positioning against the sticky stage. Mobile: the wrappers ARE the
+		     scene — .mod carries the scroll budget, .mod-stage locks to the
+		     viewport while the panels cross-fade. -->
+		<div class="mod" data-mod>
+			<div class="mod-stage">
+				<!-- ---------- module rail (fades in once the frame locks) ---------- -->
+				<div class="rail-wrap shell" data-rail-wrap>
+					<div class="rail-inner">
+						<div class="mb-7">
+							<p class="label">Los módulos</p>
+							<h2 id="modulos" class="mt-3 text-h2 font-semibold tracking-[-0.025em]">
+								Once piezas. Enciendes las que usas.
+							</h2>
 						</div>
-					))
-				}
+
+						<!-- Mobile: the chips are gone, this names what is on screen. -->
+						<p class="now" aria-hidden="true">
+							{
+								MODULES.map((m, i) => (
+									<span class="now-item" data-now-item data-active={i === 0 ? true : undefined}>
+										<Icon name={m.icon} class="size-[18px] shrink-0" />
+										<span class="now-name">{m.name}</span>
+										<span class="now-i">
+											{String(i + 1).padStart(2, '0')}/{String(steps).padStart(2, '0')}
+										</span>
+									</span>
+								))
+							}
+						</p>
+
+						<div class="rail" role="tablist" aria-label="Módulos de Manttio">
+							{
+								MODULES.map((m, i) => (
+									<button
+										type="button"
+										role="tab"
+										id={`tab-${m.id}`}
+										aria-controls={`panel-${m.id}`}
+										aria-selected={i === 0 ? 'true' : 'false'}
+										tabindex={i === 0 ? 0 : -1}
+										class="rail-item"
+										data-rail-item
+									>
+										<Icon name={m.icon} class="size-[17px] shrink-0" />
+										<span class="whitespace-nowrap">{m.name}</span>
+										{!m.shipped && <span class="soon">Próximamente</span>}
+									</button>
+								))
+							}
+						</div>
+					</div>
+				</div>
+
+				<!-- ---------- the frame: small in the hero, locked as the stage ---------- -->
+				<div class="frame-slot shell" aria-hidden="false">
+					<div class="frame" data-frame>
+						{
+							MODULES.map((m, i) => (
+								<div
+									class="panel"
+									id={`panel-${m.id}`}
+									role="tabpanel"
+									aria-labelledby={`tab-${m.id}`}
+									data-panel
+									data-active={i === 0 ? true : undefined}
+									aria-hidden={i === 0 ? 'false' : 'true'}
+								>
+									<AppShot module={m} loading={i === 0 ? 'eager' : 'lazy'} />
+								</div>
+							))
+						}
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -123,8 +151,7 @@ const STEP = 38;
 
 <style>
 	/* ------------------------------------------------------------------
-	   Mobile first: no scene at all. Hero in normal flow, then chips over a
-	   snap carousel — what a thumb actually wants.
+	   Shared
 	   ------------------------------------------------------------------ */
 	.hero {
 		display: flex;
@@ -138,9 +165,6 @@ const STEP = 38;
 		max-width: 46ch;
 	}
 
-	.rail-wrap {
-		padding-block: 3rem 1rem;
-	}
 	.rail {
 		display: flex;
 		gap: 0.5rem;
@@ -182,29 +206,130 @@ const STEP = 38;
 		padding: 0.05rem 0.45rem;
 	}
 
-	.frame-slot {
-		padding-bottom: 4rem;
-	}
-	.frame {
-		display: flex;
-		gap: 1rem;
-		overflow-x: auto;
-		scroll-snap-type: x mandatory;
-		scrollbar-width: none;
-	}
-	.frame::-webkit-scrollbar {
-		display: none;
-	}
 	.panel {
-		flex: 0 0 100%;
-		min-width: 0;
-		scroll-snap-align: center;
+		opacity: 0;
+		transition: opacity 320ms ease;
+	}
+	.panel[data-active] {
+		opacity: 1;
+	}
+
+	/* ------------------------------------------------------------------
+	   Mobile: hero in flow, then the modules lock to the viewport and the
+	   panels switch on scroll. Full-bleed, 2px off the edge.
+	   ------------------------------------------------------------------ */
+	@media (max-width: 1023.98px) {
+		.mod {
+			position: relative;
+			height: calc((100 + var(--steps) * var(--mstep)) * 1svh);
+		}
+		.mod-stage {
+			position: sticky;
+			top: 0;
+			display: flex;
+			height: 100svh;
+			flex-direction: column;
+			overflow: hidden;
+			padding-block: 5.5rem 1.25rem;
+		}
+
+		.rail-wrap {
+			flex: 0 0 auto;
+			width: 100%;
+			margin-inline: 0;
+			padding-inline: 1.25rem;
+		}
+		/* The chips are what the scroll replaced. */
+		.rail {
+			display: none;
+		}
+
+		.now {
+			display: grid;
+			margin-top: 1.5rem;
+		}
+		.now-item {
+			grid-area: 1 / 1;
+			display: flex;
+			align-items: center;
+			gap: 0.6rem;
+			font-weight: 600;
+			opacity: 0;
+			transition: opacity 260ms ease;
+		}
+		.now-item[data-active] {
+			opacity: 1;
+		}
+		.now-name {
+			min-width: 0;
+		}
+		.now-i {
+			margin-left: auto;
+			padding-left: 0.75rem;
+			font-size: var(--text-caption);
+			font-weight: 400;
+			font-variant-numeric: tabular-nums;
+			color: var(--color-ink-faint);
+		}
+
+		.frame-slot {
+			display: grid;
+			/* Both tracks capped, or the widest panel's min-content widens the
+			   column and every shot bleeds past the 2px. */
+			grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+			flex: 1;
+			min-height: 0;
+			width: 100%;
+			margin-inline: 0;
+			padding: 0;
+		}
+		.frame {
+			display: grid;
+			grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+			min-height: 0;
+		}
+		.panel {
+			grid-area: 1 / 1;
+			display: flex;
+			min-height: 0;
+			align-items: center;
+			justify-content: center;
+			padding: 2px;
+		}
+		/* Fit the shot to whatever height is left, ratio intact. The wrapper
+		   around a phone-shaped shot needs a definite height of its own or the
+		   image's max-height has nothing to resolve against. */
+		.panel > :global(*) {
+			max-height: 100%;
+		}
+		.panel > :global(div) {
+			display: flex;
+			height: 100%;
+			align-items: center;
+			justify-content: center;
+		}
+		.panel :global(img) {
+			width: auto;
+			height: auto;
+			max-width: 100%;
+			max-height: 100%;
+		}
 	}
 
 	/* ------------------------------------------------------------------
 	   Desktop: one sticky stage, scroll-driven.
 	   ------------------------------------------------------------------ */
 	@media (min-width: 1024px) {
+		/* The mobile scene shell disappears so the rail and frame keep
+		   positioning against the sticky stage. */
+		.mod,
+		.mod-stage {
+			display: contents;
+		}
+		.now {
+			display: none;
+		}
+
 		.scene {
 			height: calc(100vh + (var(--grow) + var(--steps) * var(--step)) * 1vh);
 		}
@@ -302,18 +427,16 @@ const STEP = 38;
 		}
 		.panel {
 			grid-area: 1 / 1;
-			opacity: 0;
-			transition: opacity 320ms ease;
 			pointer-events: none;
 		}
 		.panel[data-active] {
-			opacity: 1;
 			pointer-events: auto;
 		}
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.panel {
+		.panel,
+		.now-item {
 			transition: none;
 		}
 	}
@@ -327,8 +450,10 @@ const STEP = 38;
 	const hero = scene?.querySelector<HTMLElement>('[data-hero]');
 	const railWrap = scene?.querySelector<HTMLElement>('[data-rail-wrap]');
 	const frame = scene?.querySelector<HTMLElement>('[data-frame]');
+	const mod = scene?.querySelector<HTMLElement>('[data-mod]');
 	const title = scene?.querySelector<HTMLElement>('h1');
 	const items = Array.from(scene?.querySelectorAll<HTMLElement>('[data-rail-item]') ?? []);
+	const nowItems = Array.from(scene?.querySelectorAll<HTMLElement>('[data-now-item]') ?? []);
 	const panels = Array.from(scene?.querySelectorAll<HTMLElement>('[data-panel]') ?? []);
 	const count = panels.length;
 	const desktop = window.matchMedia('(min-width: 1024px)');
@@ -345,12 +470,12 @@ const STEP = 38;
 			el.setAttribute('aria-selected', String(on));
 			el.tabIndex = on ? 0 : -1;
 			if (on && focusRail) el.focus();
-			if (on && !desktop.matches) el.scrollIntoView({ block: 'nearest', inline: 'center' });
 		});
+		nowItems.forEach((el, idx) => el.toggleAttribute('data-active', idx === next));
 		panels.forEach((el, idx) => {
 			const on = idx === next;
 			el.toggleAttribute('data-active', on);
-			el.setAttribute('aria-hidden', desktop.matches ? String(!on) : 'false');
+			el.setAttribute('aria-hidden', String(!on));
 		});
 	}
 	select(0);
@@ -431,35 +556,44 @@ const STEP = 38;
 		railWrap.style.pointerEvents = '';
 	}
 
+	/** Progress through the mobile modules scene, 0…1. */
+	function modProgress() {
+		if (!mod) return 0;
+		const travel = mod.offsetHeight - window.innerHeight;
+		if (travel <= 0) return 0;
+		return clamp01(-mod.getBoundingClientRect().top / travel);
+	}
+
 	let ticking = false;
 	function onScroll() {
 		if (ticking || !scene) return;
 		ticking = true;
 		requestAnimationFrame(() => {
 			ticking = false;
-			const travel = scene.offsetHeight - window.innerHeight;
-			if (travel <= 0) return;
-			apply(clamp01((window.scrollY - scene.offsetTop) / travel));
+			if (desktop.matches) {
+				if (prefersReduced()) return;
+				const travel = scene.offsetHeight - window.innerHeight;
+				if (travel <= 0) return;
+				apply(clamp01((window.scrollY - scene.offsetTop) / travel));
+			} else {
+				// No grow phase here — scroll only picks the panel. The lock is
+				// pure sticky, so it stands with reduced motion too.
+				select(Math.floor(modProgress() * count * 0.999));
+			}
 		});
 	}
 
 	function start() {
-		if (!desktop.matches || prefersReduced()) {
-			reset();
-			window.removeEventListener('scroll', onScroll);
-			select(0);
-			return;
-		}
-		measure();
+		if (desktop.matches && !prefersReduced()) measure();
+		else reset();
 		onScroll();
-		window.addEventListener('scroll', onScroll, { passive: true });
 	}
 
 	start();
+	window.addEventListener('scroll', onScroll, { passive: true });
 	desktop.addEventListener('change', start);
 	window.addEventListener('resize', () => {
-		if (!desktop.matches || prefersReduced()) return;
-		measure();
+		if (desktop.matches && !prefersReduced()) measure();
 		onScroll();
 	});
 
@@ -470,9 +604,10 @@ const STEP = 38;
 				const travel = scene.offsetHeight - window.innerHeight;
 				const p = geo.growEnd + ((i + 0.5) / count) * (1 - geo.growEnd);
 				window.scrollTo({ top: scene.offsetTop + travel * p, behavior: 'smooth' });
-			} else {
-				panels[i]?.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
-				select(i);
+			} else if (mod) {
+				const travel = mod.offsetHeight - window.innerHeight;
+				const top = mod.getBoundingClientRect().top + window.scrollY;
+				window.scrollTo({ top: top + travel * ((i + 0.5) / count), behavior: 'smooth' });
 			}
 		});
 		el.addEventListener('keydown', (e) => {
@@ -486,43 +621,22 @@ const STEP = 38;
 		});
 	});
 
-	/* "Ver los módulos" / nav "Módulos" should land where the frame locks, not
-	   at the top of the scene — the anchor sits inside a sticky container. */
+	/* "Ver los módulos" / nav "Módulos" should land where the modules lock, not
+	   on the h2 — that heading lives inside a sticky container, so the browser's
+	   own anchor jump lands somewhere arbitrary. */
 	document.querySelectorAll<HTMLAnchorElement>('a[href="#modulos"]').forEach((a) => {
 		a.addEventListener('click', (e) => {
-			if (!scene || !desktop.matches) return;
-			e.preventDefault();
-			const travel = scene.offsetHeight - window.innerHeight;
-			window.scrollTo({
-				top: scene.offsetTop + travel * geo.growEnd + 2,
-				behavior: prefersReduced() ? 'auto' : 'smooth',
-			});
+			if (!scene) return;
+			const behavior = prefersReduced() ? 'auto' : 'smooth';
+			if (desktop.matches) {
+				e.preventDefault();
+				const travel = scene.offsetHeight - window.innerHeight;
+				window.scrollTo({ top: scene.offsetTop + travel * geo.growEnd + 2, behavior });
+			} else if (mod) {
+				e.preventDefault();
+				window.scrollTo({ top: mod.getBoundingClientRect().top + window.scrollY + 2, behavior });
+			}
 		});
 	});
 
-	/* Mobile: the carousel decides which chip is lit. */
-	if (frame) {
-		let raf = 0;
-		frame.addEventListener(
-			'scroll',
-			() => {
-				if (desktop.matches || raf) return;
-				raf = requestAnimationFrame(() => {
-					raf = 0;
-					const mid = frame.scrollLeft + frame.clientWidth / 2;
-					let best = 0;
-					let bestD = Infinity;
-					panels.forEach((pnl, i) => {
-						const d = Math.abs(pnl.offsetLeft + pnl.offsetWidth / 2 - mid);
-						if (d < bestD) {
-							bestD = d;
-							best = i;
-						}
-					});
-					select(best);
-				});
-			},
-			{ passive: true },
-		);
-	}
 </script>
