@@ -1,0 +1,71 @@
+---
+const steps = [
+	{ n: '01', title: 'Configuramos tu marca', body: 'Nombre, logotipo y colores. Tu instancia queda lista con tu identidad, no con la nuestra.' },
+	{ n: '02', title: 'Cargamos tus clientes', body: 'Importamos tu cartera y tu catálogo de servicios con sus precios y unidades.' },
+	{ n: '03', title: 'Tus técnicos capturan', body: 'Desde el celular, con o sin señal. El reporte se cierra con la firma del cliente.' },
+	{ n: '04', title: 'Tú cobras y das seguimiento', body: 'Reportes cerrados que se convierten en cobro, y clientes que no se te olvidan.' },
+];
+---
+
+<section id="como-funciona" class="shell py-16 sm:py-24">
+	<p class="label" data-reveal-h>Cómo funciona</p>
+	<h2 class="measure-head mt-3 text-h1 font-semibold tracking-[-0.025em]" data-reveal-h>
+		De la primera llamada al primer cobro.
+	</h2>
+
+	<div class="relative mt-12">
+		<!-- connector: the one non-transform animation the plan sanctions -->
+		<svg
+			class="pointer-events-none absolute inset-x-0 top-6 hidden h-px w-full md:block"
+			viewBox="0 0 1000 1"
+			preserveAspectRatio="none"
+			aria-hidden="true"
+		>
+			<line
+				x1="0"
+				y1="0.5"
+				x2="1000"
+				y2="0.5"
+				stroke="currentColor"
+				class="tint text-brand-300"
+				stroke-width="2"
+				stroke-dasharray="1000"
+				stroke-dashoffset="1000"
+				data-connector
+			></line>
+		</svg>
+
+		<ol class="grid gap-8 md:grid-cols-4 md:gap-6">
+			{
+				steps.map((s) => (
+					<li data-step>
+						<span class="tint nums relative z-10 grid size-12 place-items-center rounded-full bg-brand-ink font-semibold text-paper">
+							{s.n}
+						</span>
+						<h3 class="mt-5 text-h3 font-semibold tracking-tight">{s.title}</h3>
+						<p class="mt-2 text-ink-muted">{s.body}</p>
+					</li>
+				))
+			}
+		</ol>
+	</div>
+</section>
+
+<script>
+	import { animate, inView } from 'motion';
+	import { prefersReduced, reveal, revealStagger } from '../scripts/motion';
+
+	reveal('[data-reveal-h]');
+	revealStagger('[data-step]');
+
+	const line = document.querySelector('[data-connector]');
+	if (line) {
+		if (prefersReduced()) {
+			(line as SVGElement).setAttribute('stroke-dashoffset', '0');
+		} else {
+			inView(line, () => {
+				animate(line, { strokeDashoffset: [1000, 0] }, { duration: 0.9, ease: [0.2, 0.7, 0.3, 1] });
+			});
+		}
+	}
+</script>

@@ -1,0 +1,48 @@
+---
+/**
+ * A module's visual: the real app where we have a capture, the HTML faux-UI
+ * where we don't. Captures come from the screenshot harnesses in the
+ * whitelabeled repo and only exist for shipped modules — so the fallback and
+ * the "Próximamente" chip always agree with each other.
+ */
+import { Image } from 'astro:assets';
+import type { Module } from '../data/modules';
+import FauxFrame from './FauxFrame.astro';
+
+interface Props {
+	module: Module;
+	class?: string;
+	loading?: 'eager' | 'lazy';
+}
+
+const { module, class: className = '', loading = 'lazy' } = Astro.props;
+const alt = `${module.name} en Manttio`;
+---
+
+{
+	module.shot ? (
+		module.shotKind === 'mobile' ? (
+			<div class={`mx-auto w-full max-w-[268px] ${className}`}>
+				<Image
+					src={module.shot}
+					alt={alt}
+					widths={[268, 536]}
+					sizes="268px"
+					loading={loading}
+					class="w-full rounded-[2rem] shadow-e3"
+				/>
+			</div>
+		) : (
+			<Image
+				src={module.shot}
+				alt={alt}
+				widths={[720, 1080, 1440]}
+				sizes="(min-width: 1024px) 46vw, 88vw"
+				loading={loading}
+				class={`w-full rounded-frame shadow-e3 ${className}`}
+			/>
+		)
+	) : (
+		<FauxFrame module={module} class={className} />
+	)
+}

@@ -1,0 +1,528 @@
+---
+/**
+ * Hero + module showcase as one continuous scroll scene.
+ *
+ * The product frame starts small in the hero's top-right, scales up as you
+ * scroll, and locks as the exact frame the module rail then drives — so the
+ * hero doesn't hand off to the showcase, it *becomes* it.
+ *
+ * Desktop only. On a phone the scene collapses to plain flow: full-height hero,
+ * then the rail as chips over a snap carousel.
+ */
+import { Icon } from 'astro-icon/components';
+import { MODULES } from '../data/modules';
+import AppShot from './AppShot.astro';
+
+const steps = MODULES.length;
+
+/** Scroll budget, in vh, for each phase after the initial viewport. */
+const GROW = 60;
+const STEP = 38;
+
+---
+
+<section
+	id="inicio"
+	class="scene"
+	style={`--steps:${steps}; --grow:${GROW}; --step:${STEP}`}
+	data-scene
+	data-scene-grow={GROW}
+	data-scene-step={STEP}
+>
+	<div class="stage">
+		<!-- brand glows, same as before -->
+		<div class="pointer-events-none absolute inset-0 -z-10 overflow-hidden" aria-hidden="true">
+			<span class="tint absolute -top-40 -left-24 size-[34rem] rounded-full bg-brand-400 opacity-[0.18] blur-[90px]"></span>
+			<span class="tint absolute top-10 -right-20 size-[26rem] rounded-full bg-brand-300 opacity-[0.16] blur-[90px]"></span>
+		</div>
+
+		<!-- ---------- hero copy ---------- -->
+		<div class="hero shell" data-hero>
+			<h1 class="text-hero font-semibold tracking-[-0.04em]">Tu negocio en un solo lugar.</h1>
+
+			<!-- description + CTAs, left, directly under the title -->
+			<div class="hero-copy">
+				<p class="text-lead text-ink-muted">
+					Hoy tu operación vive en WhatsApp, Excel y la cabeza de tu jefe de cuadrilla. Manttio la
+					junta: clientes, cotizaciones, visitas, reportes firmados y material. Con la marca de tu
+					empresa, no con la nuestra.
+				</p>
+				<div class="mt-8 flex flex-col gap-3 sm:flex-row">
+					<a
+						href="#contacto"
+						class="tint inline-flex items-center justify-center gap-2 rounded-full bg-brand-ink px-7 py-3.5 font-medium text-paper shadow-[0_10px_28px_color-mix(in_oklab,var(--b-500)_32%,transparent)]"
+						data-magnetic
+					>
+						Solicitar demo
+						<Icon name="lucide:arrow-right" class="size-4" />
+					</a>
+					<a
+						href="#modulos"
+						class="inline-flex items-center justify-center rounded-full bg-paper px-7 py-3.5 font-medium shadow-e1 transition-transform hover:-translate-y-px"
+					>
+						Ver los módulos
+					</a>
+				</div>
+			</div>
+		</div>
+
+		<!-- ---------- module rail (fades in once the frame locks) ---------- -->
+		<div class="rail-wrap shell" data-rail-wrap>
+			<div class="rail-inner">
+				<div class="mb-7">
+					<p class="label">Los módulos</p>
+					<h2 id="modulos" class="mt-3 text-h2 font-semibold tracking-[-0.025em]">
+						Once piezas. Enciendes las que usas.
+					</h2>
+				</div>
+
+				<div class="rail" role="tablist" aria-label="Módulos de Manttio">
+					{
+						MODULES.map((m, i) => (
+							<button
+								type="button"
+								role="tab"
+								id={`tab-${m.id}`}
+								aria-controls={`panel-${m.id}`}
+								aria-selected={i === 0 ? 'true' : 'false'}
+								tabindex={i === 0 ? 0 : -1}
+								class="rail-item"
+								data-rail-item
+							>
+								<Icon name={m.icon} class="size-[17px] shrink-0" />
+								<span class="whitespace-nowrap">{m.name}</span>
+								{!m.shipped && <span class="soon">Próximamente</span>}
+							</button>
+						))
+					}
+				</div>
+			</div>
+		</div>
+
+		<!-- ---------- the frame: small in the hero, locked as the stage ---------- -->
+		<div class="frame-slot shell" aria-hidden="false">
+			<div class="frame" data-frame>
+				{
+					MODULES.map((m, i) => (
+						<div
+							class="panel"
+							id={`panel-${m.id}`}
+							role="tabpanel"
+							aria-labelledby={`tab-${m.id}`}
+							data-panel
+							aria-hidden={i === 0 ? 'false' : 'true'}
+						>
+							<AppShot module={m} loading={i === 0 ? 'eager' : 'lazy'} />
+						</div>
+					))
+				}
+			</div>
+		</div>
+	</div>
+</section>
+
+<style>
+	/* ------------------------------------------------------------------
+	   Mobile first: no scene at all. Hero in normal flow, then chips over a
+	   snap carousel — what a thumb actually wants.
+	   ------------------------------------------------------------------ */
+	.hero {
+		display: flex;
+		min-height: 100svh;
+		flex-direction: column;
+		justify-content: flex-start;
+		gap: 2.75rem;
+		padding-block: 7.5rem 3rem;
+	}
+	.hero-copy {
+		max-width: 46ch;
+	}
+
+	.rail-wrap {
+		padding-block: 3rem 1rem;
+	}
+	.rail {
+		display: flex;
+		gap: 0.5rem;
+		overflow-x: auto;
+		scroll-snap-type: x mandatory;
+		padding-bottom: 0.5rem;
+		scrollbar-width: none;
+	}
+	.rail::-webkit-scrollbar {
+		display: none;
+	}
+	.rail-item {
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
+		flex: 0 0 auto;
+		scroll-snap-align: start;
+		border-radius: 999px;
+		padding: 0.6rem 1rem;
+		color: var(--color-ink-muted);
+		background: var(--color-paper);
+		box-shadow: var(--shadow-ring);
+		cursor: pointer;
+		transition:
+			color 200ms ease,
+			box-shadow 200ms ease;
+	}
+	.rail-item[aria-selected='true'] {
+		color: var(--color-ink);
+		box-shadow: var(--shadow-e1);
+	}
+	.rail-item .soon {
+		font-size: 0.6875rem;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		color: var(--color-ink-faint);
+		background: var(--color-mist);
+		border-radius: 999px;
+		padding: 0.05rem 0.45rem;
+	}
+
+	.frame-slot {
+		padding-bottom: 4rem;
+	}
+	.frame {
+		display: flex;
+		gap: 1rem;
+		overflow-x: auto;
+		scroll-snap-type: x mandatory;
+		scrollbar-width: none;
+	}
+	.frame::-webkit-scrollbar {
+		display: none;
+	}
+	.panel {
+		flex: 0 0 100%;
+		min-width: 0;
+		scroll-snap-align: center;
+	}
+
+	/* ------------------------------------------------------------------
+	   Desktop: one sticky stage, scroll-driven.
+	   ------------------------------------------------------------------ */
+	@media (min-width: 1024px) {
+		.scene {
+			height: calc(100vh + (var(--grow) + var(--steps) * var(--step)) * 1vh);
+		}
+		.stage {
+			position: sticky;
+			top: 0;
+			height: 100vh;
+			overflow: hidden;
+		}
+
+		.hero {
+			position: absolute;
+			inset: 0;
+			min-height: 0;
+			padding-block: 9rem 2rem; /* 32px off the bottom */
+			will-change: opacity, transform;
+		}
+		/* Image takes the left of the space under the title, copy the right. */
+		.hero-copy {
+			align-self: flex-end;
+			margin-top: auto; /* push to the bottom of the hero */
+		}
+
+		.rail-wrap {
+			position: absolute;
+			inset-block: 0;
+			left: 50%;
+			translate: -50% 0;
+			display: flex;
+			align-items: center;
+			padding-block: 0;
+			opacity: 0;
+			pointer-events: none;
+			will-change: opacity;
+		}
+		.rail-inner {
+			width: min(300px, 26%);
+		}
+		.rail {
+			flex-direction: column;
+			gap: 2px;
+			overflow: visible;
+			padding-bottom: 0;
+		}
+		.rail-item {
+			position: relative;
+			border-radius: 12px;
+			background: transparent;
+			box-shadow: none;
+			padding: 0.65rem 0.85rem;
+		}
+		.rail-item:hover {
+			color: var(--color-ink);
+			background: var(--color-paper);
+		}
+		.rail-item[aria-selected='true'] {
+			background: var(--color-paper);
+			box-shadow: var(--shadow-e1);
+		}
+		.rail-item[aria-selected='true']::before {
+			content: '';
+			position: absolute;
+			left: -0.55rem;
+			top: 25%;
+			bottom: 25%;
+			width: 3px;
+			border-radius: 3px;
+			background: var(--color-brand-500);
+			transition: background-color 1200ms ease;
+		}
+		.rail-item .soon {
+			margin-left: auto;
+		}
+
+		/* The frame's LOCKED position. Script measures this, then transforms the
+		   frame back to a small box in the hero's top-right for progress 0. */
+		.frame-slot {
+			position: absolute;
+			inset-block: 0;
+			left: 50%;
+			translate: -50% 0;
+			display: flex;
+			align-items: center;
+			justify-content: flex-end;
+			padding-bottom: 0;
+			pointer-events: none;
+		}
+		.frame {
+			display: grid;
+			width: 58%;
+			overflow: visible;
+			transform-origin: center center;
+			will-change: transform;
+			pointer-events: auto;
+		}
+		.panel {
+			grid-area: 1 / 1;
+			opacity: 0;
+			transition: opacity 320ms ease;
+			pointer-events: none;
+		}
+		.panel[data-active] {
+			opacity: 1;
+			pointer-events: auto;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.panel {
+			transition: none;
+		}
+	}
+</style>
+
+<script>
+	import { magnetic, prefersReduced } from '../scripts/motion';
+
+	const scene = document.querySelector<HTMLElement>('[data-scene]');
+	const stage = scene?.querySelector<HTMLElement>('.stage');
+	const hero = scene?.querySelector<HTMLElement>('[data-hero]');
+	const railWrap = scene?.querySelector<HTMLElement>('[data-rail-wrap]');
+	const frame = scene?.querySelector<HTMLElement>('[data-frame]');
+	const title = scene?.querySelector<HTMLElement>('h1');
+	const items = Array.from(scene?.querySelectorAll<HTMLElement>('[data-rail-item]') ?? []);
+	const panels = Array.from(scene?.querySelectorAll<HTMLElement>('[data-panel]') ?? []);
+	const count = panels.length;
+	const desktop = window.matchMedia('(min-width: 1024px)');
+
+	document.querySelectorAll<HTMLElement>('[data-magnetic]').forEach((el) => magnetic(el));
+
+	let current = -1;
+	function select(i: number, focusRail = false) {
+		const next = Math.max(0, Math.min(count - 1, i));
+		if (next === current) return;
+		current = next;
+		items.forEach((el, idx) => {
+			const on = idx === next;
+			el.setAttribute('aria-selected', String(on));
+			el.tabIndex = on ? 0 : -1;
+			if (on && focusRail) el.focus();
+			if (on && !desktop.matches) el.scrollIntoView({ block: 'nearest', inline: 'center' });
+		});
+		panels.forEach((el, idx) => {
+			const on = idx === next;
+			el.toggleAttribute('data-active', on);
+			el.setAttribute('aria-hidden', desktop.matches ? String(!on) : 'false');
+		});
+	}
+	select(0);
+
+	/* ---------------- the grow-and-lock transform ---------------- */
+	const clamp01 = (n: number) => Math.min(1, Math.max(0, n));
+	const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+
+	/** Geometry from the frame's LOCKED layout back to its small hero state. */
+	let geo = { scale: 0.34, dx: 0, dy: 0, growEnd: 0.13 };
+
+	function measure() {
+		if (!scene || !frame || !stage) return;
+		const grow = Number(scene.dataset.sceneGrow ?? 60);
+		const step = Number(scene.dataset.sceneStep ?? 38);
+		geo.growEnd = grow / (grow + count * step);
+
+		// Measure both boxes untransformed, or a mid-scroll resize reads shifted
+		// positions and the frame jumps.
+		frame.style.transform = 'none';
+		const heroTransform = hero?.style.transform ?? '';
+		if (hero) hero.style.transform = 'none';
+		const locked = frame.getBoundingClientRect();
+		const stageBox = stage.getBoundingClientRect();
+		const titleBox = title?.getBoundingClientRect();
+		if (hero) hero.style.transform = heroTransform;
+		if (!locked.width) return;
+
+		// Small state: 1024px wide, left of the shell, sitting under the title.
+		// Two caps keep it inside the stage on smaller screens — one on width,
+		// one derived from the height actually left below the title.
+		const aspect = locked.width / locked.height;
+		const gapUnderTitle = 64;
+		const top = (titleBox?.bottom ?? stageBox.top + stageBox.height * 0.3) + gapUnderTitle;
+		const availH = stageBox.bottom - top - 32;
+		const smallW = Math.min(1024, stageBox.width * 0.66, availH * aspect);
+		const scale = smallW / locked.width;
+		const smallH = locked.height * scale;
+		const shellLeft = stageBox.left + stageBox.width * 0.1;
+		const smallCx = shellLeft + smallW / 2;
+		const smallCy = top + smallH / 2;
+
+		geo.scale = scale;
+		geo.dx = smallCx - (locked.left + locked.width / 2);
+		geo.dy = smallCy - (locked.top + locked.height / 2);
+	}
+
+	function apply(p: number) {
+		if (!frame || !hero || !railWrap) return;
+		const g = clamp01(p / geo.growEnd);
+
+		frame.style.transform =
+			`translate(${lerp(geo.dx, 0, g)}px, ${lerp(geo.dy, 0, g)}px) scale(${lerp(geo.scale, 1, g)})`;
+
+		// hero copy clears out first, rail arrives as the frame settles
+		const heroOut = clamp01(g / 0.7);
+		hero.style.opacity = String(1 - heroOut);
+		hero.style.transform = `translateY(${-heroOut * 40}px)`;
+		hero.style.pointerEvents = heroOut > 0.5 ? 'none' : '';
+
+		railWrap.style.opacity = String(clamp01((g - 0.55) / 0.45));
+		railWrap.style.pointerEvents = g > 0.9 ? 'auto' : 'none';
+
+		if (p > geo.growEnd) {
+			select(Math.floor(((p - geo.growEnd) / (1 - geo.growEnd)) * count * 0.999));
+		} else {
+			select(0);
+		}
+	}
+
+	function reset() {
+		if (!frame || !hero || !railWrap) return;
+		frame.style.transform = '';
+		hero.style.opacity = '';
+		hero.style.transform = '';
+		hero.style.pointerEvents = '';
+		railWrap.style.opacity = '';
+		railWrap.style.pointerEvents = '';
+	}
+
+	let ticking = false;
+	function onScroll() {
+		if (ticking || !scene) return;
+		ticking = true;
+		requestAnimationFrame(() => {
+			ticking = false;
+			const travel = scene.offsetHeight - window.innerHeight;
+			if (travel <= 0) return;
+			apply(clamp01((window.scrollY - scene.offsetTop) / travel));
+		});
+	}
+
+	function start() {
+		if (!desktop.matches || prefersReduced()) {
+			reset();
+			window.removeEventListener('scroll', onScroll);
+			select(0);
+			return;
+		}
+		measure();
+		onScroll();
+		window.addEventListener('scroll', onScroll, { passive: true });
+	}
+
+	start();
+	desktop.addEventListener('change', start);
+	window.addEventListener('resize', () => {
+		if (!desktop.matches || prefersReduced()) return;
+		measure();
+		onScroll();
+	});
+
+	/* Rail interaction: click scrolls the scene to that module's slice. */
+	items.forEach((el, i) => {
+		el.addEventListener('click', () => {
+			if (scene && desktop.matches && !prefersReduced()) {
+				const travel = scene.offsetHeight - window.innerHeight;
+				const p = geo.growEnd + ((i + 0.5) / count) * (1 - geo.growEnd);
+				window.scrollTo({ top: scene.offsetTop + travel * p, behavior: 'smooth' });
+			} else {
+				panels[i]?.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+				select(i);
+			}
+		});
+		el.addEventListener('keydown', (e) => {
+			let next: number | null = null;
+			if (e.key === 'ArrowDown' || e.key === 'ArrowRight') next = (i + 1) % count;
+			if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') next = (i - 1 + count) % count;
+			if (next !== null) {
+				e.preventDefault();
+				select(next, true);
+			}
+		});
+	});
+
+	/* "Ver los módulos" / nav "Módulos" should land where the frame locks, not
+	   at the top of the scene — the anchor sits inside a sticky container. */
+	document.querySelectorAll<HTMLAnchorElement>('a[href="#modulos"]').forEach((a) => {
+		a.addEventListener('click', (e) => {
+			if (!scene || !desktop.matches) return;
+			e.preventDefault();
+			const travel = scene.offsetHeight - window.innerHeight;
+			window.scrollTo({
+				top: scene.offsetTop + travel * geo.growEnd + 2,
+				behavior: prefersReduced() ? 'auto' : 'smooth',
+			});
+		});
+	});
+
+	/* Mobile: the carousel decides which chip is lit. */
+	if (frame) {
+		let raf = 0;
+		frame.addEventListener(
+			'scroll',
+			() => {
+				if (desktop.matches || raf) return;
+				raf = requestAnimationFrame(() => {
+					raf = 0;
+					const mid = frame.scrollLeft + frame.clientWidth / 2;
+					let best = 0;
+					let bestD = Infinity;
+					panels.forEach((pnl, i) => {
+						const d = Math.abs(pnl.offsetLeft + pnl.offsetWidth / 2 - mid);
+						if (d < bestD) {
+							bestD = d;
+							best = i;
+						}
+					});
+					select(best);
+				});
+			},
+			{ passive: true },
+		);
+	}
+</script>

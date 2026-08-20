@@ -1,0 +1,141 @@
+---
+import { Icon } from 'astro-icon/components';
+
+const presets = [
+	{ id: 'indigo', label: 'Índigo', hex: '#6574c9' },
+	{ id: 'rojizo', label: 'Terracota', hex: '#c96b65' },
+	{ id: 'verde', label: 'Verde', hex: '#69bf6d' },
+	{ id: 'violeta', label: 'Violeta', hex: '#9b4ede' },
+];
+---
+
+<section id="tu-marca" class="shell py-16 sm:py-24" data-brand-section>
+	<div class="overflow-hidden rounded-card bg-paper shadow-e2">
+		<div class="grid gap-10 p-6 sm:p-10 lg:grid-cols-[1fr_1.05fr] lg:items-center">
+			<div>
+				<p class="label">Tu marca</p>
+				<h2 class="measure-head mt-3 text-h1 font-semibold tracking-[-0.025em]">
+					Tus clientes ven tu marca. Nunca la nuestra.
+				</h2>
+				<p class="measure mt-4 text-lead text-ink-muted">
+					El color de esta página lleva cambiando desde que llegaste. Aquí se detiene y lo eliges tú —
+					es el mismo mecanismo que viste rotar, y el mismo que reviste la app de tus técnicos, tus PDF
+					y los correos que salen a tus clientes.
+				</p>
+
+				<div class="mt-8 flex flex-wrap items-center gap-2.5" role="group" aria-label="Color de marca">
+					{
+						presets.map((p) => (
+							<button
+								type="button"
+								class="flex items-center gap-2.5 rounded-full bg-mist px-4 py-2.5 text-caption shadow-ring transition-shadow hover:shadow-e1"
+								data-preset={p.id}
+								aria-pressed="false"
+							>
+								<span class="size-3.5 rounded-full" style={`background:${p.hex}`} />
+								{p.label}
+							</button>
+						))
+					}
+					<label class="flex items-center gap-2.5 rounded-full bg-mist px-4 py-2 text-caption shadow-ring">
+						<span class="text-ink-muted">Tu hex</span>
+						<input
+							type="color"
+							value="#6574c9"
+							class="size-7 cursor-pointer rounded-full border-0 bg-transparent p-0"
+							aria-label="Elegir un color de marca personalizado"
+							data-custom
+						/>
+					</label>
+				</div>
+
+				<p class="mt-5 text-caption text-ink-faint">
+					Al salir de esta sección, la rotación continúa desde el color que dejaste.
+				</p>
+			</div>
+
+			<!-- what actually gets branded -->
+			<div class="flex flex-col gap-4">
+				<div class="rounded-frame bg-mist p-4 shadow-ring">
+					<p class="label mb-3">La app de tu equipo</p>
+					<div class="flex items-center gap-3 rounded-soft bg-paper p-3 shadow-e1">
+						<span class="tint size-8 rounded-lg bg-brand-500"></span>
+						<div class="min-w-0 flex-1">
+							<div class="h-2.5 w-24 rounded-full bg-hair"></div>
+							<div class="mt-1.5 h-2 w-16 rounded-full bg-hair-soft"></div>
+						</div>
+						<span class="tint rounded-full bg-brand-ink px-3 py-1.5 text-caption text-paper">Nuevo</span>
+					</div>
+				</div>
+
+				<div class="rounded-frame bg-mist p-4 shadow-ring">
+					<p class="label mb-3">El PDF que recibe tu cliente</p>
+					<div class="rounded-soft bg-paper p-4 shadow-e1">
+						<div class="tint flex items-center justify-between border-b-2 border-brand-500 pb-2.5">
+							<span class="font-semibold tracking-tight">Reporte de servicio</span>
+							<span class="tint size-6 rounded-md bg-brand-500"></span>
+						</div>
+						<div class="mt-3 space-y-2">
+							<div class="h-2 w-full rounded-full bg-hair-soft"></div>
+							<div class="h-2 w-4/5 rounded-full bg-hair-soft"></div>
+							<div class="h-2 w-2/3 rounded-full bg-hair-soft"></div>
+						</div>
+					</div>
+				</div>
+
+				<div class="rounded-frame bg-mist p-4 shadow-ring">
+					<p class="label mb-3">El correo que sale de tu empresa</p>
+					<div class="flex items-center gap-3 rounded-soft bg-paper p-3 shadow-e1">
+						<span class="tint grid size-9 place-items-center rounded-lg bg-brand-50 text-brand-ink">
+							<Icon name="lucide:mail" class="size-4" />
+						</span>
+						<div class="min-w-0">
+							<p class="truncate font-medium">Tu cotización COT-0184</p>
+							<p class="tint truncate text-caption text-brand-ink">Aprobar o rechazar</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<script>
+	import { cycle } from '../scripts/brand';
+	import { prefersReduced } from '../scripts/motion';
+
+	const section = document.querySelector('[data-brand-section]');
+	const presets = Array.from(document.querySelectorAll<HTMLElement>('[data-preset]'));
+	const custom = document.querySelector<HTMLInputElement>('[data-custom]');
+	const root = document.documentElement;
+
+	const syncPressed = (active: string) => {
+		presets.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.preset === active)));
+	};
+	cycle.onChange(syncPressed);
+	syncPressed(cycle.current());
+
+	presets.forEach((b) => {
+		b.addEventListener('click', () => {
+			root.style.removeProperty('--b-500');
+			cycle.set(b.dataset.preset!);
+		});
+	});
+
+	custom?.addEventListener('input', () => {
+		// data-brand="custom" derives the rest of the scale from --b-500 in CSS.
+		root.style.setProperty('--b-500', custom.value);
+		root.dataset.brand = 'custom';
+		syncPressed('custom');
+	});
+
+	// Hold the ambient rotation while this section is on screen.
+	if (section && !prefersReduced()) {
+		new IntersectionObserver(
+			(entries) => {
+				for (const e of entries) (e.isIntersecting ? cycle.hold : cycle.release)();
+			},
+			{ threshold: 0.35 },
+		).observe(section);
+	}
+</script>
