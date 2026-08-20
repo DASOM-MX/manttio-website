@@ -1,0 +1,349 @@
+---
+import { Icon } from 'astro-icon/components';
+
+/**
+ * Lead attribution — mirrors two real superadmin surfaces so the page shows the
+ * product rather than an illustration of it:
+ *
+ *  - the "Enlaces de contacto" rows (icon · label · truncated URL · copiar),
+ *    `dashboard/components/share-links-menu/`
+ *  - the "Canales de captación" bars (label / total / bar / "n leads · n
+ *    activos"), `crm/pages/dashboard/` — width is relative to the top row,
+ *    floored at 4%, exactly as `channelBars()` computes it.
+ *
+ * Channels and their UTM tails come from `share-channels.const.ts`; the two
+ * WhatsApp variants (profile/chat) are collapsed into one here. Source labels
+ * are `CUSTOMER_SOURCE_LABELS`.
+ */
+const CHANNELS = [
+	{ key: 'facebook', label: 'Facebook', icon: 'lucide:thumbs-up', query: 'utm_source=facebook&utm_medium=social', source: 'Facebook' },
+	{ key: 'instagram', label: 'Instagram', icon: 'lucide:camera', query: 'utm_source=instagram&utm_medium=social', source: 'Instagram' },
+	{ key: 'tiktok', label: 'TikTok', icon: 'lucide:music-2', query: 'utm_source=tiktok&utm_medium=social', source: 'TikTok' },
+	{ key: 'whatsapp', label: 'WhatsApp', icon: 'lucide:message-circle', query: 'utm_source=whatsapp&utm_medium=chat', source: 'WhatsApp' },
+	{ key: 'webpage', label: 'Página web', icon: 'lucide:globe', query: null, source: 'Sitio web' },
+];
+
+/** Sample month, in the shape the dashboard renders: total = leads + activos. */
+const ROWS = [
+	{ source: 'Facebook', leads: 14, active: 3 },
+	{ source: 'Google', leads: 9, active: 4 },
+	{ source: 'WhatsApp', leads: 5, active: 2 },
+	{ source: 'Instagram', leads: 4, active: 1 },
+	{ source: 'Sitio web', leads: 3, active: 1 },
+	{ source: 'TikTok', leads: 2, active: 0 },
+];
+
+const SITE = 'tuempresa.mx';
+const max = Math.max(...ROWS.map((r) => r.leads + r.active), 1);
+const pct = (r: { leads: number; active: number }) =>
+	Math.max(Math.round(((r.leads + r.active) / max) * 100), 4);
+---
+
+<section id="origen" class="shell py-16 sm:py-24">
+	<p class="label" data-reveal-o>Origen del lead</p>
+	<h2 class="measure-head mt-3 text-h1 font-semibold tracking-[-0.025em]" data-reveal-o>
+		Sabrás qué anuncio te trajo a cada cliente.
+	</h2>
+	<p class="measure mt-5 text-lead text-ink-muted" data-reveal-o>
+		Te damos un enlace por canal: uno para Facebook, otro para tu perfil de WhatsApp, otro para el
+		link de tu bio. Quien llega por ahí entra a tu CRM con el canal ya marcado — y ese dato ya no se
+		puede cambiar. A fin de mes sabes cuál canal te trajo clientes y cuál solo te trajo curiosos.
+	</p>
+
+	<div class="mt-10 rounded-card bg-paper p-6 shadow-e2 sm:mt-12 sm:p-10" data-reveal-o>
+		<!-- Both tracks capped: an `auto` track grows to the URL line's min-content
+			     width and the panel blows past the viewport instead of truncating. -->
+			<div class="grid grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-14">
+			<!-- ---------- pick a channel, get a link ---------- -->
+			<div>
+				<p class="label">El canal</p>
+				<div class="mt-3 flex flex-wrap gap-2" role="group" aria-label="Canal de captación">
+					{
+						CHANNELS.map((c, i) => (
+							<button
+								type="button"
+								class="chip"
+								data-chip={c.key}
+								data-query={c.query ?? ''}
+								data-source={c.source}
+								data-label={c.label}
+								aria-pressed={i === 0 ? 'true' : 'false'}
+							>
+								<Icon name={c.icon} class="size-4 shrink-0" />
+								{c.label}
+							</button>
+						))
+					}
+				</div>
+
+				<p class="label mt-8">Tu enlace</p>
+				<!-- the same row the superadmin shows under Clientes → Enlaces de contacto -->
+				<div class="mt-3 flex items-center gap-3 rounded-frame bg-mist p-3.5 shadow-ring">
+					<span class="tint grid size-9 shrink-0 place-items-center rounded-soft bg-brand-50 text-brand-ink">
+						<Icon name={CHANNELS[0].icon} class="size-4" data-link-icon />
+					</span>
+					<div class="min-w-0 flex-1">
+						<p class="text-caption font-medium" data-link-label>{CHANNELS[0].label}</p>
+						<!-- Wraps rather than truncating (the superadmin row truncates): on a
+						     phone the UTM tail is the first thing an ellipsis eats, and it is the
+						     whole point of the row. The <wbr> puts the break right before the `?`. -->
+						<p class="font-mono text-caption break-all text-ink-faint">
+							<span>{SITE}/contact-us</span><wbr /><span class="tint text-brand-ink" data-link-query
+								>?{CHANNELS[0].query}</span
+							>
+						</p>
+					</div>
+					<button type="button" class="copy" data-copy aria-label={`Copiar enlace de ${CHANNELS[0].label}`}>
+						<Icon name="lucide:copy" class="size-4" data-copy-idle />
+						<Icon name="lucide:check" class="size-4" data-copy-done />
+					</button>
+				</div>
+
+				<p class="mt-3 text-caption text-ink-faint">
+					Pruébalo: copia el enlace y mira entrar el lead.
+				</p>
+				<p class="mt-6 text-caption text-ink-faint">
+					Si traes Google Ads no hace falta enlace: el <span class="font-mono">gclid</span> llega
+					solo y se guarda igual.
+				</p>
+			</div>
+
+			<!-- ---------- what lands, and what it adds up to ---------- -->
+			<div class="flex flex-col gap-9">
+				<div>
+					<p class="label">Así llega a tu CRM</p>
+					<div class="mt-3 rounded-frame bg-mist p-4 shadow-ring" data-lead>
+						<div class="flex items-start justify-between gap-3">
+							<div class="min-w-0">
+								<p class="font-medium" data-lead-name>Laura Méndez</p>
+								<p class="mt-0.5 truncate text-caption text-ink-faint" data-lead-mail>laura.mendez@correo.com</p>
+							</div>
+							<span class="tag">Lead</span>
+						</div>
+						<dl class="mt-4 flex items-baseline gap-2 border-t border-hair pt-3 text-caption">
+							<dt class="text-ink-faint">Origen</dt>
+							<dd class="tint font-medium text-brand-ink" data-lead-source>Facebook</dd>
+						</dl>
+						<p class="mt-2 flex items-center gap-1.5 text-caption text-ink-faint">
+							<Icon name="lucide:lock" class="size-3.5 shrink-0" />
+							Se graba una sola vez. Nadie lo puede editar después.
+						</p>
+					</div>
+				</div>
+
+				<div>
+					<p class="label">Canales de captación</p>
+					<ul class="mt-4 flex flex-col gap-4">
+						{
+							ROWS.map((r) => (
+								<li data-row={r.source}>
+									<div class="flex items-baseline justify-between gap-2">
+										<span class="row-name text-caption" data-row-name>
+											{r.source}
+										</span>
+										<span class="nums text-caption font-medium" data-row-total>
+											{r.leads + r.active}
+										</span>
+									</div>
+									<div class="mt-1.5 h-1.5 rounded-full bg-ground">
+										<div class="tint bar h-1.5 rounded-full bg-brand-400" style={`width:${pct(r)}%`} data-row-bar />
+									</div>
+									<p class="nums mt-1 text-caption text-ink-faint" data-row-split>
+										{r.leads} leads · {r.active} activos
+									</p>
+								</li>
+							))
+						}
+					</ul>
+					<p class="mt-4 text-caption text-ink-faint">
+						Agosto a la fecha, contra julio completo.
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+	<p class="sr-only" role="status" data-status></p>
+</section>
+
+<style>
+	.chip {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		border-radius: 999px;
+		background: var(--color-mist);
+		padding: 0.5rem 1rem;
+		font-size: 0.9rem;
+		color: var(--color-ink-muted);
+		box-shadow: var(--shadow-ring);
+		cursor: pointer;
+		transition:
+			background-color 300ms ease,
+			color 300ms ease;
+	}
+	.chip[aria-pressed='true'] {
+		background: var(--color-brand-50);
+		color: var(--color-brand-ink);
+		font-weight: 500;
+	}
+
+	.copy {
+		display: grid;
+		place-items: center;
+		width: 2.25rem;
+		height: 2.25rem;
+		flex-shrink: 0;
+		border-radius: 12px;
+		background: var(--color-paper);
+		color: var(--color-ink-muted);
+		box-shadow: var(--shadow-ring);
+		cursor: pointer;
+		transition: color 200ms ease;
+	}
+	.copy:hover { color: var(--color-ink); }
+	.copy [data-copy-done] { display: none; }
+	.copy[data-done] { color: var(--color-ok); }
+	.copy[data-done] [data-copy-idle] { display: none; }
+	.copy[data-done] [data-copy-done] { display: block; }
+
+	.tag {
+		flex-shrink: 0;
+		border-radius: 999px;
+		background: var(--color-paper);
+		padding: 0.1rem 0.55rem;
+		font-size: 0.6875rem;
+		font-weight: 500;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+		color: var(--color-ink-faint);
+		box-shadow: var(--shadow-ring);
+	}
+
+	/* Bars re-scale when a capture lands; width is the only thing that moves. */
+	.bar {
+		transition:
+			width 520ms var(--ease-out),
+			background-color 1200ms ease;
+	}
+	.row-name { color: var(--color-ink-muted); }
+	[data-row][data-hot] .row-name {
+		color: var(--color-brand-ink);
+		font-weight: 500;
+	}
+	[data-row][data-hot] .bar { background: var(--color-brand-ink); }
+
+	/* The card re-enters on each capture, so a new lead reads as arriving. */
+	@keyframes land {
+		from { opacity: 0; transform: translateY(6px); }
+		to { opacity: 1; transform: none; }
+	}
+	[data-lead][data-landing] { animation: land 380ms var(--ease-out); }
+</style>
+
+<script>
+	import { reveal } from '../scripts/motion';
+	reveal('[data-reveal-o]');
+
+	const root = document.querySelector<HTMLElement>('#origen');
+	if (root) {
+		const chips = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-chip]'));
+		const linkIcon = root.querySelector<SVGElement>('[data-link-icon]');
+		const linkLabel = root.querySelector<HTMLElement>('[data-link-label]');
+		const linkQuery = root.querySelector<HTMLElement>('[data-link-query]');
+		const copyBtn = root.querySelector<HTMLButtonElement>('[data-copy]');
+		const lead = root.querySelector<HTMLElement>('[data-lead]');
+		const leadName = root.querySelector<HTMLElement>('[data-lead-name]');
+		const leadMail = root.querySelector<HTMLElement>('[data-lead-mail]');
+		const leadSource = root.querySelector<HTMLElement>('[data-lead-source]');
+		const status = root.querySelector<HTMLElement>('[data-status]');
+		const rows = Array.from(root.querySelectorAll<HTMLElement>('[data-row]'));
+
+		const LEADS = [
+			{ name: 'Ricardo Salinas', email: 'ricardo.salinas@correo.com' },
+			{ name: 'Paola Rentería', email: 'paola.renteria@correo.com' },
+			{ name: 'Iván Cortés', email: 'ivan.cortes@correo.com' },
+			{ name: 'Mariana Ochoa', email: 'mariana.ochoa@correo.com' },
+			{ name: 'Sergio Bañuelos', email: 'sergio.banuelos@correo.com' },
+			{ name: 'Laura Méndez', email: 'laura.mendez@correo.com' },
+		];
+		let leadAt = 0;
+
+		/** Live counts, seeded from what the server rendered. */
+		const counts = new Map(
+			rows.map((r) => {
+				const [leads, active] = (r.querySelector('[data-row-split]')?.textContent ?? '')
+					.match(/\d+/g)!
+					.map(Number);
+				return [r.dataset.row!, { leads, active, el: r }];
+			}),
+		);
+
+		let current = chips[0];
+
+		const urlFor = (chip: HTMLButtonElement) =>
+			`https://tuempresa.mx/contact-us${chip.dataset.query ? `?${chip.dataset.query}` : ''}`;
+
+		/** Same math as the dashboard's `channelBars()`: relative to the top row,
+		 *  and sorted by total — a channel you feed climbs the list. */
+		const paint = () => {
+			const max = Math.max(...[...counts.values()].map((c) => c.leads + c.active), 1);
+			const rank = [...counts.entries()].sort(
+				(a, z) => z[1].leads + z[1].active - (a[1].leads + a[1].active),
+			);
+			rank.forEach(([, c], i) => { c.el.style.order = String(i); });
+			for (const [source, c] of counts) {
+				const total = c.leads + c.active;
+				c.el.querySelector('[data-row-total]')!.textContent = String(total);
+				c.el.querySelector('[data-row-split]')!.textContent = `${c.leads} leads · ${c.active} activos`;
+				(c.el.querySelector('[data-row-bar]') as HTMLElement).style.width =
+					`${Math.max(Math.round((total / max) * 100), 4)}%`;
+				c.el.toggleAttribute('data-hot', source === current.dataset.source);
+			}
+		};
+
+		const select = (chip: HTMLButtonElement) => {
+			current = chip;
+			for (const c of chips) c.setAttribute('aria-pressed', String(c === chip));
+			const icon = chip.querySelector('svg');
+			if (linkIcon && icon) linkIcon.innerHTML = icon.innerHTML;
+			if (linkLabel) linkLabel.textContent = chip.dataset.label!;
+			if (linkQuery) linkQuery.textContent = chip.dataset.query ? `?${chip.dataset.query}` : '';
+			if (leadSource) leadSource.textContent = chip.dataset.source!;
+			copyBtn?.setAttribute('aria-label', `Copiar enlace de ${chip.dataset.label}`);
+			copyBtn?.removeAttribute('data-done');
+			paint();
+		};
+
+		/** Copying the link is the demo's "someone clicked it": a lead lands from
+		 *  the selected channel and the month's numbers move with it. */
+		const capture = async () => {
+			try {
+				await navigator.clipboard.writeText(urlFor(current));
+			} catch {
+				/* clipboard blocked (insecure context, denied permission) — the
+				   simulation below is the point, so let it run either way */
+			}
+			copyBtn?.setAttribute('data-done', '');
+			window.setTimeout(() => copyBtn?.removeAttribute('data-done'), 1600);
+
+			const source = current.dataset.source!;
+			const row = counts.get(source);
+			if (row) row.leads += 1;
+
+			const next = LEADS[leadAt++ % LEADS.length];
+			if (leadName) leadName.textContent = next.name;
+			if (leadMail) leadMail.textContent = next.email;
+			if (lead) {
+				lead.removeAttribute('data-landing');
+				void lead.offsetWidth; // restart the animation
+				lead.setAttribute('data-landing', '');
+			}
+			if (status) status.textContent = `Enlace de ${current.dataset.label} copiado. Nuevo lead de ${source}: ${next.name}.`;
+			paint();
+		};
+
+		for (const chip of chips) chip.addEventListener('click', () => select(chip));
+		copyBtn?.addEventListener('click', capture);
+		paint();
+	}
+</script>
