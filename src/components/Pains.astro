@@ -10,53 +10,53 @@ import { Icon } from 'astro-icon/components';
 const pairs = [
 	{
 		icon: 'lucide:send',
-		ask: '¿Se te pierden las fotos y los reportes en el chat?',
-		title: 'Nosotros los enviamos en automático',
+		ask: '¿Las fotos y los reportes se pierden en el chat?',
+		title: 'Se envían en automático',
 		answer:
-			'El técnico cierra el reporte con la firma del cliente y sale solo, en PDF y con tu logotipo. Nadie tiene que armarlo en la noche ni acordarse de mandarlo.',
+			'El técnico cierra el reporte con la firma del cliente y el PDF sale al correo con tu logotipo. Nadie tiene que armarlo en la noche ni acordarse de mandarlo.',
 	},
 	{
 		icon: 'lucide:notebook-pen',
-		ask: '¿No recuerdas tu última interacción con tu cliente?',
-		title: '¡Nosotros la tenemos registrada!',
+		ask: '¿No recuerdas tu última conversación con un cliente?',
+		title: 'Está registrada, con fecha',
 		answer:
-			'Cada llamada, visita y acuerdo queda anotado con su fecha. Abres al cliente y ves todo lo que ha pasado, aunque haya sido hace ocho meses.',
+			'Cada llamada, cada visita y cada acuerdo quedan anotados con su fecha y con quién los atendió. Abres al cliente y ves todo lo que ha pasado, aunque haya sido hace ocho meses.',
 	},
 	{
 		icon: 'lucide:file-check',
-		ask: '¿Cotizaste por teléfono y ahora nadie se acuerda del precio?',
-		title: 'Nosotros lo dejamos por escrito',
+		ask: '¿Cotizaste por teléfono y ahora nadie recuerda el precio?',
+		title: 'Queda por escrito y aprobada',
 		answer:
-			'Mandas la cotización por una liga, el cliente la aprueba o la rechaza ahí mismo y el precio queda congelado. Se acabó el «yo entendí otra cosa».',
+			'Envías la cotización por un enlace, el cliente la aprueba o la rechaza ahí mismo y el precio queda fijo desde ese momento. Siempre hay constancia de quién aprobó y cuándo.',
 	},
 	{
 		icon: 'lucide:wifi-off',
 		ask: '¿Tus técnicos trabajan donde no hay señal?',
-		title: 'Nosotros guardamos todo y lo subimos después',
+		title: 'La app funciona sin internet',
 		answer:
-			'La app funciona igual en sótanos y azoteas. El técnico captura ahí mismo y todo se sube solo en cuanto vuelve a tener internet. Nadie vuelve a teclearlo en la oficina.',
+			'En sótanos, azoteas y naves industriales la app responde igual. El técnico captura ahí mismo y la información sube sola en cuanto recupera la red. Nadie tiene que volver a escribirla en la oficina.',
 	},
 	{
 		icon: 'lucide:bell-ring',
-		ask: '¿Se te vencen las pólizas sin darte cuenta?',
-		title: 'Nosotros te avisamos antes',
+		ask: '¿Las pólizas se vencen sin que nadie lo note?',
+		title: 'El sistema avisa con tiempo',
 		answer:
-			'Las pólizas por vencer, los seguimientos pendientes y la agenda de la semana están a la vista. Lo que hoy recuerdas tú, mañana lo recuerda el sistema.',
+			'Las pólizas por vencer, los seguimientos pendientes y la agenda de la semana aparecen desde que entras. Lo que hoy recuerdas tú, mañana lo recuerda el sistema.',
 	},
 	{
 		icon: 'lucide:globe',
-		ask: '¿Tus clientes te buscan en internet y no encuentran nada?',
-		title: 'Nosotros te montamos el sitio',
+		ask: '¿Tus clientes te buscan en internet y no te encuentran?',
+		title: 'Tu sitio web va incluido',
 		answer:
-			'Tu página sale con tu nombre, tus colores y tu logotipo, publicada desde el mismo sistema y actualizada por ti sin llamarle a nadie. Es justo la página que estás leyendo.',
+			'Una página con tu nombre, tus colores y tu logotipo, publicada desde el mismo sistema y actualizada por ti sin depender de nadie. Es exactamente la página que estás leyendo.',
 	},
 	{
 		icon: 'lucide:package',
 		soon: true,
-		ask: '¿No sabes qué material se subió a la camioneta?',
-		title: 'Nosotros llevamos la cuenta',
+		ask: '¿Sabes qué material trae cada camioneta?',
+		title: 'El inventario se actualiza solo',
 		answer:
-			'Cuánto hay en bodega y cuánto trae cada técnico, con el material descontado desde el mismo reporte donde se usó. Los movimientos quedan y no se editan.',
+			'Cuánto hay en bodega y cuánto trae cada técnico, con el material descontado desde el mismo reporte donde se usó. Cada movimiento queda registrado y ninguno se edita después.',
 	},
 ];
 ---
@@ -64,12 +64,12 @@ const pairs = [
 <section id="dolores" class="shell py-16 sm:py-24">
 	<p class="label" data-reveal-p>¿Te suena?</p>
 	<h2 class="measure-head mt-3 text-h1 font-semibold tracking-[-0.025em]" data-reveal-p>
-		Olvídate del desorden y de los dolores de espalda.
+		Que nada dependa de que alguien se acuerde.
 	</h2>
 	<p class="measure mt-5 text-lead text-ink-muted" data-reveal-p>
-		Lo pesado no es el trabajo en sitio. Es volver a la oficina a teclear lo que ya hiciste, cargar
-		la carpeta por si el cliente reclama y cerrar el mes acordándote de quién aprobó qué. De eso nos
-		encargamos nosotros.
+		Lo difícil no es el trabajo en sitio; eso tu equipo ya lo domina. Lo difícil es que la evidencia
+		llegue completa, que el cliente reciba su reporte a tiempo y que en diciembre puedas demostrar
+		exactamente qué se hizo en marzo. De eso nos encargamos nosotros.
 	</p>
 
 	<div class="mt-10 overflow-hidden rounded-card bg-paper shadow-e2 sm:mt-12">

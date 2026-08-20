@@ -59,7 +59,7 @@ export const MODULES: Module[] = [
 		shipped: true,
 		crumb: 'Reportes / Plantillas',
 		claim:
-			'Diseña tus propios formatos de reporte. La firma del cliente es obligatoria para cerrar y enviar — validada en el servidor, no en el teléfono.',
+			'Diseña tus propios formatos de reporte. Sin la firma del cliente, el reporte no se cierra ni se envía.',
 		stats: [
 			{ value: '4', label: 'Plantillas activas', hi: true },
 			{ value: '128', label: 'Reportes del mes' },
@@ -81,7 +81,7 @@ export const MODULES: Module[] = [
 		shipped: true,
 		crumb: 'App de campo / Sincronización',
 		claim:
-			'Una PWA que funciona sin señal. El técnico captura en el sótano y todo sube solo cuando vuelve a tener red.',
+			'Funciona sin señal. El técnico captura en el sótano y todo sube solo en cuanto recupera la red.',
 		stats: [
 			{ value: '3', label: 'Por sincronizar', hi: true },
 			{ value: '12', label: 'Técnicos activos' },
@@ -102,7 +102,7 @@ export const MODULES: Module[] = [
 		shipped: true,
 		crumb: 'Clientes / Hotel Vista Real',
 		claim:
-			'Ficha 360 por cliente y una bitácora de actividad que nunca se edita ni se borra. Seguimientos con fecha y origen de cada cliente.',
+			'Una ficha completa por cliente y una bitácora de actividad que no se edita ni se borra. Cada seguimiento con su fecha y cada cliente con su origen.',
 		stats: [
 			{ value: '38', label: 'Clientes activos' },
 			{ value: '6', label: 'Seguimientos hoy', hi: true },
@@ -124,7 +124,7 @@ export const MODULES: Module[] = [
 		shipped: true,
 		crumb: 'Clientes / Hotel Vista Real / Equipos',
 		claim:
-			'Historial de servicio por unidad. Esto convierte «visitamos el hotel» en «este compresor lleva tres reparaciones, conviene reemplazarlo».',
+			'Historial de servicio por unidad. Convierte «visitamos el hotel» en «este compresor lleva tres reparaciones, conviene reemplazarlo».',
 		stats: [
 			{ value: '14', label: 'Equipos registrados' },
 			{ value: '3', label: 'Servicios de la unidad', hi: true },
@@ -145,7 +145,7 @@ export const MODULES: Module[] = [
 		shipped: true,
 		crumb: 'Cotizaciones / COT-0184',
 		claim:
-			'El cliente aprueba o rechaza desde una liga con token, sin cuenta ni contraseña. Precio, unidad y cantidad se congelan al crear la cotización.',
+			'El cliente aprueba o rechaza desde un enlace, sin crear cuenta ni contraseña. Precio, unidad y cantidad quedan fijos desde que se crea la cotización.',
 		stats: [
 			{ value: '$184,200', label: 'En revisión', hi: true },
 			{ value: '5', label: 'Esperando aprobación' },
@@ -166,7 +166,7 @@ export const MODULES: Module[] = [
 		shipped: true,
 		crumb: 'Órdenes / OS-0442',
 		claim:
-			'Nacen de una cotización aprobada y se explotan en visitas y reportes pendientes. Todo el historial del trabajo queda en una sola bitácora.',
+			'Nacen de una cotización aprobada y se convierten en visitas y reportes pendientes. Todo el historial del trabajo vive en una sola bitácora.',
 		stats: [
 			{ value: '9', label: 'Órdenes abiertas', hi: true },
 			{ value: '3', label: 'Visitas esta semana' },
@@ -187,7 +187,7 @@ export const MODULES: Module[] = [
 		shipped: true,
 		crumb: 'Calendario / Semana 34',
 		claim:
-			'Quién va, a dónde y cuándo. Reasignaciones auditadas y empuje a Google Calendar con la agenda real encima.',
+			'Quién va, a dónde y cuándo. Cada reasignación queda registrada y la agenda se refleja en Google Calendar.',
 		stats: [
 			{ value: '17', label: 'Visitas de la semana', hi: true },
 			{ value: '4', label: 'Sin asignar' },
@@ -206,7 +206,7 @@ export const MODULES: Module[] = [
 		shipped: false,
 		crumb: 'Almacén / Existencias',
 		claim:
-			'Stock por técnico y por camioneta, reabastecimientos con evidencia y material descontado desde el reporte. Los movimientos no se editan nunca.',
+			'Existencias por técnico y por camioneta, reabastecimientos con evidencia y material descontado desde el reporte. Ningún movimiento se edita después.',
 		stats: [
 			{ value: '312', label: 'SKU en catálogo' },
 			{ value: '4', label: 'Almacenes' },
@@ -228,7 +228,7 @@ export const MODULES: Module[] = [
 		shipped: true,
 		crumb: 'Contratos / Pólizas vigentes',
 		claim:
-			'El documento firmado, tipado y fechado, colgado del cliente y de la orden que lo generó. Nada de buscar el PDF en un correo de hace ocho meses.',
+			'El documento firmado, clasificado y fechado, vinculado al cliente y a la orden que lo generó. Sin volver a buscar el PDF en un correo de hace ocho meses.',
 		stats: [
 			{ value: '11', label: 'Vigentes' },
 			{ value: '2', label: 'Vencen en 30 días', hi: true },
@@ -247,7 +247,7 @@ export const MODULES: Module[] = [
 		shipped: false,
 		crumb: 'Facturación / Saldos',
 		claim:
-			'Cobro por reportes y control de saldos dentro del producto. El timbrado CFDI ante el SAT no está incluido.',
+			'Cobranza por reportes y control de saldos dentro del sistema. El timbrado CFDI ante el SAT no está incluido.',
 		stats: [
 			{ value: '$312,480', label: 'Por cobrar', hi: true },
 			{ value: '3', label: 'Vencidas' },
@@ -266,7 +266,7 @@ export const MODULES: Module[] = [
 		shipped: true,
 		crumb: 'Marca / Identidad',
 		claim:
-			'Tu nombre, tus colores y tu sitio web. La app, los PDF y los correos salen con tu identidad — nunca con la nuestra. Es exactamente lo que hace esta página mientras la lees.',
+			'Tu nombre, tus colores y tu sitio web. La app, los PDF y los correos salen con tu identidad, nunca con la nuestra. Es exactamente lo que hace esta página mientras la lees.',
 		stats: [
 			{ value: '2', label: 'Escalas de color', hi: true },
 			{ value: '10', label: 'Tipografías' },

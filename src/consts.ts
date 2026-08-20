@@ -2,7 +2,7 @@
 
 export const SITE_TITLE = 'Manttio';
 export const SITE_DESCRIPTION =
-	'Software de servicio en campo para empresas de mantenimiento: reportes con firma, clientes, cotizaciones, visitas y almacén. Con tu marca, no la nuestra.';
+	'Software de servicio en campo para empresas de mantenimiento: reportes con firma, clientes, cotizaciones, visitas y almacén. Todo con tu marca, nunca con la nuestra.';
 
 // TODO(plan §9): real channels before launch.
 export const CONTACT = {
