@@ -1,0 +1,15 @@
+{
+	"$schema": "./node_modules/wrangler/config-schema.json",
+	"name": "manttio-website",
+	"compatibility_date": "2026-08-19",
+	// Static site: no Worker script, just the built assets. Astro emits a fully
+	// prerendered `dist/`, so there is nothing to run at the edge.
+	"assets": {
+		"directory": "./dist",
+		"html_handling": "auto-trailing-slash",
+		"not_found_handling": "404-page"
+	},
+	"observability": {
+		"enabled": true
+	}
+}

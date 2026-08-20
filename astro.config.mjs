@@ -7,9 +7,9 @@ import { defineConfig, fontProviders } from 'astro/config';
 
 // https://astro.build/config
 export default defineConfig({
-	// Cloudflare Pages project `manttio-website`. Swap for the custom domain
-	// when one is attached — canonical URLs and the sitemap read this.
-	site: 'https://manttio-website.pages.dev',
+	// Cloudflare Worker `manttio-website` (static assets). Swap for the custom
+	// domain when one is attached — canonical URLs and the sitemap read this.
+	site: 'https://manttio-website.dasom-mx.workers.dev',
 	integrations: [sitemap(), icon()],
 	vite: {
 		plugins: [tailwindcss()],
