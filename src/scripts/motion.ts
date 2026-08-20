@@ -12,6 +12,17 @@ const REDUCED = '(prefers-reduced-motion: reduce)';
 export const prefersReduced = (): boolean =>
 	typeof window !== 'undefined' && window.matchMedia(REDUCED).matches;
 
+/**
+ * How much of the element must be in view before it reveals.
+ *
+ * Anything approaching viewport height can never satisfy a fractional
+ * threshold, and since these helpers set `opacity: 0` up front, a threshold
+ * that never fires leaves the element invisible permanently. Fall back to
+ * `'some'` for tall elements.
+ */
+const visibilityAmount = (el: Element, preferred: number): number | 'some' =>
+	(el as HTMLElement).offsetHeight > window.innerHeight * 0.8 ? 'some' : preferred;
+
 /** Fade + rise once, when the element first enters view. */
 export function reveal(target: string | Element, opts: { y?: number; delay?: number } = {}) {
 	const els = resolve(target);
@@ -30,7 +41,7 @@ export function reveal(target: string | Element, opts: { y?: number; delay?: num
 					{ duration: 0.55, delay, ease: [0.2, 0.7, 0.3, 1] },
 				);
 			},
-			{ amount: 0.25 },
+			{ amount: visibilityAmount(el, 0.25) },
 		);
 	}
 }
@@ -54,7 +65,7 @@ export function revealStagger(target: string | Element, opts: { each?: number; y
 				{ duration: 0.55, delay: stagger(capped), ease: [0.2, 0.7, 0.3, 1] },
 			);
 		},
-		{ amount: 0.2 },
+		{ amount: visibilityAmount(els[0].parentElement ?? els[0], 0.2) },
 	);
 }
 

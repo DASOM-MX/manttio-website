@@ -110,6 +110,9 @@
   --text-h1--line-height: 1.08;
   --text-display: clamp(2.75rem, 1.5rem + 5.2vw, 4.768rem);
   --text-display--line-height: 1.02;
+  /* One step above display, for the full-height hero only. */
+  --text-hero: clamp(2.75rem, 1rem + 7.6vw, 7.5rem);
+  --text-hero--line-height: 0.95;
 
   /* ---- neutrals: hue-agnostic, because the accent hue moves ---- */
   --color-paper: #ffffff;

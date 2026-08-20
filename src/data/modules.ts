@@ -1,9 +1,22 @@
+import type { ImageMetadata } from 'astro';
+
+import fieldappReportes from '../assets/app/fieldapp-reportes.png';
+import superadminCalendario from '../assets/app/superadmin-calendario.png';
+import superadminClientes from '../assets/app/superadmin-clientes.png';
+import superadminContratos from '../assets/app/superadmin-contratos.png';
+import superadminCotizaciones from '../assets/app/superadmin-cotizaciones.png';
+import superadminOrdenes from '../assets/app/superadmin-ordenes.png';
+import superadminEquipos from '../assets/app/superadmin-equipos.png';
+import superadminReportes from '../assets/app/superadmin-reportes.png';
+
 /**
  * The eleven modules, in pitch order. Claims are verified against the module
  * plans in `manttio-whitelabeled/.claude/plans/superadmin/`.
  *
- * `shipped: false` renders a "Próximamente" chip. Current split reads the
- * master-plan progress board — pending the owner's line (plan §11).
+ * `shipped: false` renders a "Próximamente" chip. The split follows what is
+ * actually routed in the app (owner, 2026-08-19), NOT the whitelabeled
+ * master-plan progress board — that board still lists quotations, orders,
+ * calendar and contracts as unbuilt and is out of date.
  */
 export type ModuleRow = {
 	title: string;
@@ -24,11 +37,22 @@ export type Module = {
 	claim: string;
 	stats: ModuleStat[];
 	rows: ModuleRow[];
+	/**
+	 * Real capture of the running app, produced by the screenshot harnesses in
+	 * the whitelabeled repo (`superadmin/screenshots`, `frontend/screenshots`)
+	 * against stubbed data. Only shipped modules have one; the rest fall back to
+	 * the HTML faux-UI, which is also what keeps "Próximamente" honest.
+	 */
+	shot?: ImageMetadata;
+	/** `mobile` renders narrow, in a phone frame. */
+	shotKind?: 'desktop' | 'mobile';
 };
 
 export const MODULES: Module[] = [
 	{
 		id: 'reportes',
+		shot: superadminReportes,
+		shotKind: 'desktop',
 		name: 'Reportes y plantillas',
 		icon: 'lucide:file-text',
 		plan: '06',
@@ -49,6 +73,8 @@ export const MODULES: Module[] = [
 	},
 	{
 		id: 'campo',
+		shot: fieldappReportes,
+		shotKind: 'mobile',
 		name: 'App de campo',
 		icon: 'lucide:smartphone',
 		plan: 'field app',
@@ -68,6 +94,8 @@ export const MODULES: Module[] = [
 	},
 	{
 		id: 'crm',
+		shot: superadminClientes,
+		shotKind: 'desktop',
 		name: 'Clientes y CRM',
 		icon: 'lucide:users',
 		plan: '07 · 08',
@@ -88,6 +116,8 @@ export const MODULES: Module[] = [
 	},
 	{
 		id: 'equipos',
+		shot: superadminEquipos,
+		shotKind: 'desktop',
 		name: 'Equipos',
 		icon: 'lucide:gauge',
 		plan: '11',
@@ -107,10 +137,12 @@ export const MODULES: Module[] = [
 	},
 	{
 		id: 'cotizaciones',
+		shot: superadminCotizaciones,
+		shotKind: 'desktop',
 		name: 'Cotizaciones',
 		icon: 'lucide:file-check',
 		plan: '20',
-		shipped: false,
+		shipped: true,
 		crumb: 'Cotizaciones / COT-0184',
 		claim:
 			'El cliente aprueba o rechaza desde una liga con token, sin cuenta ni contraseña. Precio, unidad y cantidad se congelan al crear la cotización.',
@@ -126,10 +158,12 @@ export const MODULES: Module[] = [
 	},
 	{
 		id: 'ordenes',
+		shot: superadminOrdenes,
+		shotKind: 'desktop',
 		name: 'Órdenes de servicio',
 		icon: 'lucide:clipboard-list',
 		plan: '19',
-		shipped: false,
+		shipped: true,
 		crumb: 'Órdenes / OS-0442',
 		claim:
 			'Nacen de una cotización aprobada y se explotan en visitas y reportes pendientes. Todo el historial del trabajo queda en una sola bitácora.',
@@ -145,10 +179,12 @@ export const MODULES: Module[] = [
 	},
 	{
 		id: 'calendario',
+		shot: superadminCalendario,
+		shotKind: 'desktop',
 		name: 'Calendario',
 		icon: 'lucide:calendar-days',
 		plan: '12',
-		shipped: false,
+		shipped: true,
 		crumb: 'Calendario / Semana 34',
 		claim:
 			'Quién va, a dónde y cuándo. Reasignaciones auditadas y empuje a Google Calendar con la agenda real encima.',
@@ -184,10 +220,12 @@ export const MODULES: Module[] = [
 	},
 	{
 		id: 'contratos',
+		shot: superadminContratos,
+		shotKind: 'desktop',
 		name: 'Contratos y pólizas',
 		icon: 'lucide:file-signature',
 		plan: '13',
-		shipped: false,
+		shipped: true,
 		crumb: 'Contratos / Pólizas vigentes',
 		claim:
 			'El documento firmado, tipado y fechado, colgado del cliente y de la orden que lo generó. Nada de buscar el PDF en un correo de hace ocho meses.',
