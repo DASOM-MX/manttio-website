@@ -1,5 +1,4 @@
 ---
-import { Icon } from 'astro-icon/components';
 import { SITE_TITLE } from '../consts';
 
 const links = [
@@ -45,25 +44,131 @@ const links = [
 			aria-label="Abrir menú"
 			data-menu-btn
 		>
-			<Icon name="lucide:menu" class="size-5" />
+			<!-- three bars that fold into an X; the button's aria-label carries the
+			     meaning, so the shape itself is decorative -->
+			<span class="burger" aria-hidden="true">
+				<span class="bar bar-1"></span>
+				<span class="bar bar-2"></span>
+				<span class="bar bar-3"></span>
+			</span>
 		</button>
 	</nav>
 
-	<div id="menu-movil" class="shell hidden pb-6 md:hidden" data-menu>
-		<div class="flex flex-col items-start gap-1">
-			{
-				links.map((l) => (
-					<a href={l.href} class="py-3 text-lead text-ink-muted transition-colors hover:text-ink" data-menu-link>
-						{l.label}
-					</a>
-				))
-			}
-			<a href="#contacto" class="tint mt-3 rounded-full bg-brand-ink px-6 py-3 font-medium text-paper" data-menu-link>
-				Solicitar demo
-			</a>
+	<div id="menu-movil" class="menu shell" data-menu>
+		<div class="menu-clip">
+			<div class="flex flex-col items-start gap-1 pb-6">
+				{
+					links.map((l, i) => (
+						<a
+							href={l.href}
+							class="py-3 text-lead text-ink-muted transition-colors hover:text-ink"
+							style={`--i:${i}`}
+							data-menu-link
+						>
+							{l.label}
+						</a>
+					))
+				}
+				<a
+					href="#contacto"
+					class="tint mt-3 rounded-full bg-brand-ink px-6 py-3 font-medium text-paper"
+					style={`--i:${links.length}`}
+					data-menu-link
+				>
+					Solicitar demo
+				</a>
+			</div>
 		</div>
 	</div>
 </header>
+
+<style>
+	/* ---- the burger ---- */
+	.burger {
+		position: relative;
+		display: block;
+		width: 20px;
+		height: 20px;
+	}
+	.bar {
+		position: absolute;
+		left: 0;
+		height: 2px;
+		width: 100%;
+		border-radius: 2px;
+		background: currentColor;
+		transition:
+			transform 320ms var(--ease-out),
+			opacity 140ms linear;
+	}
+	.bar-1 { top: 4px; }
+	.bar-2 { top: 10px; }
+	.bar-3 { top: 16px; }
+
+	[aria-expanded='true'] .bar-1 { transform: translateY(6px) rotate(45deg); }
+	[aria-expanded='true'] .bar-2 { opacity: 0; transform: scaleX(0.3); }
+	[aria-expanded='true'] .bar-3 { transform: translateY(-6px) rotate(-45deg); }
+
+	/* ---- the panel ----
+	   0fr → 1fr on a grid row is the one way to transition to an unknown height
+	   without measuring it in JS. `visibility` (not just the clip) is what keeps
+	   the links out of the tab order while collapsed; its transition is delayed
+	   so it only flips once the collapse has finished. */
+	.menu {
+		display: grid;
+		grid-template-rows: 0fr;
+		transition: grid-template-rows 180ms var(--ease-out);
+	}
+	.menu-clip {
+		overflow: hidden;
+		visibility: hidden;
+		transition: visibility 0s linear 180ms;
+	}
+	.menu[data-open] {
+		grid-template-rows: 1fr;
+		transition-duration: 420ms;
+	}
+	.menu[data-open] .menu-clip {
+		visibility: visible;
+		transition-delay: 0s;
+	}
+
+	/* Items rise into place behind the panel, one after another. Closing runs
+	   with no delay, so the whole thing exits in one short beat. */
+	.menu [data-menu-link] {
+		opacity: 0;
+		transform: translateY(8px);
+		transition:
+			opacity 140ms linear,
+			transform 140ms var(--ease-out),
+			color 200ms ease;
+	}
+	.menu[data-open] [data-menu-link] {
+		opacity: 1;
+		transform: none;
+		transition-duration: 300ms;
+		transition-delay: calc(var(--i) * 45ms + 70ms);
+	}
+
+	/* The panel is mobile-only. This has to live here rather than as `md:hidden`:
+	   an Astro scoped rule is unlayered and would beat the utility. */
+	@media (min-width: 768px) {
+		.menu {
+			display: none;
+		}
+	}
+
+	/* The global reduced-motion rule zeroes durations but not delays, which would
+	   leave the links waiting on a stagger that no longer animates. */
+	@media (prefers-reduced-motion: reduce) {
+		.menu[data-open] [data-menu-link] {
+			transition-delay: 0s;
+		}
+		.menu-clip {
+			transition-delay: 0s;
+		}
+	}
+</style>
 
 <script>
 	const nav = document.querySelector('[data-nav]') as HTMLElement | null;
@@ -82,19 +187,19 @@ const links = [
 	}
 
 	if (btn && menu) {
-		const close = () => {
-			menu.classList.add('hidden');
-			btn.setAttribute('aria-expanded', 'false');
-			btn.setAttribute('aria-label', 'Abrir menú');
-		};
-		btn.addEventListener('click', () => {
-			const open = menu.classList.toggle('hidden') === false;
+		const set = (open: boolean) => {
+			menu.toggleAttribute('data-open', open);
 			btn.setAttribute('aria-expanded', String(open));
 			btn.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
-		});
-		menu.querySelectorAll('[data-menu-link]').forEach((l) => l.addEventListener('click', close));
+		};
+
+		btn.addEventListener('click', () => set(!menu.hasAttribute('data-open')));
+		menu.querySelectorAll('[data-menu-link]').forEach((l) => l.addEventListener('click', () => set(false)));
 		document.addEventListener('keydown', (e) => {
-			if (e.key === 'Escape') close();
+			if (e.key === 'Escape' && menu.hasAttribute('data-open')) {
+				set(false);
+				btn.focus();
+			}
 		});
 	}
 </script>
