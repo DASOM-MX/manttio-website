@@ -75,22 +75,28 @@ const pairs = [
 	<div class="mt-10 overflow-hidden rounded-card bg-paper shadow-e2 sm:mt-12">
 		<ul class="divide-y divide-hair">
 			{
-				pairs.map((p) => (
+				pairs.map((p, i) => (
 					<li class="qa px-6 py-7 sm:px-8 sm:py-8" data-pair>
 						<p class="text-lead font-medium tracking-tight text-balance">{p.ask}</p>
 
-						<div class="mt-6 flex gap-4 border-t border-hair-soft pt-6 md:mt-0 md:border-t-0 md:border-l md:border-hair md:pt-0 md:pl-8">
-							<span class="tint grid size-10 shrink-0 place-items-center rounded-soft bg-brand-50 text-brand-ink">
-								<Icon name={p.icon} class="size-5" />
-							</span>
-							<div>
-								<h3 class="tint text-h3 font-semibold tracking-tight text-brand-ink">
+						<details
+							class="ans mt-6 border-t border-hair-soft pt-6 lg:mt-0 lg:border-t-0 lg:border-l lg:border-hair lg:pt-0 lg:pl-8"
+							open={i === 0}
+						>
+							<summary class="flex cursor-pointer list-none items-center gap-4">
+								<span class="tint grid size-10 shrink-0 place-items-center rounded-soft bg-brand-50 text-brand-ink">
+									<Icon name={p.icon} class="size-5" />
+								</span>
+								<h3 class="tint text-lead font-semibold tracking-tight text-brand-ink xl:text-h3">
 									{p.title}{' '}
 									{p.soon && <span class="soon align-middle">Próximamente</span>}
 								</h3>
-								<p class="mt-2 text-ink-muted">{p.answer}</p>
-							</div>
-						</div>
+								<span class="chev ml-auto shrink-0 text-ink-faint" aria-hidden="true">
+									<Icon name="lucide:chevron-down" class="size-5" />
+								</span>
+							</summary>
+							<p class="ans-body mt-3 text-ink-muted">{p.answer}</p>
+						</details>
 					</li>
 				))
 			}
@@ -101,8 +107,10 @@ const pairs = [
 <style>
 	/* Layout lives here rather than in utilities: an Astro scoped rule is
 	   unlayered, so it would beat anything from the utilities layer. Below the
-	   breakpoint the row is plain flow — pregunta arriba, respuesta abajo. */
-	@media (min-width: 768px) {
+	   breakpoint the row is plain flow — pregunta arriba, respuesta abajo.
+	   The split waits for 1024 px: at 768 the respuesta column comes out as
+	   narrow as a phone's, which wraps every headline to three lines. */
+	@media (min-width: 1024px) {
 		.qa {
 			display: grid;
 			grid-template-columns: 0.85fr 1.15fr;
@@ -115,6 +123,29 @@ const pairs = [
 			display: flex;
 			align-items: center;
 		}
+	}
+
+	/* The respuesta collapses; the pregunta and the headline always show, so the
+	   list stays scannable at seven rows. Native <details>, so it works with the
+	   keyboard and without JS. */
+	.ans > summary::-webkit-details-marker {
+		display: none;
+	}
+	/* At the two-column width the body aligns under the title rather than under
+	   the icon tile (2.5rem icon + 1rem gap). On a phone the column is only
+	   ~264 px wide, so that indent costs more than the alignment is worth. */
+	@media (min-width: 1024px) {
+		.ans-body {
+			padding-left: 3.5rem;
+		}
+	}
+	.chev {
+		display: grid;
+		place-items: center;
+		transition: transform 240ms var(--ease-out);
+	}
+	.ans[open] .chev {
+		transform: rotate(180deg);
 	}
 
 	/* Same chip as the module rail, so "Próximamente" reads the same twice. */
