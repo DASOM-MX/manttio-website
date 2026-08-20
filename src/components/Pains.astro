@@ -1,0 +1,140 @@
+---
+import { Icon } from 'astro-icon/components';
+
+/**
+ * Pregunta → respuesta. Las respuestas sin `soon` son cosas que el producto ya
+ * hace hoy (ver `shipped: true` en `../data/modules.ts`). `soon: true` marca la
+ * fila con el mismo chip "Próximamente" que usa el riel de módulos, para no
+ * prometer en presente lo que todavía no está.
+ */
+const pairs = [
+	{
+		icon: 'lucide:send',
+		ask: '¿Se te pierden las fotos y los reportes en el chat?',
+		title: 'Nosotros los enviamos en automático',
+		answer:
+			'El técnico cierra el reporte con la firma del cliente y sale solo, en PDF y con tu logotipo. Nadie tiene que armarlo en la noche ni acordarse de mandarlo.',
+	},
+	{
+		icon: 'lucide:notebook-pen',
+		ask: '¿No recuerdas tu última interacción con tu cliente?',
+		title: '¡Nosotros la tenemos registrada!',
+		answer:
+			'Cada llamada, visita y acuerdo queda anotado con su fecha. Abres al cliente y ves todo lo que ha pasado, aunque haya sido hace ocho meses.',
+	},
+	{
+		icon: 'lucide:file-check',
+		ask: '¿Cotizaste por teléfono y ahora nadie se acuerda del precio?',
+		title: 'Nosotros lo dejamos por escrito',
+		answer:
+			'Mandas la cotización por una liga, el cliente la aprueba o la rechaza ahí mismo y el precio queda congelado. Se acabó el «yo entendí otra cosa».',
+	},
+	{
+		icon: 'lucide:wifi-off',
+		ask: '¿Tus técnicos trabajan donde no hay señal?',
+		title: 'Nosotros guardamos todo y lo subimos después',
+		answer:
+			'La app funciona igual en sótanos y azoteas. El técnico captura ahí mismo y todo se sube solo en cuanto vuelve a tener internet. Nadie vuelve a teclearlo en la oficina.',
+	},
+	{
+		icon: 'lucide:bell-ring',
+		ask: '¿Se te vencen las pólizas sin darte cuenta?',
+		title: 'Nosotros te avisamos antes',
+		answer:
+			'Las pólizas por vencer, los seguimientos pendientes y la agenda de la semana están a la vista. Lo que hoy recuerdas tú, mañana lo recuerda el sistema.',
+	},
+	{
+		icon: 'lucide:globe',
+		ask: '¿Tus clientes te buscan en internet y no encuentran nada?',
+		title: 'Nosotros te montamos el sitio',
+		answer:
+			'Tu página sale con tu nombre, tus colores y tu logotipo, publicada desde el mismo sistema y actualizada por ti sin llamarle a nadie. Es justo la página que estás leyendo.',
+	},
+	{
+		icon: 'lucide:package',
+		soon: true,
+		ask: '¿No sabes qué material se subió a la camioneta?',
+		title: 'Nosotros llevamos la cuenta',
+		answer:
+			'Cuánto hay en bodega y cuánto trae cada técnico, con el material descontado desde el mismo reporte donde se usó. Los movimientos quedan y no se editan.',
+	},
+];
+---
+
+<section id="dolores" class="shell py-16 sm:py-24">
+	<p class="label" data-reveal-p>¿Te suena?</p>
+	<h2 class="measure-head mt-3 text-h1 font-semibold tracking-[-0.025em]" data-reveal-p>
+		Olvídate del desorden y de los dolores de espalda.
+	</h2>
+	<p class="measure mt-5 text-lead text-ink-muted" data-reveal-p>
+		Lo pesado no es el trabajo en sitio. Es volver a la oficina a teclear lo que ya hiciste, cargar
+		la carpeta por si el cliente reclama y cerrar el mes acordándote de quién aprobó qué. De eso nos
+		encargamos nosotros.
+	</p>
+
+	<div class="mt-10 overflow-hidden rounded-card bg-paper shadow-e2 sm:mt-12">
+		<ul class="divide-y divide-hair">
+			{
+				pairs.map((p) => (
+					<li class="qa px-6 py-7 sm:px-8 sm:py-8" data-pair>
+						<p class="text-lead font-medium tracking-tight text-balance">{p.ask}</p>
+
+						<div class="mt-6 flex gap-4 border-t border-hair-soft pt-6 md:mt-0 md:border-t-0 md:border-l md:border-hair md:pt-0 md:pl-8">
+							<span class="tint grid size-10 shrink-0 place-items-center rounded-soft bg-brand-50 text-brand-ink">
+								<Icon name={p.icon} class="size-5" />
+							</span>
+							<div>
+								<h3 class="tint text-h3 font-semibold tracking-tight text-brand-ink">
+									{p.title}{' '}
+									{p.soon && <span class="soon align-middle">Próximamente</span>}
+								</h3>
+								<p class="mt-2 text-ink-muted">{p.answer}</p>
+							</div>
+						</div>
+					</li>
+				))
+			}
+		</ul>
+	</div>
+</section>
+
+<style>
+	/* Layout lives here rather than in utilities: an Astro scoped rule is
+	   unlayered, so it would beat anything from the utilities layer. Below the
+	   breakpoint the row is plain flow — pregunta arriba, respuesta abajo. */
+	@media (min-width: 768px) {
+		.qa {
+			display: grid;
+			grid-template-columns: 0.85fr 1.15fr;
+			gap: 2rem;
+			align-items: stretch;
+		}
+		/* The row stretches so the divider spans it; the pregunta centers
+		   itself against a taller respuesta rather than floating at the top. */
+		.qa > p:first-child {
+			display: flex;
+			align-items: center;
+		}
+	}
+
+	/* Same chip as the module rail, so "Próximamente" reads the same twice. */
+	.soon {
+		display: inline-block;
+		margin-left: 0.15rem;
+		border-radius: 999px;
+		background: var(--color-mist);
+		padding: 0.15rem 0.5rem;
+		font-size: 0.6875rem;
+		font-weight: 500;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		color: var(--color-ink-faint);
+		white-space: nowrap;
+	}
+</style>
+
+<script>
+	import { reveal, revealStagger } from '../scripts/motion';
+	reveal('[data-reveal-p]');
+	revealStagger('[data-pair]');
+</script>
