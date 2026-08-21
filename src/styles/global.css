@@ -192,8 +192,12 @@
 /* Page shell — 80% of the viewport, per owner direction 2026-08-19. Reading
    measures (below) still cap paragraph width so wide screens don't produce
    200-character lines. */
+/* Every section's container. 80% keeps the side gutters proportional on the
+   sizes people actually browse at; the cap stops the page from stretching into
+   a stripe of text on an ultrawide (80% only reaches 1524 px past ~1905 px). */
 @utility shell {
   width: 80%;
+  max-width: 1524px;
   margin-inline: auto;
 }
 

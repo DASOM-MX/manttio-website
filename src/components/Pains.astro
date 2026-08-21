@@ -62,96 +62,51 @@ const pairs = [
 ---
 
 <section id="dolores" class="shell py-16 sm:py-24">
-	<p class="label" data-reveal-p>¿Te suena?</p>
-	<h2 class="measure-head mt-3 text-h1 font-semibold tracking-[-0.025em]" data-reveal-p>
-		Que nada dependa de que alguien se acuerde.
-	</h2>
-	<p class="measure mt-5 text-lead text-ink-muted" data-reveal-p>
-		Lo difícil no es el trabajo en sitio; eso tu equipo ya lo domina. Lo difícil es que la evidencia
-		llegue completa, que el cliente reciba su reporte a tiempo y que en diciembre puedas demostrar
-		exactamente qué se hizo en marzo. De eso nos encargamos nosotros.
-	</p>
+	<div class="mx-auto max-w-2xl lg:text-center">
+		<p class="label tint text-brand-ink" data-reveal-p>¿Te suena?</p>
+		<h2 class="mt-3 text-h1 font-semibold tracking-[-0.025em] text-balance" data-reveal-p>
+			Que nada dependa de que alguien se acuerde.
+		</h2>
+		<p class="mt-6 text-lead text-ink-muted" data-reveal-p>
+			Lo difícil no es el trabajo en sitio; eso tu equipo ya lo domina. Lo difícil es que la
+			evidencia llegue completa, que el cliente reciba su reporte a tiempo y que en diciembre puedas
+			demostrar exactamente qué se hizo en marzo. De eso nos encargamos nosotros.
+		</p>
+	</div>
 
-	<div class="mt-10 overflow-hidden rounded-card bg-paper shadow-e2 sm:mt-12">
-		<ul class="divide-y divide-hair">
+	<div class="mx-auto mt-14 max-w-2xl sm:mt-16 lg:mt-20 lg:max-w-4xl">
+		<dl class="grid grid-cols-1 gap-x-10 gap-y-10 lg:grid-cols-2 lg:gap-y-14">
 			{
-				pairs.map((p, i) => (
-					<li class="qa px-6 py-7 sm:px-8 sm:py-8" data-pair>
-						<p class="text-lead font-medium tracking-tight text-balance">{p.ask}</p>
-
-						<details
-							class="ans mt-6 border-t border-hair-soft pt-6 lg:mt-0 lg:border-t-0 lg:border-l lg:border-hair lg:pt-0 lg:pl-8"
-							open={i === 0}
-						>
-							<summary class="flex cursor-pointer list-none items-center gap-4">
-								<span class="tint grid size-10 shrink-0 place-items-center rounded-soft bg-brand-50 text-brand-ink">
-									<Icon name={p.icon} class="size-5" />
-								</span>
-								<h3 class="tint text-lead font-semibold tracking-tight text-brand-ink xl:text-h3">
-									{p.title}{' '}
-									{p.soon && <span class="soon align-middle">Próximamente</span>}
-								</h3>
-								<span class="chev ml-auto shrink-0 text-ink-faint" aria-hidden="true">
-									<Icon name="lucide:chevron-down" class="size-5" />
-								</span>
-							</summary>
-							<p class="ans-body mt-3 text-ink-muted">{p.answer}</p>
-						</details>
-					</li>
+				pairs.map((p) => (
+					<div class="relative pl-16" data-pair>
+						{/* The pregunta carries the item: it is what the reader recognizes
+						    before they care what the module is called. */}
+						<dt class="text-lead font-semibold tracking-tight text-balance">
+							<span class="tint absolute top-0 left-0 grid size-10 place-items-center rounded-soft bg-brand-ink text-paper">
+								<Icon name={p.icon} class="size-5" />
+							</span>
+							{p.ask}
+						</dt>
+						<dd class="mt-2 text-ink-muted">
+							<span class="tint font-medium text-brand-ink">{p.title}.</span>{' '}
+							{p.soon && (
+								<>
+									<span class="soon">Próximamente</span>{' '}
+								</>
+							)}
+							{p.answer}
+						</dd>
+					</div>
 				))
 			}
-		</ul>
+		</dl>
 	</div>
 </section>
 
 <style>
-	/* Layout lives here rather than in utilities: an Astro scoped rule is
-	   unlayered, so it would beat anything from the utilities layer. Below the
-	   breakpoint the row is plain flow — pregunta arriba, respuesta abajo.
-	   The split waits for 1024 px: at 768 the respuesta column comes out as
-	   narrow as a phone's, which wraps every headline to three lines. */
-	@media (min-width: 1024px) {
-		.qa {
-			display: grid;
-			grid-template-columns: 0.85fr 1.15fr;
-			gap: 2rem;
-			align-items: stretch;
-		}
-		/* The row stretches so the divider spans it; the pregunta centers
-		   itself against a taller respuesta rather than floating at the top. */
-		.qa > p:first-child {
-			display: flex;
-			align-items: center;
-		}
-	}
-
-	/* The respuesta collapses; the pregunta and the headline always show, so the
-	   list stays scannable at seven rows. Native <details>, so it works with the
-	   keyboard and without JS. */
-	.ans > summary::-webkit-details-marker {
-		display: none;
-	}
-	/* At the two-column width the body aligns under the title rather than under
-	   the icon tile (2.5rem icon + 1rem gap). On a phone the column is only
-	   ~264 px wide, so that indent costs more than the alignment is worth. */
-	@media (min-width: 1024px) {
-		.ans-body {
-			padding-left: 3.5rem;
-		}
-	}
-	.chev {
-		display: grid;
-		place-items: center;
-		transition: transform 240ms var(--ease-out);
-	}
-	.ans[open] .chev {
-		transform: rotate(180deg);
-	}
-
 	/* Same chip as the module rail, so "Próximamente" reads the same twice. */
 	.soon {
 		display: inline-block;
-		margin-left: 0.15rem;
 		border-radius: 999px;
 		background: var(--color-mist);
 		padding: 0.15rem 0.5rem;
@@ -161,6 +116,8 @@ const pairs = [
 		text-transform: uppercase;
 		color: var(--color-ink-faint);
 		white-space: nowrap;
+		box-shadow: var(--shadow-ring);
+		vertical-align: middle;
 	}
 </style>
 
