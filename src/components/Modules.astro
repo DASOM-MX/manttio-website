@@ -1,0 +1,324 @@
+---
+import { Icon } from 'astro-icon/components';
+import { MODULES } from '../data/modules';
+import AppShot from './AppShot.astro';
+import BrandRing from './BrandRing.astro';
+
+const steps = MODULES.length;
+---
+
+<section id="modulos" class="relative overflow-hidden bg-night py-20 text-paper sm:py-28">
+	<div class="ring-slot" aria-hidden="true">
+		<BrandRing tone="light" spin={72} reverse />
+	</div>
+
+	<div class="shell relative">
+		<div class="max-w-2xl">
+			<p class="label !text-white/50">Los módulos</p>
+			<h2 class="mt-3 text-h1 font-semibold tracking-[-0.025em]">
+				Once piezas. Enciendes las que usas.
+			</h2>
+			<p class="measure mt-4 text-lead text-white/65">
+				Cada módulo resuelve una parte de tu operación y se enciende por separado. Elige uno para ver
+				cómo se ve por dentro.
+			</p>
+		</div>
+
+		<div class="mt-12 grid grid-cols-[minmax(0,1fr)] gap-8 sm:mt-14 lg:grid-cols-12 lg:items-start lg:gap-x-12">
+			<!-- One tablist for both layouts: below `lg` it is a horizontal snap
+			     rail of chips with the claim hidden, at `lg` it becomes a vertical
+			     list where the selected card opens to show its claim. -->
+			<div class="rail-wrap min-w-0 lg:col-span-5">
+				<div class="rail" role="tablist" aria-orientation="vertical" aria-label="Módulos de Manttio" data-rail>
+					{
+						MODULES.map((m, i) => (
+							<button
+								type="button"
+								role="tab"
+								id={`tab-${m.id}`}
+								aria-controls={`panel-${m.id}`}
+								aria-selected={i === 0 ? 'true' : 'false'}
+								tabindex={i === 0 ? 0 : -1}
+								class="tab"
+								data-tab
+							>
+								<span class="tab-head">
+									<Icon name={m.icon} class="size-[18px] shrink-0" />
+									<span class="tab-name">{m.name}</span>
+									{!m.shipped && <span class="soon">Próximamente</span>}
+								</span>
+								<span class="tab-claim">
+									<span class="tab-claim-in">{m.claim}</span>
+								</span>
+							</button>
+						))
+					}
+				</div>
+				<p class="now text-caption text-white/45" aria-hidden="true">
+					<span class="now-i" data-now-i>01</span>/{String(steps).padStart(2, '0')}
+				</p>
+			</div>
+
+			<div class="min-w-0 lg:col-span-7">
+				<div class="shot-frame">
+					<div class="frame">
+						{
+							MODULES.map((m, i) => (
+								<div
+									class="panel"
+									id={`panel-${m.id}`}
+									role="tabpanel"
+									aria-labelledby={`tab-${m.id}`}
+									data-panel
+									data-active={i === 0 ? true : undefined}
+									aria-hidden={i === 0 ? 'false' : 'true'}
+								>
+									<AppShot module={m} loading={i === 0 ? 'eager' : 'lazy'} />
+								</div>
+							))
+						}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<style>
+	.ring-slot {
+		position: absolute;
+		top: 50%;
+		right: -14rem;
+		width: 46rem;
+		height: 46rem;
+		translate: 0 -50%;
+		opacity: 0.5;
+		pointer-events: none;
+	}
+
+	/* ---------- the tab list ---------- */
+	.rail {
+		display: flex;
+		gap: 0.5rem;
+		overflow-x: auto;
+		scroll-snap-type: x mandatory;
+		scrollbar-width: none;
+		padding-bottom: 0.5rem;
+		/* Fades the rail out at both ends instead of cutting it, so a half-visible
+		   chip reads as "there is more" rather than as a clipping bug. */
+		mask-image: linear-gradient(
+			to right,
+			transparent,
+			#000 1.75rem,
+			#000 calc(100% - 1.75rem),
+			transparent
+		);
+	}
+	.rail::-webkit-scrollbar {
+		display: none;
+	}
+
+	.tab {
+		display: flex;
+		flex: 0 0 auto;
+		scroll-snap-align: start;
+		flex-direction: column;
+		gap: 0;
+		border-radius: 999px;
+		padding: 0.6rem 1rem;
+		text-align: left;
+		color: rgba(255, 255, 255, 0.62);
+		background: rgba(255, 255, 255, 0.05);
+		box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.07);
+		cursor: pointer;
+		transition:
+			color 220ms ease,
+			background-color 220ms ease,
+			box-shadow 220ms ease;
+	}
+	.tab:hover {
+		color: rgba(255, 255, 255, 0.85);
+	}
+	.tab[aria-selected='true'] {
+		color: var(--color-paper);
+		background: rgba(255, 255, 255, 0.1);
+		box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16);
+	}
+	.tab-head {
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
+	}
+	.tab-name {
+		white-space: nowrap;
+		font-weight: 500;
+	}
+	/* Below `lg` the rail is the compact chip row — the claim would turn each
+	   chip into a paragraph. */
+	.tab-claim {
+		display: none;
+	}
+
+	.soon {
+		font-size: 0.6875rem;
+		font-weight: 500;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		white-space: nowrap;
+		color: rgba(255, 255, 255, 0.55);
+		background: rgba(255, 255, 255, 0.1);
+		border-radius: 999px;
+		padding: 0.1rem 0.45rem;
+	}
+
+	.now {
+		margin-top: 0.75rem;
+		font-variant-numeric: tabular-nums;
+	}
+
+	/* ---------- the shot ---------- */
+	.shot-frame {
+		border-radius: var(--radius-card);
+		background: rgba(255, 255, 255, 0.04);
+		padding: 0.5rem;
+		box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+	}
+	/* One box for every module, or the phone-shaped field-app capture (268×580)
+	   would set the stack's height and leave the ten desktop shots floating in
+	   180 px of dead space. Everything is contained inside the same ratio. */
+	.frame {
+		display: grid;
+		grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+		/* Squarer on a phone, where a 16:10 box is only ~185 px tall and the one
+		   phone-shaped capture has nowhere to stand. */
+		aspect-ratio: 4 / 3;
+	}
+	.panel {
+		grid-area: 1 / 1;
+		display: flex;
+		min-width: 0;
+		min-height: 0;
+		align-items: center;
+		justify-content: center;
+		opacity: 0;
+		transition: opacity 320ms ease;
+		pointer-events: none;
+	}
+	.panel > :global(*) {
+		max-height: 100%;
+	}
+	.panel > :global(div) {
+		display: flex;
+		height: 100%;
+		align-items: center;
+		justify-content: center;
+	}
+	.panel :global(img) {
+		width: auto;
+		height: auto;
+		max-width: 100%;
+		max-height: 100%;
+	}
+	.panel[data-active] {
+		opacity: 1;
+		pointer-events: auto;
+	}
+
+	@media (min-width: 1024px) {
+		.rail {
+			flex-direction: column;
+			overflow-x: visible;
+			padding-bottom: 0;
+			mask-image: none;
+		}
+		.tab {
+			border-radius: var(--radius-soft);
+			padding: 0.9rem 1.15rem;
+			width: 100%;
+		}
+		.tab-name {
+			white-space: normal;
+		}
+		/* 0fr → 1fr is the one way to open to an unknown height without measuring
+		   it in JS; the inner span is what actually gets clipped. */
+		.tab-claim {
+			display: grid;
+			grid-template-rows: 0fr;
+			transition: grid-template-rows 260ms var(--ease-out);
+		}
+		.tab-claim-in {
+			overflow: hidden;
+			font-size: var(--text-caption);
+			line-height: 1.5;
+			color: rgba(255, 255, 255, 0.6);
+		}
+		.tab[aria-selected='true'] .tab-claim {
+			grid-template-rows: 1fr;
+		}
+		.tab[aria-selected='true'] .tab-claim-in {
+			padding-top: 0.5rem;
+		}
+		.now {
+			display: none;
+		}
+		.frame {
+			aspect-ratio: 16 / 10;
+		}
+		.shot-frame {
+			position: sticky;
+			top: 6.5rem;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.panel,
+		.tab-claim {
+			transition: none;
+		}
+	}
+</style>
+
+<script>
+	const rail = document.querySelector<HTMLElement>('[data-rail]');
+	const tabs = Array.from(document.querySelectorAll<HTMLElement>('[data-tab]'));
+	const panels = Array.from(document.querySelectorAll<HTMLElement>('[data-panel]'));
+	const nowI = document.querySelector<HTMLElement>('[data-now-i]');
+	const wide = window.matchMedia('(min-width: 1024px)');
+	let current = 0;
+
+	function select(i: number, focus = false) {
+		const next = Math.max(0, Math.min(tabs.length - 1, i));
+		if (next === current && !focus) return;
+		current = next;
+		tabs.forEach((el, idx) => {
+			const on = idx === next;
+			el.setAttribute('aria-selected', String(on));
+			el.tabIndex = on ? 0 : -1;
+			if (on && focus) el.focus();
+		});
+		panels.forEach((el, idx) => {
+			const on = idx === next;
+			el.toggleAttribute('data-active', on);
+			el.setAttribute('aria-hidden', String(!on));
+		});
+		if (nowI) nowI.textContent = String(next + 1).padStart(2, '0');
+	}
+
+	tabs.forEach((el, i) => el.addEventListener('click', () => select(i)));
+
+	/* Both axes are live: the same list is a row below `lg` and a column above
+	   it, and a keyboard user should not have to know which one they are on. */
+	rail?.addEventListener('keydown', (e) => {
+		const back = e.key === 'ArrowLeft' || e.key === 'ArrowUp';
+		const fwd = e.key === 'ArrowRight' || e.key === 'ArrowDown';
+		if (!back && !fwd && e.key !== 'Home' && e.key !== 'End') return;
+		e.preventDefault();
+		if (e.key === 'Home') return select(0, true);
+		if (e.key === 'End') return select(tabs.length - 1, true);
+		select((current + (fwd ? 1 : -1) + tabs.length) % tabs.length, true);
+	});
+
+	const orient = () => rail?.setAttribute('aria-orientation', wide.matches ? 'vertical' : 'horizontal');
+	wide.addEventListener('change', orient);
+	orient();
+</script>

@@ -1,0 +1,186 @@
+---
+import { Icon } from 'astro-icon/components';
+import { MODULES } from '../data/modules';
+import AppShot from './AppShot.astro';
+import BrandRing from './BrandRing.astro';
+
+/**
+ * The h1 rotates its subject: "<subject> en un solo lugar."
+ *
+ * The first entry is the one the h1 actually reads as: it is the sr-only copy
+ * that gives the heading its accessible name, and the only subject a
+ * reduced-motion visitor ever sees. The rest are decorative, so the stack is
+ * aria-hidden and there is no live region — a loop that announces itself every
+ * few seconds is noise, not information.
+ */
+const SUBJECTS = [
+	'Tu negocio',
+	'Tus reportes',
+	'Tus clientes',
+	'Tus órdenes',
+	'Tu calendario',
+	'Tus facturas',
+	'Tus contratos',
+	'Tu sitio',
+];
+---
+
+<section id="inicio" class="relative overflow-hidden pt-32 pb-16 sm:pt-40 sm:pb-24">
+	<div class="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
+		<span
+			class="tint absolute -top-40 -left-24 size-[34rem] rounded-full bg-brand-400 opacity-[0.16] blur-[90px]"
+		></span>
+	</div>
+
+	<div class="shell">
+		<div class="grid grid-cols-[minmax(0,1fr)] items-center gap-14 lg:grid-cols-12 lg:gap-x-10">
+			<div class="min-w-0 lg:col-span-7 xl:col-span-6">
+				<h1 class="text-display font-semibold tracking-[-0.035em]" data-rot-title>
+					<span class="rot" aria-hidden="true">
+						{
+							SUBJECTS.map((subject, i) => (
+								<span class="rot-item" data-rot-item data-active={i === 0 ? true : undefined}>
+									{subject}
+								</span>
+							))
+						}
+					</span>
+					<span class="sr-only">{SUBJECTS[0]}</span>
+					<span class="rot-tail">en un solo lugar.</span>
+				</h1>
+
+				<p class="measure-lead mt-6 text-lead text-ink-muted">
+					Hoy tu información vive repartida entre WhatsApp, Excel y la memoria de tu equipo. Manttio
+					la reúne y la deja en orden: clientes, cotizaciones, visitas, reportes firmados y material.
+					Todo con la marca de tu empresa, nunca con la nuestra.
+				</p>
+
+				<div class="mt-9 flex flex-col gap-3 sm:flex-row">
+					<a
+						href="#contacto"
+						class="tint inline-flex items-center justify-center gap-2 rounded-full bg-brand-ink px-7 py-3.5 font-medium text-paper shadow-[0_10px_28px_color-mix(in_oklab,var(--b-500)_32%,transparent)]"
+						data-magnetic
+					>
+						Solicitar demo
+						<Icon name="lucide:arrow-right" class="size-4" />
+					</a>
+					<a
+						href="#modulos"
+						class="inline-flex items-center justify-center rounded-full bg-paper px-7 py-3.5 font-medium shadow-e1 transition-transform hover:-translate-y-px"
+					>
+						Ver los módulos
+					</a>
+				</div>
+			</div>
+
+			<!-- The ring sits behind the shot and is clipped by the section, so it
+			     reads as an object passing behind the product rather than a badge
+			     stuck next to it. -->
+			<div class="relative min-w-0 lg:col-span-5 xl:col-span-6">
+				<div class="ring-slot" aria-hidden="true">
+					<BrandRing />
+				</div>
+				<div class="relative">
+					<AppShot module={MODULES[0]} loading="eager" />
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<style>
+	/* Subject and tail are separate lines, so a longer word never shoves "en un
+	   solo lugar." sideways. Grid stacking drops every subject into the same
+	   cell, which reserves the tallest one up front — that is what keeps the
+	   line below from jumping when a word wraps on a narrow phone. Aligning to
+	   the end sends the reserve upward, into the space under the nav, instead of
+	   opening a gap above the tail. */
+	.rot {
+		display: grid;
+		grid-template-areas: 'subject';
+		align-items: end;
+	}
+	.rot-tail {
+		display: block;
+	}
+	.rot-item {
+		grid-area: subject;
+		justify-self: start;
+		opacity: 0;
+		transform: translateY(0.22em);
+		transition:
+			opacity 180ms linear,
+			transform 180ms var(--ease-out);
+	}
+	/* The incoming word rises over ~half a second; the outgoing one leaves
+	   upward in the 180 ms above, so the two never read as one movement. */
+	.rot-item[data-active] {
+		opacity: 1;
+		transform: none;
+		transition-duration: 520ms;
+	}
+	.rot-item[data-out] {
+		transform: translateY(-0.26em);
+	}
+
+	.ring-slot {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: 42rem;
+		height: 42rem;
+		translate: -50% -50%;
+		opacity: 0.55;
+		pointer-events: none;
+	}
+</style>
+
+<script>
+	import { magnetic, prefersReduced } from '../scripts/motion';
+
+	document.querySelectorAll<HTMLElement>('[data-magnetic]').forEach((el) => magnetic(el));
+
+	/* ---------- the h1's rotating subject ----------
+	   Runs only while the hero is on screen and the tab is visible, and not at
+	   all under reduced motion — there the first subject just stays put. */
+	const rotTitle = document.querySelector<HTMLElement>('[data-rot-title]');
+	const rotItems = Array.from(rotTitle?.querySelectorAll<HTMLElement>('[data-rot-item]') ?? []);
+
+	if (rotTitle && rotItems.length > 1 && !prefersReduced()) {
+		const HOLD = 2800;
+		let at = 0;
+		let timer: number | null = null;
+		let onScreen = true;
+
+		const advance = () => {
+			const prev = rotItems[at];
+			at = (at + 1) % rotItems.length;
+			const next = rotItems[at];
+			prev.removeAttribute('data-active');
+			prev.setAttribute('data-out', '');
+			next.removeAttribute('data-out');
+			next.setAttribute('data-active', '');
+			// Park the outgoing word back at its start once it is invisible, so
+			// its next entrance rises rather than drops.
+			window.setTimeout(() => prev.removeAttribute('data-out'), 200);
+		};
+
+		const sync = () => {
+			if (timer !== null) {
+				window.clearInterval(timer);
+				timer = null;
+			}
+			if (onScreen && !document.hidden) timer = window.setInterval(advance, HOLD);
+		};
+
+		document.addEventListener('visibilitychange', sync);
+		new IntersectionObserver(
+			(entries) => {
+				onScreen = entries[0].isIntersecting;
+				sync();
+			},
+			{ threshold: 0 },
+		).observe(rotTitle);
+		sync();
+	}
+</script>

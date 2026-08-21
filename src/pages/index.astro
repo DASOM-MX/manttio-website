@@ -2,9 +2,10 @@
 import Attribution from '../components/Attribution.astro';
 import Closer from '../components/Closer.astro';
 import Faq from '../components/Faq.astro';
-import HeroScene from '../components/HeroScene.astro';
+import Hero from '../components/Hero.astro';
 import HowItWorks from '../components/HowItWorks.astro';
 import Modularity from '../components/Modularity.astro';
+import Modules from '../components/Modules.astro';
 import Nav from '../components/Nav.astro';
 import Pains from '../components/Pains.astro';
 import Whitelabel from '../components/Whitelabel.astro';
@@ -14,8 +15,10 @@ import Layout from '../layouts/Layout.astro';
 <Layout>
 	<Nav />
 	<main id="contenido">
-		<!-- hero and the module showcase are one scroll scene -->
-		<HeroScene />
+		<!-- Grounds alternate the way the reference template does: ground → night
+		     → ground → paper → ground → paper → ground → mist → night. -->
+		<Hero />
+		<Modules />
 		<Pains />
 		<Whitelabel />
 		<Attribution />

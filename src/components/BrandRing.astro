@@ -1,0 +1,80 @@
+---
+/**
+ * The ambient ring — a full circle at low opacity with a quarter-arc drawn over
+ * it in a fading gradient, rotating slowly.
+ *
+ * The stroke is `--b-500` by default, so the ring changes hue with the ambient
+ * brand rotation (§3.2): the ornament is itself a demonstration of the
+ * whitelabel claim rather than decoration next to it. On the night sections
+ * pass `tone="light"`, where the brand scale is too dark to read.
+ *
+ * Geometry is a plain <circle>; the arc is a dash long enough to cover a
+ * quarter of the circumference (2πr ≈ 1747 for r=278).
+ */
+/**
+ * Sizing and placement belong to the caller: a `class` passed into a component
+ * does NOT inherit the caller's scope id, so a rule like `.ring-hero {}` in the
+ * parent's scoped <style> would never match this element. The parent wraps this
+ * in its own positioned element instead, and the ring fills it.
+ */
+interface Props {
+	/** Seconds for one full turn. */
+	spin?: number;
+	reverse?: boolean;
+	tone?: 'brand' | 'light';
+}
+
+const { spin = 44, reverse = false, tone = 'brand' } = Astro.props;
+
+// Unique per instance: two rings on one page must not share a gradient id.
+const gid = `ring-${Math.random().toString(36).slice(2, 9)}`;
+const stroke = tone === 'light' ? '#ffffff' : 'var(--b-500)';
+const QUARTER = 437;
+const REST = 1747 - QUARTER;
+---
+
+<svg
+	viewBox="0 0 558 558"
+	fill="none"
+	aria-hidden="true"
+	class="ring"
+	style={`--spin:${spin}s; --dir:${reverse ? 'reverse' : 'normal'}`}
+>
+	<defs>
+		<linearGradient id={gid} x1="79" y1="16" x2="105" y2="237" gradientUnits="userSpaceOnUse">
+			<stop stop-color={stroke}></stop>
+			<stop offset="1" stop-color={stroke} stop-opacity="0"></stop>
+		</linearGradient>
+	</defs>
+	<circle cx="279" cy="279" r="278" stroke={stroke} stroke-opacity="0.2"></circle>
+	<circle
+		cx="279"
+		cy="279"
+		r="278"
+		stroke={`url(#${gid})`}
+		stroke-linecap="round"
+		stroke-dasharray={`${QUARTER} ${REST}`}
+	></circle>
+</svg>
+
+<style>
+	.ring {
+		display: block;
+		width: 100%;
+		height: 100%;
+		animation: ring-spin var(--spin) linear infinite;
+		animation-direction: var(--dir);
+	}
+	@keyframes ring-spin {
+		to {
+			transform: rotate(360deg);
+		}
+	}
+	/* The global reduced-motion rule collapses the duration, which would spin the
+	   ring through 360° in an instant on every repaint. Stop it outright. */
+	@media (prefers-reduced-motion: reduce) {
+		.ring {
+			animation: none;
+		}
+	}
+</style>
