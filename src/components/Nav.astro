@@ -10,7 +10,7 @@ const links = [
 
 <header
 	id="nav"
-	class="fixed inset-x-0 top-0 z-40 bg-paper transition-shadow duration-300"
+	class="fixed inset-x-0 top-0 z-40 transition-[background-color,box-shadow,backdrop-filter] duration-300"
 	data-nav
 >
 	<nav class="shell flex items-center gap-6 py-4" aria-label="Principal">
@@ -56,7 +56,7 @@ const links = [
 
 	<div id="menu-movil" class="menu shell" data-menu>
 		<div class="menu-clip">
-			<div class="flex flex-col items-start gap-1 pb-6">
+			<div class="flex flex-col items-start gap-1 px-5 pt-3 pb-5">
 				{
 					links.map((l, i) => (
 						<a
@@ -119,9 +119,16 @@ const links = [
 		grid-template-rows: 0fr;
 		transition: grid-template-rows 180ms var(--ease-out);
 	}
+	/* The bar stays transparent over the hero, so the panel brings its own
+	   ground — otherwise the links open straight onto whatever is behind them.
+	   `visibility` is what keeps the shadow from painting as a blurred line
+	   while the row is collapsed to 0fr and the box has no height. */
 	.menu-clip {
 		overflow: hidden;
 		visibility: hidden;
+		border-radius: var(--radius-frame);
+		background: var(--color-paper);
+		box-shadow: var(--shadow-e2);
 		transition: visibility 0s linear 180ms;
 	}
 	.menu[data-open] {
@@ -176,11 +183,12 @@ const links = [
 	const menu = document.querySelector('[data-menu]') as HTMLElement | null;
 
 	if (nav) {
-		// The bar is opaque from the top — a translucent header over the hero left
-		// the logo and links sitting on whatever scrolled under them, and the open
-		// mobile panel had no ground of its own at all. Only the elevation is
-		// scroll-dependent now; with an opaque background the blur did nothing.
-		const solid = () => nav.classList.toggle('shadow-e1', window.scrollY > 80);
+		const solid = () => {
+			const on = window.scrollY > 80;
+			nav.classList.toggle('bg-paper/80', on);
+			nav.classList.toggle('backdrop-blur-lg', on);
+			nav.classList.toggle('shadow-e1', on);
+		};
 		solid();
 		window.addEventListener('scroll', solid, { passive: true });
 	}
