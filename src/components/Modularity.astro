@@ -1,21 +1,27 @@
 ---
+/**
+ * Short labels for the toggle demo, in the same pitch order as
+ * `../data/modules.ts`. Reportes and Clientes are the base and never turn off.
+ */
 const modules = [
 	{ label: 'Reportes', locked: true },
-	{ label: 'Clientes', locked: true },
-	{ label: 'CRM', locked: false },
-	{ label: 'Equipos', locked: false },
-	{ label: 'Cotizaciones', locked: false },
 	{ label: 'Órdenes', locked: false },
+	{ label: 'Métricas', locked: false },
+	{ label: 'Clientes', locked: true },
 	{ label: 'Calendario', locked: false },
-	{ label: 'Almacén', locked: false },
 	{ label: 'Contratos', locked: false },
+	{ label: 'Sitio web', locked: false },
+	{ label: 'Almacén', locked: false },
+	{ label: 'Cotizaciones', locked: false },
+	{ label: 'Equipos', locked: false },
 	{ label: 'Facturación', locked: false },
+	{ label: 'App de campo', locked: false },
 ];
 ---
 
-<section class="shell py-16 sm:py-24">
-	<div class="rounded-card bg-paper p-6 shadow-e2 sm:p-10">
-		<div class="grid gap-10 lg:grid-cols-[1fr_1fr] lg:items-center">
+<section class="border-t border-hair bg-paper py-16 sm:py-24">
+	<div class="shell">
+		<div class="grid grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-center">
 			<div>
 				<p class="label">Modularidad</p>
 				<h2 class="measure-head mt-3 text-h1 font-semibold tracking-[-0.025em]">Activa solo lo que necesitas.</h2>

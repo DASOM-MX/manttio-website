@@ -10,8 +10,11 @@ import superadminEquipos from '../assets/app/superadmin-equipos.png';
 import superadminReportes from '../assets/app/superadmin-reportes.png';
 
 /**
- * The eleven modules, in pitch order. Claims are verified against the module
- * plans in `manttio-whitelabeled/.claude/plans/superadmin/`.
+ * The twelve modules, in pitch order (owner, 2026-08-21). The order is a sales
+ * decision, not a dependency order: the strongest proof points lead, the two
+ * unshipped modules and the remaining shipped ones sit in the middle, and the
+ * field app closes. Claims are verified against the module plans in
+ * `manttio-whitelabeled/.claude/plans/superadmin/`.
  *
  * `shipped: false` renders a "Próximamente" chip. The split follows what is
  * actually routed in the app (owner, 2026-08-19), NOT the whitelabeled
@@ -72,91 +75,6 @@ export const MODULES: Module[] = [
 		],
 	},
 	{
-		id: 'campo',
-		shot: fieldappReportes,
-		shotKind: 'mobile',
-		name: 'App de campo',
-		icon: 'lucide:smartphone',
-		plan: 'field app',
-		shipped: true,
-		crumb: 'App de campo / Sincronización',
-		claim:
-			'Funciona sin señal. El técnico captura en el sótano y todo sube solo en cuanto recupera la red.',
-		stats: [
-			{ value: '3', label: 'Por sincronizar', hi: true },
-			{ value: '12', label: 'Técnicos activos' },
-		],
-		rows: [
-			{ title: 'Captura offline · Hotel Vista Real', meta: 'hace 2 h', chip: 'Sincronizado', state: 'ok' },
-			{ title: 'Firma del cliente capturada', meta: 'hace 2 h', chip: 'Sincronizado', state: 'ok' },
-			{ title: 'Fotos de evidencia (4)', meta: 'en cola', chip: 'Pendiente', state: 'wait' },
-		],
-	},
-	{
-		id: 'crm',
-		shot: superadminClientes,
-		shotKind: 'desktop',
-		name: 'Clientes y CRM',
-		icon: 'lucide:users',
-		plan: '07 · 08',
-		shipped: true,
-		crumb: 'Clientes / Hotel Vista Real',
-		claim:
-			'Una ficha completa por cliente y una bitácora de actividad que no se edita ni se borra. Cada seguimiento con su fecha y cada cliente con su origen.',
-		stats: [
-			{ value: '38', label: 'Clientes activos' },
-			{ value: '6', label: 'Seguimientos hoy', hi: true },
-			{ value: '2', label: 'Vencidos' },
-		],
-		rows: [
-			{ title: 'Llamada · confirma visita del jueves', meta: 'Hoy 10:24', chip: 'Nota', state: 'wait' },
-			{ title: 'Cambio de estatus → Cliente', meta: 'Ayer', chip: 'Sistema', state: 'act' },
-			{ title: 'Seguimiento programado', meta: '22 ago', chip: 'Agendado', state: 'ok' },
-		],
-	},
-	{
-		id: 'equipos',
-		shot: superadminEquipos,
-		shotKind: 'desktop',
-		name: 'Equipos',
-		icon: 'lucide:gauge',
-		plan: '11',
-		shipped: true,
-		crumb: 'Clientes / Hotel Vista Real / Equipos',
-		claim:
-			'Historial de servicio por unidad. Convierte «visitamos el hotel» en «este compresor lleva tres reparaciones, conviene reemplazarlo».',
-		stats: [
-			{ value: '14', label: 'Equipos registrados' },
-			{ value: '3', label: 'Servicios de la unidad', hi: true },
-		],
-		rows: [
-			{ title: 'Compresor Bitzer 4VE-6 · serie 88214', meta: '3 servicios', chip: 'En sitio', state: 'ok' },
-			{ title: 'Chiller York YCAL · 40 TR', meta: '7 servicios', chip: 'En sitio', state: 'ok' },
-			{ title: 'Manejadora Trane · nave 2', meta: '1 servicio', chip: 'Garantía', state: 'act' },
-		],
-	},
-	{
-		id: 'cotizaciones',
-		shot: superadminCotizaciones,
-		shotKind: 'desktop',
-		name: 'Cotizaciones',
-		icon: 'lucide:file-check',
-		plan: '20',
-		shipped: true,
-		crumb: 'Cotizaciones / COT-0184',
-		claim:
-			'El cliente aprueba o rechaza desde un enlace, sin crear cuenta ni contraseña. Precio, unidad y cantidad quedan fijos desde que se crea la cotización.',
-		stats: [
-			{ value: '$184,200', label: 'En revisión', hi: true },
-			{ value: '5', label: 'Esperando aprobación' },
-		],
-		rows: [
-			{ title: 'COT-0184 · Hotel Vista Real', meta: '18 ago', chip: 'Esperando', state: 'act' },
-			{ title: 'COT-0183 · Planta Norte', meta: '16 ago', chip: 'Aprobada', state: 'ok' },
-			{ title: 'COT-0179 · Bodega Sur', meta: '11 ago', chip: 'Rechazada', state: 'wait' },
-		],
-	},
-	{
 		id: 'ordenes',
 		shot: superadminOrdenes,
 		shotKind: 'desktop',
@@ -178,10 +96,52 @@ export const MODULES: Module[] = [
 		],
 	},
 	{
+		id: 'metricas',
+		name: 'Métricas de clientes',
+		icon: 'lucide:chart-no-axes-column',
+		plan: '08 · utm-params',
+		shipped: true,
+		crumb: 'Clientes / Panel',
+		claim:
+			'Cuántos leads entraron, cuántos se volvieron clientes y por qué canal llegaron. El origen se graba una sola vez y ya nadie lo puede modificar.',
+		stats: [
+			{ value: '37', label: 'Leads del mes', hi: true },
+			{ value: '11', label: 'Nuevos activos' },
+			{ value: '30%', label: 'Conversión' },
+		],
+		rows: [
+			{ title: 'Facebook · 14 leads', meta: '3 activos', chip: 'Canal', state: 'ok' },
+			{ title: 'Google · 9 leads', meta: '4 activos', chip: 'Canal', state: 'ok' },
+			{ title: 'WhatsApp · 5 leads', meta: '2 activos', chip: 'Canal', state: 'act' },
+		],
+	},
+	{
+		id: 'crm',
+		shot: superadminClientes,
+		shotKind: 'desktop',
+		name: 'Clientes',
+		icon: 'lucide:users',
+		plan: '07 · 08',
+		shipped: true,
+		crumb: 'Clientes / Hotel Vista Real',
+		claim:
+			'Una ficha completa por cliente y una bitácora de actividad que no se edita ni se borra. Cada llamada, cada visita y cada acuerdo con su fecha y su responsable.',
+		stats: [
+			{ value: '38', label: 'Clientes activos' },
+			{ value: '6', label: 'Seguimientos hoy', hi: true },
+			{ value: '2', label: 'Vencidos' },
+		],
+		rows: [
+			{ title: 'Llamada · confirma visita del jueves', meta: 'Hoy 10:24', chip: 'Nota', state: 'wait' },
+			{ title: 'Cambio de estatus → Cliente', meta: 'Ayer', chip: 'Sistema', state: 'act' },
+			{ title: 'Seguimiento programado', meta: '22 ago', chip: 'Agendado', state: 'ok' },
+		],
+	},
+	{
 		id: 'calendario',
 		shot: superadminCalendario,
 		shotKind: 'desktop',
-		name: 'Calendario',
+		name: 'Calendario de visitas',
 		icon: 'lucide:calendar-days',
 		plan: '12',
 		shipped: true,
@@ -196,26 +156,6 @@ export const MODULES: Module[] = [
 			{ title: 'Mar 09:00 · Hotel Vista Real', meta: 'J. Ramírez', chip: 'Asignada', state: 'act' },
 			{ title: 'Mié 13:00 · Planta Norte', meta: 'L. Ortega', chip: 'Atendida', state: 'ok' },
 			{ title: 'Jue 08:00 · Bodega Sur', meta: 'sin asignar', chip: 'Pendiente', state: 'wait' },
-		],
-	},
-	{
-		id: 'almacen',
-		name: 'Almacén',
-		icon: 'lucide:package',
-		plan: '10',
-		shipped: false,
-		crumb: 'Almacén / Existencias',
-		claim:
-			'Existencias por técnico y por camioneta, reabastecimientos con evidencia y material descontado desde el reporte. Ningún movimiento se edita después.',
-		stats: [
-			{ value: '312', label: 'SKU en catálogo' },
-			{ value: '4', label: 'Almacenes' },
-			{ value: '2', label: 'Bajo mínimo', hi: true },
-		],
-		rows: [
-			{ title: 'Refrigerante R-410A · Camioneta 3', meta: '12 kg', chip: 'En rango', state: 'ok' },
-			{ title: 'Filtro 20x25x1 · Bodega central', meta: '8 pz', chip: 'Bajo mínimo', state: 'wait' },
-			{ title: 'Reabastecimiento · factura cargada', meta: 'hoy', chip: 'Por aprobar', state: 'act' },
 		],
 	},
 	{
@@ -240,6 +180,88 @@ export const MODULES: Module[] = [
 		],
 	},
 	{
+		id: 'sitio',
+		name: 'Sitio web y CMS',
+		icon: 'lucide:globe',
+		plan: '03 · 04 · 15',
+		shipped: true,
+		crumb: 'Sitio web / Contenido',
+		claim:
+			'Tu sitio público se edita desde el mismo sistema: contenido, secciones y publicación, con tu nombre, tus colores y tu logotipo. Es exactamente la página que estás leyendo.',
+		stats: [
+			{ value: '1', label: 'Sitio publicado', hi: true },
+			{ value: '2', label: 'Escalas de color' },
+			{ value: '10', label: 'Tipografías' },
+		],
+		rows: [
+			{ title: 'Color primario · escala completa', meta: 'materializada', chip: 'Aplicada', state: 'ok' },
+			{ title: 'Logotipo claro y oscuro', meta: 'cargados', chip: 'Aplicada', state: 'ok' },
+			{ title: 'Sitio público · contenido publicado', meta: 'hace 3 días', chip: 'En línea', state: 'ok' },
+		],
+	},
+	{
+		id: 'almacen',
+		name: 'Almacén',
+		icon: 'lucide:package',
+		plan: '10',
+		shipped: false,
+		crumb: 'Almacén / Existencias',
+		claim:
+			'Existencias por técnico y por camioneta, reabastecimientos con evidencia y material descontado desde el reporte. Ningún movimiento se edita después.',
+		stats: [
+			{ value: '312', label: 'SKU en catálogo' },
+			{ value: '4', label: 'Almacenes' },
+			{ value: '2', label: 'Bajo mínimo', hi: true },
+		],
+		rows: [
+			{ title: 'Refrigerante R-410A · Camioneta 3', meta: '12 kg', chip: 'En rango', state: 'ok' },
+			{ title: 'Filtro 20x25x1 · Bodega central', meta: '8 pz', chip: 'Bajo mínimo', state: 'wait' },
+			{ title: 'Reabastecimiento · factura cargada', meta: 'hoy', chip: 'Por aprobar', state: 'act' },
+		],
+	},
+	{
+		id: 'cotizaciones',
+		shot: superadminCotizaciones,
+		shotKind: 'desktop',
+		name: 'Cotizaciones',
+		icon: 'lucide:file-check',
+		plan: '20',
+		shipped: true,
+		crumb: 'Cotizaciones / COT-0184',
+		claim:
+			'El cliente aprueba o rechaza desde un enlace, sin crear cuenta ni contraseña. Precio, unidad y cantidad quedan fijos desde que se crea la cotización.',
+		stats: [
+			{ value: '$184,200', label: 'En revisión', hi: true },
+			{ value: '5', label: 'Esperando aprobación' },
+		],
+		rows: [
+			{ title: 'COT-0184 · Hotel Vista Real', meta: '18 ago', chip: 'Esperando', state: 'act' },
+			{ title: 'COT-0183 · Planta Norte', meta: '16 ago', chip: 'Aprobada', state: 'ok' },
+			{ title: 'COT-0179 · Bodega Sur', meta: '11 ago', chip: 'Rechazada', state: 'wait' },
+		],
+	},
+	{
+		id: 'equipos',
+		shot: superadminEquipos,
+		shotKind: 'desktop',
+		name: 'Equipos',
+		icon: 'lucide:gauge',
+		plan: '11',
+		shipped: true,
+		crumb: 'Clientes / Hotel Vista Real / Equipos',
+		claim:
+			'Historial de servicio por unidad. Convierte «visitamos el hotel» en «este compresor lleva tres reparaciones, conviene reemplazarlo».',
+		stats: [
+			{ value: '14', label: 'Equipos registrados' },
+			{ value: '3', label: 'Servicios de la unidad', hi: true },
+		],
+		rows: [
+			{ title: 'Compresor Bitzer 4VE-6 · serie 88214', meta: '3 servicios', chip: 'En sitio', state: 'ok' },
+			{ title: 'Chiller York YCAL · 40 TR', meta: '7 servicios', chip: 'En sitio', state: 'ok' },
+			{ title: 'Manejadora Trane · nave 2', meta: '1 servicio', chip: 'Garantía', state: 'act' },
+		],
+	},
+	{
 		id: 'facturacion',
 		name: 'Facturación',
 		icon: 'lucide:receipt',
@@ -259,23 +281,24 @@ export const MODULES: Module[] = [
 		],
 	},
 	{
-		id: 'marca',
-		name: 'Tu marca',
-		icon: 'lucide:palette',
-		plan: '03 · 04 · 15',
+		id: 'campo',
+		shot: fieldappReportes,
+		shotKind: 'mobile',
+		name: 'App de campo',
+		icon: 'lucide:smartphone',
+		plan: 'field app',
 		shipped: true,
-		crumb: 'Marca / Identidad',
+		crumb: 'App de campo / Sincronización',
 		claim:
-			'Tu nombre, tus colores y tu sitio web. La app, los PDF y los correos salen con tu identidad, nunca con la nuestra. Es exactamente lo que hace esta página mientras la lees.',
+			'Funciona sin señal. El técnico captura en el sótano y todo sube solo en cuanto recupera la red.',
 		stats: [
-			{ value: '2', label: 'Escalas de color', hi: true },
-			{ value: '10', label: 'Tipografías' },
-			{ value: '1', label: 'Sitio publicado' },
+			{ value: '3', label: 'Por sincronizar', hi: true },
+			{ value: '12', label: 'Técnicos activos' },
 		],
 		rows: [
-			{ title: 'Color primario · escala completa', meta: 'materializada', chip: 'Aplicada', state: 'ok' },
-			{ title: 'Logotipo claro y oscuro', meta: 'cargados', chip: 'Aplicada', state: 'ok' },
-			{ title: 'Sitio público · contenido publicado', meta: 'hace 3 días', chip: 'En línea', state: 'ok' },
+			{ title: 'Captura offline · Hotel Vista Real', meta: 'hace 2 h', chip: 'Sincronizado', state: 'ok' },
+			{ title: 'Firma del cliente capturada', meta: 'hace 2 h', chip: 'Sincronizado', state: 'ok' },
+			{ title: 'Fotos de evidencia (4)', meta: 'en cola', chip: 'Pendiente', state: 'wait' },
 		],
 	},
 ];
