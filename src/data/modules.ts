@@ -1,6 +1,7 @@
 import type { ImageMetadata } from 'astro';
 
 import fieldappReportes from '../assets/app/fieldapp-reportes.png';
+import superadminMetricas from '../assets/app/superadmin-metricas.png';
 import superadminCalendario from '../assets/app/superadmin-calendario.png';
 import superadminClientes from '../assets/app/superadmin-clientes.png';
 import superadminContratos from '../assets/app/superadmin-contratos.png';
@@ -97,17 +98,19 @@ export const MODULES: Module[] = [
 	},
 	{
 		id: 'metricas',
+		shot: superadminMetricas,
+		shotKind: 'desktop',
 		name: 'Métricas de clientes',
 		icon: 'lucide:chart-no-axes-column',
 		plan: '08 · utm-params',
 		shipped: true,
-		crumb: 'Clientes / Panel',
+		crumb: 'CRM / Dashboard',
 		claim:
 			'Cuántos leads entraron, cuántos se volvieron clientes y por qué canal llegaron. El origen se graba una sola vez y ya nadie lo puede modificar.',
 		stats: [
 			{ value: '37', label: 'Leads del mes', hi: true },
 			{ value: '11', label: 'Nuevos activos' },
-			{ value: '30%', label: 'Conversión' },
+			{ value: '23%', label: 'Conversión' },
 		],
 		rows: [
 			{ title: 'Facebook · 14 leads', meta: '3 activos', chip: 'Canal', state: 'ok' },
