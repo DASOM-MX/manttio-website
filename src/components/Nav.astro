@@ -119,15 +119,26 @@ const links = [
 		grid-template-rows: 0fr;
 		transition: grid-template-rows 180ms var(--ease-out);
 	}
-	/* The bar stays transparent over the hero, so the panel brings its own
+	/* Over the hero the bar is fully transparent, so the panel brings its own
 	   ground — otherwise the links open straight onto whatever is behind them.
-	   A plain full-bleed sheet: no radius, no shadow, no border. Anything else
-	   reads as a card floating over the section behind it. */
+	   Same treatment as the bar: translucent paper plus the blur, never a
+	   card — no radius, no shadow, no border. */
 	.menu-clip {
 		overflow: hidden;
 		visibility: hidden;
-		background: var(--color-paper);
-		transition: visibility 0s linear 180ms;
+		background: color-mix(in oklab, var(--color-paper) 65%, transparent);
+		backdrop-filter: blur(16px);
+		transition:
+			visibility 0s linear 180ms,
+			background-color 300ms;
+	}
+	/* Past the scroll threshold the header paints 80% paper across its whole
+	   box — the panel included. A second layer here would stack on top of that
+	   and leave the panel reading whiter than the bar above it, so it drops out
+	   and lets the bar's own ground show through. */
+	[data-solid] .menu-clip {
+		background: transparent;
+		backdrop-filter: none;
 	}
 	.menu[data-open] {
 		grid-template-rows: 1fr;
@@ -186,6 +197,8 @@ const links = [
 			nav.classList.toggle('bg-paper/80', on);
 			nav.classList.toggle('backdrop-blur-lg', on);
 			nav.classList.toggle('shadow-e1', on);
+			// The panel keys off this to avoid double-painting its ground.
+			nav.toggleAttribute('data-solid', on);
 		};
 		solid();
 		window.addEventListener('scroll', solid, { passive: true });
