@@ -1,19 +1,28 @@
 ---
+import { Icon } from "astro-icon/components";
+import { MODULES } from "../data/modules";
+import AppShot from "./AppShot.astro";
+import BrandRing from "./BrandRing.astro";
+
 /**
  * Hero + module showcase as one continuous scroll scene.
  *
- * The product frame starts small in the hero's top-right, scales up as you
- * scroll, and locks as the exact frame the module rail then drives — so the
- * hero doesn't hand off to the showcase, it *becomes* it.
+ * There is only ever ONE product shot on this screen. It starts in the hero's
+ * right-hand column, and as you scroll it grows and travels into the module
+ * stage's locked position — bleeding off the right edge — while the hero copy
+ * clears out and the ground cross-fades to night. The hero doesn't hand off to
+ * the showcase, it *becomes* it.
  *
- * On a phone there is no grow phase: the hero stays in normal flow and the
- * modules get their own sticky scene below it — locked to the viewport,
- * full-bleed, one panel per screenful of scroll.
+ * Past the lock the stage stays pinned and each screenful of scroll steps to
+ * the next module.
+ *
+ * Everything above lives under `[data-ready]`, which the inline script below
+ * only sets on a viewport wide and tall enough to hold the locked stage, with
+ * motion allowed. Without it — no JS, a phone, a short window, or
+ * `prefers-reduced-motion` — the same markup lays out as two ordinary stacked
+ * sections: the light hero, then the night module block with a horizontal chip
+ * rail. That is the layout this page shipped before the scene came back.
  */
-import { Icon } from 'astro-icon/components';
-import { MODULES } from '../data/modules';
-import AppShot from './AppShot.astro';
-
 const steps = MODULES.length;
 
 /**
@@ -26,721 +35,921 @@ const steps = MODULES.length;
  * few seconds is noise, not information.
  */
 const SUBJECTS = [
-	'Tu negocio',
-	'Tus reportes',
-	'Tus clientes',
-	'Tus órdenes',
-	'Tu calendario',
-	'Tus facturas',
-	'Tus contratos',
-	'Tu sitio',
+  "Tu negocio",
+  "Tus reportes",
+  "Tus clientes",
+  "Tus órdenes",
+  "Tu calendario",
+  "Tus facturas",
+  "Tus contratos",
+  "Tu sitio",
 ];
 
-/** Scroll budget, in vh, for each phase after the initial viewport. */
+/** Scroll budget, in vh, for each phase after the first viewport. */
 const GROW = 60;
 const STEP = 38;
-/** Mobile has no grow phase, just one locked viewport per module. */
-const MSTEP = 42;
-
 ---
 
 <section
-	id="inicio"
-	class="scene"
-	style={`--steps:${steps}; --grow:${GROW}; --step:${STEP}; --mstep:${MSTEP}`}
-	data-scene
-	data-scene-grow={GROW}
-	data-scene-step={STEP}
+  id="inicio"
+  class="scene"
+  style={`--steps:${steps}; --grow:${GROW}; --step:${STEP}`}
+  data-scene
+  data-grow={GROW}
+  data-step={STEP}
 >
-	<div class="stage">
-		<!-- brand glows, same as before -->
-		<div class="pointer-events-none absolute inset-0 -z-10 overflow-hidden" aria-hidden="true">
-			<span class="tint absolute -top-40 -left-24 size-[34rem] rounded-full bg-brand-400 opacity-[0.18] blur-[90px]"></span>
-			<span class="tint absolute top-10 -right-20 size-[26rem] rounded-full bg-brand-300 opacity-[0.16] blur-[90px]"></span>
-		</div>
+  <div class="stage" data-stage>
+    <!-- The night ground arrives during the transit, so the shot appears to
+         travel out of the light hero and into the dark module stage. -->
+    <span class="night" aria-hidden="true" data-night></span>
 
-		<!-- ---------- hero copy ---------- -->
-		<div class="hero shell" data-hero>
-			<h1 class="text-hero font-semibold flex gap-3 items-start tracking-[-0.04em]" data-rot-title>
-				<span class="rot-tail">Tu negocio en un solo lugar.</span>
-			</h1>
+    <!-- ---------- hero ---------- -->
+    <div class="hero" data-hero>
+      <div class="glow" aria-hidden="true">
+        <span
+          class="tint absolute -top-40 -left-24 size-[34rem] rounded-full bg-brand-400 opacity-[0.16] blur-[90px]"
+        ></span>
+      </div>
 
-			<!-- description + CTAs, left, directly under the title -->
-			<div class="hero-copy">
-				<p class="text-lead text-ink-muted">
-					Manten la operacion y la informacion de tu negocio de servicios tecnicos en orden con nosotros.
-					Tu pones tu marca y nosotros nos encargamos del resto, respira y olvidate del desorden con Manttio.
-				</p>
-				<div class="mt-8 flex flex-col gap-3 sm:flex-row">
-					<a
-						href="#contacto"
-						class="tint inline-flex items-center justify-center gap-2 rounded-full bg-brand-ink px-7 py-3.5 font-medium text-paper shadow-[0_10px_28px_color-mix(in_oklab,var(--b-500)_32%,transparent)]"
-						data-magnetic
-					>
-						Solicitar demo
-						<Icon name="lucide:arrow-right" class="size-4" />
-					</a>
-					<a
-						href="#modulos"
-						class="inline-flex items-center justify-center rounded-full bg-paper px-7 py-3.5 font-medium shadow-e1 transition-transform hover:-translate-y-px"
-					>
-						Ver los módulos
-					</a>
-				</div>
-			</div>
-		</div>
+      <div class="shell hero-grid">
+        <div class="min-w-0 lg:col-span-7 xl:col-span-6">
+          <h1
+            class="text-display font-semibold tracking-[-0.035em]"
+            data-rot-title
+          >
+            <span class="rot" aria-hidden="true">
+              {
+                SUBJECTS.map((subject, i) => (
+                  <span
+                    class="rot-item"
+                    data-rot-item
+                    data-active={i === 0 ? true : undefined}
+                  >
+                    {subject}
+                  </span>
+                ))
+              }
+            </span>
+            <span class="sr-only">{SUBJECTS[0]}</span>
+            <span class="rot-tail">en un solo lugar.</span>
+          </h1>
 
-		<!-- ---------- modules: rail + frame ----------
-		     Desktop: the wrappers are display:contents, so both children keep
-		     positioning against the sticky stage. Mobile: the wrappers ARE the
-		     scene — .mod carries the scroll budget, .mod-stage locks to the
-		     viewport while the panels cross-fade. -->
-		<div class="mod" data-mod>
-			<div class="mod-stage">
-				<!-- ---------- module rail (fades in once the frame locks) ---------- -->
-				<div class="rail-wrap shell" data-rail-wrap>
-					<div class="rail-inner">
-						<div class="mb-7">
-							<p class="label">Los módulos</p>
-							<h2 id="modulos" class="mt-3 text-h2 font-semibold tracking-[-0.025em]">
-								Once piezas. Enciendes las que usas.
-							</h2>
-						</div>
+          <p class="measure-lead mt-6 text-lead text-ink-muted">
+            Mantén en orden la operación y la información de tu negocio de
+            servicios técnicos: maneja todos tus procesos en un solo lugar y
+            revisa reportes, clientes, órdenes de servicio, contratos,
+            inventarios y más con nosotros.
+            <br />
+            <br />
+            Tú pones tu marca y nosotros nos encargamos del resto. Respira y
+            olvídate del desorden con Manttio.
+          </p>
 
-						<!-- Mobile: the chips are gone, this names what is on screen. -->
-						<p class="now" aria-hidden="true">
-							{
-								MODULES.map((m, i) => (
-									<span class="now-item" data-now-item data-active={i === 0 ? true : undefined}>
-										<Icon name={m.icon} class="size-[18px] shrink-0" />
-										<span class="now-name">{m.name}</span>
-										<span class="now-i">
-											{String(i + 1).padStart(2, '0')}/{String(steps).padStart(2, '0')}
-										</span>
-									</span>
-								))
-							}
-						</p>
+          <div class="mt-9 flex flex-col gap-3 sm:flex-row">
+            <a
+              href="#contacto"
+              class="tint inline-flex items-center justify-center gap-2 rounded-full bg-brand-ink px-7 py-3.5 font-medium text-paper shadow-[0_10px_28px_color-mix(in_oklab,var(--b-500)_32%,transparent)]"
+              data-magnetic
+            >
+              Solicitar demo
+              <Icon name="lucide:arrow-right" class="size-4" />
+            </a>
+            <a
+              href="#modulos"
+              class="inline-flex items-center justify-center rounded-full bg-paper px-7 py-3.5 font-medium shadow-e1 transition-transform hover:-translate-y-px"
+            >
+              Ver los módulos
+            </a>
+          </div>
+        </div>
 
-						<div class="rail" role="tablist" aria-label="Módulos de Manttio">
-							{
-								MODULES.map((m, i) => (
-									<button
-										type="button"
-										role="tab"
-										id={`tab-${m.id}`}
-										aria-controls={`panel-${m.id}`}
-										aria-selected={i === 0 ? 'true' : 'false'}
-										tabindex={i === 0 ? 0 : -1}
-										class="rail-item"
-										data-rail-item
-									>
-										<Icon name={m.icon} class="size-[17px] shrink-0" />
-										<span class="whitespace-nowrap">{m.name}</span>
-										{!m.shipped && <span class="soon">Próximamente</span>}
-									</button>
-								))
-							}
-						</div>
-					</div>
-				</div>
+        <!-- The ring sits behind the shot and is clipped by the stage, so it
+             reads as an object passing behind the product rather than a badge
+             stuck next to it. -->
+        <div class="relative min-w-0 lg:col-span-5 xl:col-span-6">
+          <div class="ring-slot ring-hero" aria-hidden="true">
+            <BrandRing />
+          </div>
+          <!-- Once the scene is running this only reserves the geometry the
+               travelling frame starts from — `measure()` reads its box. It
+               still renders a real shot, because in the fallback layout it IS
+               the hero's shot. Same file as panel 01, so it is one download. -->
+          <div class="hero-slot" data-hero-slot>
+            <AppShot module={MODULES[0]} loading="eager" />
+          </div>
+        </div>
+      </div>
+    </div>
 
-				<!-- ---------- the frame: small in the hero, locked as the stage ---------- -->
-				<div class="frame-slot shell" aria-hidden="false">
-					<div class="frame" data-frame>
-						{
-							MODULES.map((m, i) => (
-								<div
-									class="panel"
-									id={`panel-${m.id}`}
-									role="tabpanel"
-									aria-labelledby={`tab-${m.id}`}
-									data-panel
-									data-active={i === 0 ? true : undefined}
-									aria-hidden={i === 0 ? 'false' : 'true'}
-								>
-									<AppShot module={m} loading={i === 0 ? 'eager' : 'lazy'} />
-								</div>
-							))
-						}
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+    <!-- ---------- modules ----------
+         `.mod` is `display: contents` once the scene is running, so the rail
+         and the frame position against the sticky stage. In the fallback it is
+         a real block and carries the night ground for both of them. -->
+    <div class="mod">
+      <div class="rail-wrap" data-rail-wrap>
+        <div class="ring-slot ring-mod" aria-hidden="true">
+          <BrandRing tone="light" spin={72} reverse />
+        </div>
+
+        <div class="shell rail-grid">
+          <div class="rail-col min-w-0">
+            <div class="rail-head">
+              <p class="now nums" aria-hidden="true">
+                <span data-now-i>01</span>/{String(steps).padStart(2, "0")}
+              </p>
+            </div>
+            <h2
+              id="modulos"
+              class="rail-title mt-2 font-semibold tracking-[-0.025em]"
+            >
+              Doce módulos: paga los que necesites
+            </h2>
+
+            <!-- One tablist for both layouts: in the fallback it is a
+                 horizontal snap rail of chips with the claim hidden, in the
+                 scene it is a vertical list where the selected card opens to
+                 show its claim and its ground runs on under the shot. -->
+            <div
+              class="rail"
+              role="tablist"
+              aria-label="Módulos de Manttio"
+              data-rail
+            >
+              {
+                MODULES.map((m, i) => (
+                  <button
+                    type="button"
+                    role="tab"
+                    id={`tab-${m.id}`}
+                    aria-controls={`panel-${m.id}`}
+                    aria-selected={i === 0 ? "true" : "false"}
+                    tabindex={i === 0 ? 0 : -1}
+                    class="tab"
+                    data-tab
+                  >
+                    <span class="tab-head">
+                      <Icon name={m.icon} class="size-[18px] shrink-0" />
+                      <span class="tab-name">{m.name}</span>
+                      {!m.shipped && <span class="soon">Próximamente</span>}
+                    </span>
+                    <span class="tab-claim">
+                      <span class="tab-claim-in">{m.claim}</span>
+                    </span>
+                  </button>
+                ))
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="frame-slot">
+        <div class="shell frame-grid">
+          <div class="frame-col min-w-0">
+            <div class="frame" data-frame>
+              {
+                MODULES.map((m, i) => (
+                  <div
+                    class="panel"
+                    id={`panel-${m.id}`}
+                    role="tabpanel"
+                    aria-labelledby={`tab-${m.id}`}
+                    data-panel
+                    data-kind={m.shotKind ?? "faux"}
+                    data-active={i === 0 ? true : undefined}
+                    aria-hidden={i === 0 ? "false" : "true"}
+                  >
+                    <AppShot module={m} loading={i === 0 ? "eager" : "lazy"} />
+                  </div>
+                ))
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
 
+<!-- Runs during parse, before the module script below and before first paint,
+     so a wide viewport never flashes the fallback layout on its way to the
+     scene. The module script owns it from there (resize, breakpoint change). -->
+<script is:inline>
+  (function () {
+    var s = document.querySelector("[data-scene]");
+    if (
+      s &&
+      window.matchMedia("(min-width: 1024px)").matches &&
+      window.matchMedia("(min-height: 720px)").matches &&
+      !window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      s.setAttribute("data-ready", "");
+    }
+  })();
+</script>
+
 <style>
-	/* ------------------------------------------------------------------
-	   Shared
-	   ------------------------------------------------------------------ */
-	.hero {
-		display: flex;
-		min-height: 100svh;
-		flex-direction: column;
-		justify-content: flex-start;
-		gap: 2.75rem;
-		padding-block: 7.5rem 3rem;
-	}
-	.hero-copy {
-		max-width: 46ch;
-	}
+  /* ==================================================================
+     Fallback layout — no JS, a phone, or reduced motion.
+     Two ordinary stacked sections: the light hero, then the night module
+     block with a horizontal chip rail. Everything here is also the base
+     the scene layout below builds on.
+     ================================================================== */
+  .glow {
+    position: absolute;
+    inset: 0;
+    z-index: -10;
+    pointer-events: none;
+  }
+  .hero {
+    position: relative;
+    overflow: hidden;
+    padding-block: 8rem 4rem;
+  }
+  .hero-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: center;
+    gap: 3.5rem;
+  }
 
-	/* Subject and tail are separate lines, so a longer word never shoves "en un
-	   solo lugar." sideways. Grid stacking drops every subject into the same
-	   cell, which reserves the tallest one up front — that is what keeps the
-	   line below from jumping when a word wraps on a narrow phone. Aligning to
-	   the end sends the reserve upward, into the space under the nav, instead of
-	   opening a gap above the tail. */
-	.rot {
-		display: grid;
-		grid-template-areas: 'subject';
-		align-items: end;
-	}
-	.rot-tail {
-		display: block;
-	}
-	.rot-item {
-		grid-area: subject;
-		justify-self: start;
-		opacity: 0;
-		transform: translateY(0.22em);
-		transition:
-			opacity 180ms linear,
-			transform 180ms var(--ease-out);
-	}
-	/* The incoming word rises over ~half a second; the outgoing one leaves
-	   upward in the 180 ms above, so the two never read as one movement. */
-	.rot-item[data-active] {
-		opacity: 1;
-		transform: none;
-		transition-duration: 520ms;
-	}
-	.rot-item[data-out] {
-		transform: translateY(-0.26em);
-	}
+  .ring-slot {
+    position: absolute;
+    pointer-events: none;
+  }
+  .ring-hero {
+    top: 50%;
+    left: 50%;
+    width: 42rem;
+    height: 42rem;
+    translate: -50% -50%;
+    opacity: 0.55;
+  }
+  .ring-mod {
+    top: 50%;
+    right: -14rem;
+    width: 46rem;
+    height: 46rem;
+    translate: 0 -50%;
+    opacity: 0.5;
+  }
 
-	.rail {
-		display: flex;
-		gap: 0.5rem;
-		overflow-x: auto;
-		scroll-snap-type: x mandatory;
-		padding-bottom: 0.5rem;
-		scrollbar-width: none;
-	}
-	.rail::-webkit-scrollbar {
-		display: none;
-	}
-	.rail-item {
-		display: flex;
-		align-items: center;
-		gap: 0.6rem;
-		flex: 0 0 auto;
-		scroll-snap-align: start;
-		border-radius: 999px;
-		padding: 0.6rem 1rem;
-		color: var(--color-ink-muted);
-		background: var(--color-paper);
-		box-shadow: var(--shadow-ring);
-		cursor: pointer;
-		transition:
-			color 200ms ease,
-			box-shadow 200ms ease;
-	}
-	.rail-item[aria-selected='true'] {
-		color: var(--color-ink);
-		box-shadow: var(--shadow-e1);
-	}
-	.rail-item .soon {
-		font-size: 0.6875rem;
-		letter-spacing: 0.06em;
-		text-transform: uppercase;
-		color: var(--color-ink-faint);
-		background: var(--color-mist);
-		border-radius: 999px;
-		padding: 0.05rem 0.45rem;
-	}
+  .mod {
+    position: relative;
+    overflow: hidden;
+    background: var(--color-night);
+    color: var(--color-paper);
+    padding-block: 5rem;
+  }
+  .rail-wrap {
+    position: relative;
+  }
+  .rail-grid,
+  .frame-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .frame-slot {
+    margin-top: 3rem;
+  }
 
-	.panel {
-		opacity: 0;
-		transition: opacity 320ms ease;
-	}
-	.panel[data-active] {
-		opacity: 1;
-	}
+  .rail-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .label-light {
+    color: rgba(255, 255, 255, 0.5);
+  }
+  .now {
+    font-size: var(--text-caption);
+    color: rgba(255, 255, 255, 0.45);
+  }
+  .rail-title {
+    font-size: var(--text-h1);
+    line-height: 1.08;
+  }
 
-	/* ------------------------------------------------------------------
-	   Mobile: hero in flow, then the modules lock to the viewport and the
-	   panels switch on scroll. Full-bleed, 2px off the edge.
-	   ------------------------------------------------------------------ */
-	@media (max-width: 1023.98px) {
-		.mod {
-			position: relative;
-			height: calc((100 + var(--steps) * var(--mstep)) * 1svh);
-		}
-		.mod-stage {
-			position: sticky;
-			top: 0;
-			display: flex;
-			height: 100svh;
-			flex-direction: column;
-			overflow: hidden;
-			padding-block: 5.5rem 1.25rem;
-		}
+  .rail {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 2rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    padding-bottom: 0.5rem;
+    /* Fades the rail out at both ends instead of cutting it, so a half-visible
+       chip reads as "there is more" rather than as a clipping bug. */
+    mask-image: linear-gradient(
+      to right,
+      transparent,
+      #000 1.75rem,
+      #000 calc(100% - 1.75rem),
+      transparent
+    );
+  }
+  .rail::-webkit-scrollbar {
+    display: none;
+  }
 
-		.rail-wrap {
-			flex: 0 0 auto;
-			width: 100%;
-			margin-inline: 0;
-			padding-inline: 1.25rem;
-		}
-		/* The chips are what the scroll replaced. */
-		.rail {
-			display: none;
-		}
+  .tab {
+    display: flex;
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+    flex-direction: column;
+    gap: 0;
+    border-radius: 999px;
+    padding: 0.6rem 1rem;
+    text-align: left;
+    color: rgba(255, 255, 255, 0.62);
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.07);
+    cursor: pointer;
+    transition:
+      color 220ms ease,
+      background-color 220ms ease,
+      box-shadow 220ms ease;
+  }
+  .tab:hover {
+    color: rgba(255, 255, 255, 0.85);
+  }
+  .tab[aria-selected="true"] {
+    color: var(--color-paper);
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16);
+  }
+  .tab-head {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .tab-name {
+    white-space: nowrap;
+    font-weight: 500;
+  }
+  /* In the chip row the claim would turn each chip into a paragraph. */
+  .tab-claim {
+    display: none;
+  }
 
-		.now {
-			display: grid;
-			margin-top: 1.5rem;
-		}
-		.now-item {
-			grid-area: 1 / 1;
-			display: flex;
-			align-items: center;
-			gap: 0.6rem;
-			font-weight: 600;
-			opacity: 0;
-			transition: opacity 260ms ease;
-		}
-		.now-item[data-active] {
-			opacity: 1;
-		}
-		.now-name {
-			min-width: 0;
-		}
-		.now-i {
-			margin-left: auto;
-			padding-left: 0.75rem;
-			font-size: var(--text-caption);
-			font-weight: 400;
-			font-variant-numeric: tabular-nums;
-			color: var(--color-ink-faint);
-		}
+  .soon {
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: rgba(255, 255, 255, 0.55);
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 999px;
+    padding: 0.1rem 0.45rem;
+  }
 
-		.frame-slot {
-			display: grid;
-			/* Both tracks capped, or the widest panel's min-content widens the
-			   column and every shot bleeds past the 2px. */
-			grid-template: minmax(0, 1fr) / minmax(0, 1fr);
-			flex: 1;
-			min-height: 0;
-			width: 100%;
-			margin-inline: 0;
-			padding: 0;
-		}
-		.frame {
-			display: grid;
-			grid-template: minmax(0, 1fr) / minmax(0, 1fr);
-			min-height: 0;
-		}
-		.panel {
-			grid-area: 1 / 1;
-			display: flex;
-			min-height: 0;
-			align-items: center;
-			justify-content: center;
-			padding: 2px;
-		}
-		/* Fit the shot to whatever height is left, ratio intact. The wrapper
-		   around a phone-shaped shot needs a definite height of its own or the
-		   image's max-height has nothing to resolve against. */
-		.panel > :global(*) {
-			max-height: 100%;
-		}
-		.panel > :global(div) {
-			display: flex;
-			height: 100%;
-			align-items: center;
-			justify-content: center;
-		}
-		.panel :global(img) {
-			width: auto;
-			height: auto;
-			max-width: 100%;
-			max-height: 100%;
-		}
-	}
+  /* One box for every module, or the phone-shaped field-app capture would set
+     the stack's height and leave the eleven wide shots floating in dead space.
+     The ratio is the desktop captures' own — 3360 × 1640 — so those fill it
+     edge to edge instead of letterboxing inside a squarer box. */
+  .frame {
+    display: grid;
+    grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+    aspect-ratio: 3360 / 1640;
+  }
+  .panel {
+    grid-area: 1 / 1;
+    display: flex;
+    min-width: 0;
+    min-height: 0;
+    align-items: center;
+    justify-content: flex-start;
+    opacity: 0;
+    transition: opacity 320ms ease;
+    pointer-events: none;
+  }
+  .panel[data-active] {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  /* The wide shots and the faux frames fill the box's width. */
+  .panel > :global(*) {
+    width: 100%;
+    max-height: 100%;
+  }
+  /* The phone capture is height-driven and stays at the left edge — centring
+     it in a box whose right half is off-screen would push it out of view. */
+  .panel[data-kind="mobile"] > :global(*) {
+    width: auto;
+    max-width: none;
+    height: 100%;
+    margin-inline: 0;
+  }
+  .panel[data-kind="mobile"] :global(img) {
+    width: auto;
+    height: 100%;
+    max-height: 100%;
+  }
 
-	/* ------------------------------------------------------------------
-	   Desktop: one sticky stage, scroll-driven.
-	   ------------------------------------------------------------------ */
-	@media (min-width: 1024px) {
-		/* The mobile scene shell disappears so the rail and frame keep
-		   positioning against the sticky stage. */
-		.mod,
-		.mod-stage {
-			display: contents;
-		}
-		.now {
-			display: none;
-		}
+  /* Below the scene breakpoint the phone is squarer, so the wide box leaves the
+     shot only ~160 px tall. Give it more height to stand in. */
+  @media (max-width: 639.98px) {
+    .frame {
+      aspect-ratio: 4 / 3;
+    }
+    .panel > :global(*) {
+      width: auto;
+      max-width: 100%;
+      height: auto;
+    }
+    .panel {
+      justify-content: center;
+    }
+  }
 
-		.scene {
-			height: calc(100vh + (var(--grow) + var(--steps) * var(--step)) * 1vh);
-		}
-		.stage {
-			position: sticky;
-			top: 0;
-			height: 100vh;
-			overflow: hidden;
-		}
+  @media (min-width: 1024px) {
+    .hero-grid {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: 2.5rem;
+    }
+  }
 
-		.hero {
-			position: absolute;
-			inset: 0;
-			min-height: 0;
-			padding-block: 9rem 2rem; /* 32px off the bottom */
-			will-change: opacity, transform;
-		}
-		/* Image takes the left of the space under the title, copy the right. */
-		.hero-copy {
-			align-self: flex-end;
-			margin-top: auto; /* push to the bottom of the hero */
-		}
+  /* ==================================================================
+     The scene — wide viewport, motion allowed.
+     ================================================================== */
+  .scene[data-ready] {
+    height: calc(100vh + (var(--grow) + var(--steps) * var(--step)) * 1vh);
+  }
+  [data-ready] .stage {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    /* The clip lives here and never on `.scene` — `overflow: hidden` on a
+       sticky element's ancestor would kill the stickiness outright. */
+    overflow: hidden;
+  }
+  [data-ready] .night {
+    position: absolute;
+    inset: 0;
+    background: var(--color-night);
+    opacity: 0;
+    pointer-events: none;
+  }
 
-		.rail-wrap {
-			position: absolute;
-			inset-block: 0;
-			left: 50%;
-			translate: -50% 0;
-			display: flex;
-			align-items: center;
-			padding-block: 0;
-			opacity: 0;
-			pointer-events: none;
-			will-change: opacity;
-		}
-		.rail-inner {
-			width: min(300px, 26%);
-		}
-		.rail {
-			flex-direction: column;
-			gap: 2px;
-			overflow: visible;
-			padding-bottom: 0;
-		}
-		.rail-item {
-			position: relative;
-			border-radius: 12px;
-			background: transparent;
-			box-shadow: none;
-			padding: 0.65rem 0.85rem;
-		}
-		.rail-item:hover {
-			color: var(--color-ink);
-			background: var(--color-paper);
-		}
-		.rail-item[aria-selected='true'] {
-			background: var(--color-paper);
-			box-shadow: var(--shadow-e1);
-		}
-		.rail-item[aria-selected='true']::before {
-			content: '';
-			position: absolute;
-			left: -0.55rem;
-			top: 25%;
-			bottom: 25%;
-			width: 3px;
-			border-radius: 3px;
-			background: var(--color-brand-500);
-			transition: background-color 1200ms ease;
-		}
-		.rail-item .soon {
-			margin-left: auto;
-		}
+  /* The mobile shell disappears so the rail and the frame keep positioning
+     against the sticky stage. */
+  [data-ready] .mod {
+    display: contents;
+  }
 
-		/* The frame's LOCKED position. Script measures this, then transforms the
-		   frame back to a small box in the hero's top-right for progress 0. */
-		.frame-slot {
-			position: absolute;
-			inset-block: 0;
-			left: 50%;
-			translate: -50% 0;
-			display: flex;
-			align-items: center;
-			justify-content: flex-end;
-			padding-bottom: 0;
-			pointer-events: none;
-		}
-		.frame {
-			display: grid;
-			width: 58%;
-			overflow: visible;
-			transform-origin: center center;
-			will-change: transform;
-			pointer-events: auto;
-		}
-		.panel {
-			grid-area: 1 / 1;
-			pointer-events: none;
-		}
-		.panel[data-active] {
-			pointer-events: auto;
-		}
-	}
+  /* Three layers over the stage, each running the same 12-column shell so the
+     hero's shot slot, the rail and the frame all line up. */
+  [data-ready] .hero,
+  [data-ready] .rail-wrap,
+  [data-ready] .frame-slot {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    margin-top: 0;
+    padding-block: 6.5rem 2.5rem;
+    overflow: visible;
+  }
+  [data-ready] .rail-grid,
+  [data-ready] .frame-grid {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: 3rem;
+  }
+  [data-ready] .rail-col {
+    grid-column: 1 / span 5;
+  }
+  [data-ready] .frame-col {
+    grid-column: 6 / span 7;
+  }
+  [data-ready] .hero {
+    will-change: opacity, transform;
+  }
+  [data-ready] .rail-wrap {
+    opacity: 0;
+    pointer-events: none;
+    will-change: opacity;
+  }
+  /* Above the rail, so the selected tab's ground disappears underneath the shot
+     rather than stopping at a hard edge. */
+  [data-ready] .frame-slot {
+    z-index: 1;
+    pointer-events: none;
+  }
+  [data-ready] .frame {
+    pointer-events: auto;
+  }
 
-	@media (prefers-reduced-motion: reduce) {
-		.panel,
-		.now-item {
-			transition: none;
-		}
-	}
+  /* Reserves the geometry the frame starts from. Same ratio as `.frame`, or the
+     uniform scale between them could only land on one axis. */
+  [data-ready] .hero-slot {
+    visibility: hidden;
+    aspect-ratio: 3360 / 1640;
+  }
+
+  [data-ready] .rail-col {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+  [data-ready] .rail-title {
+    font-size: var(--text-h2);
+    line-height: 1.15;
+  }
+  [data-ready] .rail {
+    flex-direction: column;
+    gap: 1px;
+    margin-top: 1.5rem;
+    overflow: visible;
+    padding-bottom: 0;
+    mask-image: none;
+  }
+  [data-ready] .tab {
+    /* No `width: 100%` — it would resolve against the column and cancel the
+       negative margin below, leaving the ground stopping at the column edge
+       instead of running on under the shot. The flex column stretches it. */
+    border-radius: var(--radius-soft);
+    background: transparent;
+    box-shadow: none;
+    /* Pulled left so the tab text still lines up with the heading above it, and
+       far enough right that the selected ground runs past the column gap and
+       under the shot. */
+    margin-inline: -1.15rem -6rem;
+    padding: 0.5rem 6rem 0.5rem 1.15rem;
+  }
+  [data-ready] .tab-name {
+    white-space: normal;
+  }
+  [data-ready] .tab[aria-selected="true"] {
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  }
+  /* 0fr → 1fr is the one way to open to an unknown height without measuring it
+     in JS; the inner span is what actually gets clipped. */
+  [data-ready] .tab-claim {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 260ms var(--ease-out);
+  }
+  [data-ready] .tab-claim-in {
+    overflow: hidden;
+    max-width: 46ch;
+    font-size: var(--text-caption);
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.6);
+  }
+  [data-ready] .tab[aria-selected="true"] .tab-claim {
+    grid-template-rows: 1fr;
+  }
+  [data-ready] .tab[aria-selected="true"] .tab-claim-in {
+    padding-top: 0.4rem;
+  }
+
+  /* The shot: wider than its column, so it runs past the right edge of the
+     viewport and the stage's clip cuts it. `--bleed` is the one dial. */
+  [data-ready] .frame {
+    --bleed: 42vw;
+    width: calc(100% + var(--bleed));
+    transform-origin: center center;
+    will-change: transform;
+  }
+
+  /* A 12-tab column plus an open claim needs about 700 px. Short laptops get a
+     tighter rhythm rather than a clipped list; below `min-height: 720px` the
+     scene does not start at all (see `running()`) and the fallback — which
+     scrolls normally and so always fits — takes over instead. */
+  @media (min-width: 1024px) and (max-height: 860px) {
+    [data-ready] .hero,
+    [data-ready] .rail-wrap,
+    [data-ready] .frame-slot {
+      padding-block: 5rem 1.25rem;
+    }
+    [data-ready] .rail-title {
+      font-size: var(--text-h3);
+    }
+    [data-ready] .rail {
+      margin-top: 0.6rem;
+    }
+    [data-ready] .tab {
+      padding-block: 0.25rem;
+      font-size: 0.9375rem;
+    }
+    [data-ready] .tab-claim-in {
+      padding-top: 0.2rem;
+    }
+  }
+
+  /* ---------- the h1's rotating subject ----------
+     Subject and tail are separate lines, so a longer word never shoves "en un
+     solo lugar." sideways. Grid stacking drops every subject into the same
+     cell, which reserves the tallest one up front — that is what keeps the line
+     below from jumping when a word wraps on a narrow phone. Aligning to the end
+     sends the reserve upward, into the space under the nav, instead of opening
+     a gap above the tail. */
+  .rot {
+    display: grid;
+    grid-template-areas: "subject";
+    align-items: end;
+  }
+  .rot-tail {
+    display: block;
+  }
+  .rot-item {
+    grid-area: subject;
+    justify-self: start;
+    opacity: 0;
+    transform: translateY(0.22em);
+    transition:
+      opacity 180ms linear,
+      transform 180ms var(--ease-out);
+  }
+  /* The incoming word rises over ~half a second; the outgoing one leaves upward
+     in the 180 ms above, so the two never read as one movement. */
+  .rot-item[data-active] {
+    opacity: 1;
+    transform: none;
+    transition-duration: 520ms;
+  }
+  .rot-item[data-out] {
+    transform: translateY(-0.26em);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .panel,
+    .tab-claim {
+      transition: none;
+    }
+  }
 </style>
 
 <script>
-	import { magnetic, prefersReduced } from '../scripts/motion';
+  import { magnetic, prefersReduced } from "../scripts/motion";
 
-	const scene = document.querySelector<HTMLElement>('[data-scene]');
-	const stage = scene?.querySelector<HTMLElement>('.stage');
-	const hero = scene?.querySelector<HTMLElement>('[data-hero]');
-	const railWrap = scene?.querySelector<HTMLElement>('[data-rail-wrap]');
-	const frame = scene?.querySelector<HTMLElement>('[data-frame]');
-	const mod = scene?.querySelector<HTMLElement>('[data-mod]');
-	const title = scene?.querySelector<HTMLElement>('h1');
-	const items = Array.from(scene?.querySelectorAll<HTMLElement>('[data-rail-item]') ?? []);
-	const nowItems = Array.from(scene?.querySelectorAll<HTMLElement>('[data-now-item]') ?? []);
-	const panels = Array.from(scene?.querySelectorAll<HTMLElement>('[data-panel]') ?? []);
-	const count = panels.length;
-	const desktop = window.matchMedia('(min-width: 1024px)');
+  const scene = document.querySelector<HTMLElement>("[data-scene]");
+  const hero = scene?.querySelector<HTMLElement>("[data-hero]");
+  const heroSlot = scene?.querySelector<HTMLElement>("[data-hero-slot]");
+  const railWrap = scene?.querySelector<HTMLElement>("[data-rail-wrap]");
+  const rail = scene?.querySelector<HTMLElement>("[data-rail]");
+  const frame = scene?.querySelector<HTMLElement>("[data-frame]");
+  const night = scene?.querySelector<HTMLElement>("[data-night]");
+  const nowI = scene?.querySelector<HTMLElement>("[data-now-i]");
+  const tabs = Array.from(scene?.querySelectorAll<HTMLElement>("[data-tab]") ?? []);
+  const panels = Array.from(scene?.querySelectorAll<HTMLElement>("[data-panel]") ?? []);
+  const count = panels.length;
+  const wide = window.matchMedia("(min-width: 1024px)");
+  /* The locked stage has to hold a twelve-tab column with one claim open. Under
+     this it cannot, and a clipped list is worse than no scene — so the fallback
+     takes over, where the same content scrolls normally. */
+  const tall = window.matchMedia("(min-height: 720px)");
 
-	document.querySelectorAll<HTMLElement>('[data-magnetic]').forEach((el) => magnetic(el));
+  document
+    .querySelectorAll<HTMLElement>("[data-magnetic]")
+    .forEach((el) => magnetic(el));
 
-	/* ---------- the h1's rotating subject ----------
-	   Runs only while the hero is on screen and the tab is visible, and not at
-	   all under reduced motion — there the first subject just stays put. */
-	const rotTitle = scene?.querySelector<HTMLElement>('[data-rot-title]');
-	const rotItems = Array.from(rotTitle?.querySelectorAll<HTMLElement>('[data-rot-item]') ?? []);
+  /** The scene only runs where it was designed to: wide enough, tall enough,
+      and motion allowed. */
+  const running = () => wide.matches && tall.matches && !prefersReduced();
 
-	if (rotTitle && rotItems.length > 1 && !prefersReduced()) {
-		const HOLD = 2800;
-		let at = 0;
-		let timer: number | null = null;
-		let onScreen = true;
+  const clamp01 = (n: number) => Math.min(1, Math.max(0, n));
+  const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
-		const advance = () => {
-			const prev = rotItems[at];
-			at = (at + 1) % rotItems.length;
-			const next = rotItems[at];
-			prev.removeAttribute('data-active');
-			prev.setAttribute('data-out', '');
-			next.removeAttribute('data-out');
-			next.setAttribute('data-active', '');
-			// Park the outgoing word back at its start once it is invisible, so
-			// its next entrance rises rather than drops.
-			window.setTimeout(() => prev.removeAttribute('data-out'), 200);
-		};
+  /* ---------------- selection ---------------- */
+  let current = -1;
 
-		const sync = () => {
-			if (timer !== null) {
-				window.clearInterval(timer);
-				timer = null;
-			}
-			if (onScreen && !document.hidden) timer = window.setInterval(advance, HOLD);
-		};
+  function select(i: number) {
+    const next = Math.max(0, Math.min(count - 1, i));
+    if (next === current) return;
+    current = next;
+    tabs.forEach((el, idx) => {
+      const on = idx === next;
+      el.setAttribute("aria-selected", String(on));
+      el.tabIndex = on ? 0 : -1;
+    });
+    panels.forEach((el, idx) => {
+      const on = idx === next;
+      el.toggleAttribute("data-active", on);
+      el.setAttribute("aria-hidden", String(!on));
+    });
+    if (nowI) nowI.textContent = String(next + 1).padStart(2, "0");
+  }
+  select(0);
 
-		document.addEventListener('visibilitychange', sync);
-		new IntersectionObserver(
-			(entries) => {
-				onScreen = entries[0].isIntersecting;
-				sync();
-			},
-			{ threshold: 0 },
-		).observe(rotTitle);
-		sync();
-	}
+  /* ---------------- the grow-and-lock transform ---------------- */
 
-	let current = -1;
-	function select(i: number, focusRail = false) {
-		const next = Math.max(0, Math.min(count - 1, i));
-		if (next === current) return;
-		current = next;
-		items.forEach((el, idx) => {
-			const on = idx === next;
-			el.setAttribute('aria-selected', String(on));
-			el.tabIndex = on ? 0 : -1;
-			if (on && focusRail) el.focus();
-		});
-		nowItems.forEach((el, idx) => el.toggleAttribute('data-active', idx === next));
-		panels.forEach((el, idx) => {
-			const on = idx === next;
-			el.toggleAttribute('data-active', on);
-			el.setAttribute('aria-hidden', String(!on));
-		});
-	}
-	select(0);
+  /** Geometry from the frame's LOCKED layout back to its small hero state. */
+  const geo = { scale: 0.34, dx: 0, dy: 0, growEnd: 0.12 };
 
-	/* ---------------- the grow-and-lock transform ---------------- */
-	const clamp01 = (n: number) => Math.min(1, Math.max(0, n));
-	const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+  function measure() {
+    if (!scene || !frame || !heroSlot) return;
+    const grow = Number(scene.dataset.grow ?? 60);
+    const step = Number(scene.dataset.step ?? 38);
+    geo.growEnd = grow / (grow + count * step);
 
-	/** Geometry from the frame's LOCKED layout back to its small hero state. */
-	let geo = { scale: 0.34, dx: 0, dy: 0, growEnd: 0.13 };
+    // Measure both boxes untransformed, or a mid-scroll resize reads shifted
+    // positions and the frame jumps.
+    frame.style.transform = "none";
+    const heroTransform = hero?.style.transform ?? "";
+    if (hero) hero.style.transform = "none";
+    const locked = frame.getBoundingClientRect();
+    const small = heroSlot.getBoundingClientRect();
+    if (hero) hero.style.transform = heroTransform;
+    if (!locked.width || !small.width) return;
 
-	function measure() {
-		if (!scene || !frame || !stage) return;
-		const grow = Number(scene.dataset.sceneGrow ?? 60);
-		const step = Number(scene.dataset.sceneStep ?? 38);
-		geo.growEnd = grow / (grow + count * step);
+    geo.scale = small.width / locked.width;
+    geo.dx = small.left + small.width / 2 - (locked.left + locked.width / 2);
+    geo.dy = small.top + small.height / 2 - (locked.top + locked.height / 2);
+  }
 
-		// Measure both boxes untransformed, or a mid-scroll resize reads shifted
-		// positions and the frame jumps.
-		frame.style.transform = 'none';
-		const heroTransform = hero?.style.transform ?? '';
-		if (hero) hero.style.transform = 'none';
-		const locked = frame.getBoundingClientRect();
-		const stageBox = stage.getBoundingClientRect();
-		const titleBox = title?.getBoundingClientRect();
-		if (hero) hero.style.transform = heroTransform;
-		if (!locked.width) return;
+  /** Whether the hero copy is still worth animating behind. */
+  let heroVisible = true;
+  let syncRot = () => {};
 
-		// Small state: 1024px wide, left of the shell, sitting under the title.
-		// Two caps keep it inside the stage on smaller screens — one on width,
-		// one derived from the height actually left below the title.
-		const aspect = locked.width / locked.height;
-		const gapUnderTitle = 64;
-		const top = (titleBox?.bottom ?? stageBox.top + stageBox.height * 0.3) + gapUnderTitle;
-		const availH = stageBox.bottom - top - 32;
-		// Measured off the hero's own shell rather than a fraction of the stage:
-		// `.shell` caps at 1524 px, so past ~1905 px the gutters stop being 10%
-		// and a stage-derived left edge would strand the frame outside it.
-		const shellBox = hero?.getBoundingClientRect();
-		const shellLeft = shellBox?.left ?? stageBox.left + stageBox.width * 0.1;
-		const shellW = shellBox?.width ?? stageBox.width * 0.8;
-		const smallW = Math.min(1024, shellW * 0.825, availH * aspect);
-		const scale = smallW / locked.width;
-		const smallH = locked.height * scale;
-		const smallCx = shellLeft + smallW / 2;
-		const smallCy = top + smallH / 2;
+  function apply(p: number) {
+    if (!frame || !hero || !railWrap) return;
+    const g = clamp01(p / geo.growEnd);
 
-		geo.scale = scale;
-		geo.dx = smallCx - (locked.left + locked.width / 2);
-		geo.dy = smallCy - (locked.top + locked.height / 2);
-	}
+    frame.style.transform = `translate(${lerp(geo.dx, 0, g)}px, ${lerp(geo.dy, 0, g)}px) scale(${lerp(geo.scale, 1, g)})`;
 
-	function apply(p: number) {
-		if (!frame || !hero || !railWrap) return;
-		const g = clamp01(p / geo.growEnd);
+    // Hero copy clears out first, the ground darkens through the middle of the
+    // transit, and the rail arrives as the frame settles.
+    const heroOut = clamp01(g / 0.7);
+    hero.style.opacity = String(1 - heroOut);
+    hero.style.transform = `translateY(${-heroOut * 40}px)`;
+    hero.style.pointerEvents = heroOut > 0.5 ? "none" : "";
 
-		frame.style.transform =
-			`translate(${lerp(geo.dx, 0, g)}px, ${lerp(geo.dy, 0, g)}px) scale(${lerp(geo.scale, 1, g)})`;
+    if (night) night.style.opacity = String(clamp01((g - 0.25) / 0.5));
 
-		// hero copy clears out first, rail arrives as the frame settles
-		const heroOut = clamp01(g / 0.7);
-		hero.style.opacity = String(1 - heroOut);
-		hero.style.transform = `translateY(${-heroOut * 40}px)`;
-		hero.style.pointerEvents = heroOut > 0.5 ? 'none' : '';
+    railWrap.style.opacity = String(clamp01((g - 0.55) / 0.45));
+    railWrap.style.pointerEvents = g > 0.9 ? "auto" : "none";
 
-		railWrap.style.opacity = String(clamp01((g - 0.55) / 0.45));
-		railWrap.style.pointerEvents = g > 0.9 ? 'auto' : 'none';
+    // The stage is sticky, so the h1 stays "in view" for the whole 616 vh even
+    // though it is invisible. Stop the rotator once it has faded out.
+    const vis = heroOut < 1;
+    if (vis !== heroVisible) {
+      heroVisible = vis;
+      syncRot();
+    }
 
-		if (p > geo.growEnd) {
-			select(Math.floor(((p - geo.growEnd) / (1 - geo.growEnd)) * count * 0.999));
-		} else {
-			select(0);
-		}
-	}
+    select(
+      p > geo.growEnd
+        ? Math.floor(((p - geo.growEnd) / (1 - geo.growEnd)) * count * 0.999)
+        : 0,
+    );
+  }
 
-	function reset() {
-		if (!frame || !hero || !railWrap) return;
-		frame.style.transform = '';
-		hero.style.opacity = '';
-		hero.style.transform = '';
-		hero.style.pointerEvents = '';
-		railWrap.style.opacity = '';
-		railWrap.style.pointerEvents = '';
-	}
+  function reset() {
+    if (!frame || !hero || !railWrap) return;
+    frame.style.transform = "";
+    hero.style.opacity = "";
+    hero.style.transform = "";
+    hero.style.pointerEvents = "";
+    railWrap.style.opacity = "";
+    railWrap.style.pointerEvents = "";
+    if (night) night.style.opacity = "";
+    if (!heroVisible) {
+      heroVisible = true;
+      syncRot();
+    }
+  }
 
-	/** Progress through the mobile modules scene, 0…1. */
-	function modProgress() {
-		if (!mod) return 0;
-		const travel = mod.offsetHeight - window.innerHeight;
-		if (travel <= 0) return 0;
-		return clamp01(-mod.getBoundingClientRect().top / travel);
-	}
+  let ticking = false;
+  function onScroll() {
+    if (ticking || !scene || !running()) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      ticking = false;
+      const travel = scene.offsetHeight - window.innerHeight;
+      if (travel <= 0) return;
+      apply(clamp01((window.scrollY - scene.offsetTop) / travel));
+    });
+  }
 
-	let ticking = false;
-	function onScroll() {
-		if (ticking || !scene) return;
-		ticking = true;
-		requestAnimationFrame(() => {
-			ticking = false;
-			if (desktop.matches) {
-				if (prefersReduced()) return;
-				const travel = scene.offsetHeight - window.innerHeight;
-				if (travel <= 0) return;
-				apply(clamp01((window.scrollY - scene.offsetTop) / travel));
-			} else {
-				// No grow phase here — scroll only picks the panel. The lock is
-				// pure sticky, so it stands with reduced motion too.
-				select(Math.floor(modProgress() * count * 0.999));
-			}
-		});
-	}
+  function start() {
+    if (!scene) return;
+    if (running()) {
+      scene.setAttribute("data-ready", "");
+      measure();
+      onScroll();
+    } else {
+      scene.removeAttribute("data-ready");
+      reset();
+    }
+    rail?.setAttribute(
+      "aria-orientation",
+      running() ? "vertical" : "horizontal",
+    );
+  }
 
-	function start() {
-		if (desktop.matches && !prefersReduced()) measure();
-		else reset();
-		onScroll();
-	}
+  start();
+  window.addEventListener("scroll", onScroll, { passive: true });
+  wide.addEventListener("change", start);
+  tall.addEventListener("change", start);
+  window.addEventListener("resize", () => {
+    if (running()) measure();
+    onScroll();
+  });
 
-	start();
-	window.addEventListener('scroll', onScroll, { passive: true });
-	desktop.addEventListener('change', start);
-	window.addEventListener('resize', () => {
-		if (desktop.matches && !prefersReduced()) measure();
-		onScroll();
-	});
+  /* ---------------- rail interaction ----------------
+     While the scene is running, scroll owns the selection — a tab press moves
+     the scroll to that module's slice and lets `apply()` do the selecting. */
+  const behavior = () => (prefersReduced() ? "auto" : "smooth");
 
-	/* Rail interaction: click scrolls the scene to that module's slice. */
-	items.forEach((el, i) => {
-		el.addEventListener('click', () => {
-			if (scene && desktop.matches && !prefersReduced()) {
-				const travel = scene.offsetHeight - window.innerHeight;
-				const p = geo.growEnd + ((i + 0.5) / count) * (1 - geo.growEnd);
-				window.scrollTo({ top: scene.offsetTop + travel * p, behavior: 'smooth' });
-			} else if (mod) {
-				const travel = mod.offsetHeight - window.innerHeight;
-				const top = mod.getBoundingClientRect().top + window.scrollY;
-				window.scrollTo({ top: top + travel * ((i + 0.5) / count), behavior: 'smooth' });
-			}
-		});
-		el.addEventListener('keydown', (e) => {
-			let next: number | null = null;
-			if (e.key === 'ArrowDown' || e.key === 'ArrowRight') next = (i + 1) % count;
-			if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') next = (i - 1 + count) % count;
-			if (next !== null) {
-				e.preventDefault();
-				select(next, true);
-			}
-		});
-	});
+  function goTo(i: number) {
+    if (scene && running()) {
+      const travel = scene.offsetHeight - window.innerHeight;
+      const p = geo.growEnd + ((i + 0.5) / count) * (1 - geo.growEnd);
+      window.scrollTo({
+        top: scene.offsetTop + travel * p,
+        behavior: behavior(),
+      });
+    } else {
+      select(i);
+    }
+  }
 
-	/* "Ver los módulos" / nav "Módulos" should land where the modules lock, not
-	   on the h2 — that heading lives inside a sticky container, so the browser's
-	   own anchor jump lands somewhere arbitrary. */
-	document.querySelectorAll<HTMLAnchorElement>('a[href="#modulos"]').forEach((a) => {
-		a.addEventListener('click', (e) => {
-			if (!scene) return;
-			const behavior = prefersReduced() ? 'auto' : 'smooth';
-			if (desktop.matches) {
-				e.preventDefault();
-				const travel = scene.offsetHeight - window.innerHeight;
-				window.scrollTo({ top: scene.offsetTop + travel * geo.growEnd + 2, behavior });
-			} else if (mod) {
-				e.preventDefault();
-				window.scrollTo({ top: mod.getBoundingClientRect().top + window.scrollY + 2, behavior });
-			}
-		});
-	});
+  tabs.forEach((el, i) => el.addEventListener("click", () => goTo(i)));
 
+  /* Both axes are live: the same list is a chip row in the fallback and a
+     column in the scene, and a keyboard user should not have to know which one
+     they are on. Selection clamps rather than wrapping — in a scroll-driven
+     scene, "next" past the last module would throw you back to the top. */
+  rail?.addEventListener("keydown", (e) => {
+    const back = e.key === "ArrowLeft" || e.key === "ArrowUp";
+    const fwd = e.key === "ArrowRight" || e.key === "ArrowDown";
+    if (!back && !fwd && e.key !== "Home" && e.key !== "End") return;
+    e.preventDefault();
+    const next =
+      e.key === "Home"
+        ? 0
+        : e.key === "End"
+          ? count - 1
+          : Math.max(0, Math.min(count - 1, current + (fwd ? 1 : -1)));
+    goTo(next);
+    tabs[next]?.focus({ preventScroll: true });
+  });
+
+  /* "Ver los módulos" / nav "Módulos" should land where the modules lock, not
+     on the h2 — that heading lives inside a sticky container, so the browser's
+     own anchor jump lands somewhere arbitrary. */
+  document
+    .querySelectorAll<HTMLAnchorElement>('a[href="#modulos"]')
+    .forEach((a) => {
+      a.addEventListener("click", (e) => {
+        if (!scene || !running()) return;
+        e.preventDefault();
+        const travel = scene.offsetHeight - window.innerHeight;
+        window.scrollTo({
+          top: scene.offsetTop + travel * geo.growEnd + 2,
+          behavior: behavior(),
+        });
+      });
+    });
+
+  /* ---------- the h1's rotating subject ----------
+     Runs only while the hero is on screen, visible, and the tab is active, and
+     not at all under reduced motion — there the first subject just stays put. */
+  const rotTitle = scene?.querySelector<HTMLElement>("[data-rot-title]");
+  const rotItems = Array.from(
+    rotTitle?.querySelectorAll<HTMLElement>("[data-rot-item]") ?? [],
+  );
+
+  if (rotTitle && rotItems.length > 1 && !prefersReduced()) {
+    const HOLD = 2800;
+    let at = 0;
+    let timer: number | null = null;
+    let onScreen = true;
+
+    const advance = () => {
+      const prev = rotItems[at];
+      at = (at + 1) % rotItems.length;
+      const next = rotItems[at];
+      prev.removeAttribute("data-active");
+      prev.setAttribute("data-out", "");
+      next.removeAttribute("data-out");
+      next.setAttribute("data-active", "");
+      // Park the outgoing word back at its start once it is invisible, so its
+      // next entrance rises rather than drops.
+      window.setTimeout(() => prev.removeAttribute("data-out"), 200);
+    };
+
+    syncRot = () => {
+      if (timer !== null) {
+        window.clearInterval(timer);
+        timer = null;
+      }
+      if (onScreen && heroVisible && !document.hidden)
+        timer = window.setInterval(advance, HOLD);
+    };
+
+    document.addEventListener("visibilitychange", syncRot);
+    new IntersectionObserver(
+      (entries) => {
+        onScreen = entries[0].isIntersecting;
+        syncRot();
+      },
+      { threshold: 0 },
+    ).observe(rotTitle);
+    syncRot();
+  }
 </script>

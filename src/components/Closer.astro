@@ -1,48 +1,51 @@
 ---
-import { Icon } from 'astro-icon/components';
-import { CONTACT, SITE_TITLE } from '../consts';
+import { Icon } from "astro-icon/components";
+import { CONTACT, SITE_TITLE } from "../consts";
 
 const year = new Date().getFullYear();
-const wa = CONTACT.whatsapp.replace(/[^0-9]/g, '');
+const wa = CONTACT.whatsapp.replace(/[^0-9]/g, "");
 ---
 
 <section id="contacto" class="bg-night text-paper">
-	<div class="shell py-20 sm:py-28">
-		<p class="label !text-white/55">Solicitar demo</p>
-		<h2 class="measure-head mt-3 text-h1 font-semibold tracking-[-0.025em]">
-			Te mostramos el sistema con tus propios servicios.
-		</h2>
-		<p class="measure mt-5 text-lead text-white/65">
-			Media hora, sin presentación genérica: llegamos con tu catálogo ya cargado y recorremos contigo cómo se
-			vería tu operación dentro del sistema. Si no es para ti, te lo decimos ahí mismo.
-		</p>
+  <div class="shell py-20 sm:py-28">
+    <h2 class="measure-head mt-3 text-h1 font-semibold tracking-[-0.025em]">
+      Te mostramos el sistema con tus propios servicios.
+    </h2>
+    <p class="measure mt-5 text-lead text-white/65">
+      Solicita tu demo hoy mismo, sin compromiso, totalmente gratis y totalmente
+      personalizado a las necesidades de tu negocio.
+    </p>
 
-		<div class="mt-10 flex flex-col gap-3 sm:flex-row">
-			<a
-				href={`https://wa.me/${wa}`}
-				class="inline-flex items-center justify-center gap-2.5 rounded-full bg-paper px-7 py-3.5 font-medium text-ink transition-transform hover:-translate-y-px"
-			>
-				<Icon name="lucide:message-circle" class="size-4" />
-				Escríbenos por WhatsApp
-			</a>
-			<a
-				href={`mailto:${CONTACT.email}`}
-				class="inline-flex items-center justify-center gap-2.5 rounded-full bg-white/10 px-7 py-3.5 font-medium text-paper ring-1 ring-white/15 transition-colors hover:bg-white/15"
-			>
-				<Icon name="lucide:mail" class="size-4" />
-				{CONTACT.email}
-			</a>
-		</div>
-		<!-- TODO(plan CP-4): formulario /demo + captura UTM cuando se decida el destino del lead. -->
+    <div class="mt-10 flex flex-col gap-3 sm:flex-row">
+      <a
+        href={`https://wa.me/${wa}`}
+        class="inline-flex items-center justify-center gap-2.5 rounded-full bg-paper px-7 py-3.5 font-medium text-ink transition-transform hover:-translate-y-px"
+      >
+        <Icon name="lucide:message-circle" class="size-4" />
+        Escríbenos por WhatsApp
+      </a>
+      <a
+        href={`mailto:${CONTACT.email}`}
+        class="inline-flex items-center justify-center gap-2.5 rounded-full bg-white/10 px-7 py-3.5 font-medium text-paper ring-1 ring-white/15 transition-colors hover:bg-white/15"
+      >
+        <Icon name="lucide:mail" class="size-4" />
+        {CONTACT.email}
+      </a>
+    </div>
+    <!-- TODO(plan CP-4): formulario /demo + captura UTM cuando se decida el destino del lead. -->
 
-		<footer class="mt-20 flex flex-col gap-4 border-t border-white/10 pt-8 text-caption text-white/55 sm:flex-row sm:items-center sm:justify-between">
-			<p>© {year} {SITE_TITLE}. Todos los derechos reservados.</p>
-			<nav class="flex flex-wrap gap-x-6 gap-y-2" aria-label="Pie de página">
-				<a href="#modulos" class="hover:text-white/80">Módulos</a>
-				<a href="#tu-marca" class="hover:text-white/80">Tu marca</a>
-				<a href="#preguntas" class="hover:text-white/80">Preguntas</a>
-				<a href="/aviso-de-privacidad" class="hover:text-white/80">Aviso de privacidad</a>
-			</nav>
-		</footer>
-	</div>
+    <footer
+      class="mt-20 flex flex-col gap-4 border-t border-white/10 pt-8 text-caption text-white/55 sm:flex-row sm:items-center sm:justify-between"
+    >
+      <p>© {year} {SITE_TITLE}. Todos los derechos reservados.</p>
+      <nav class="flex flex-wrap gap-x-6 gap-y-2" aria-label="Pie de página">
+        <a href="#modulos" class="hover:text-white/80">Módulos</a>
+        <a href="#tu-marca" class="hover:text-white/80">Tu marca</a>
+        <a href="#preguntas" class="hover:text-white/80">Preguntas</a>
+        <a href="/aviso-de-privacidad" class="hover:text-white/80"
+          >Aviso de privacidad</a
+        >
+      </nav>
+    </footer>
+  </div>
 </section>

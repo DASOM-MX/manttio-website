@@ -9,6 +9,7 @@ import superadminCotizaciones from '../assets/app/superadmin-cotizaciones.png';
 import superadminOrdenes from '../assets/app/superadmin-ordenes.png';
 import superadminEquipos from '../assets/app/superadmin-equipos.png';
 import superadminReportes from '../assets/app/superadmin-reportes.png';
+import superadminSitio from '../assets/app/superadmin-sitio.png';
 
 /**
  * The twelve modules, in pitch order (owner, 2026-08-21). The order is a sales
@@ -205,6 +206,8 @@ export const MODULES: Module[] = [
 	},
 	{
 		id: 'sitio',
+		shot: superadminSitio,
+		shotKind: 'desktop',
 		name: 'Sitio web y CMS',
 		icon: 'lucide:globe',
 		plan: '03 · 04 · 15',
