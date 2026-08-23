@@ -10,20 +10,22 @@
    Step 500 is the owner's exact hex; the ladder is built around it in oklch.
    `ink` = lightest step reaching 4.5:1 on white (WCAG AA body text). */
 
-/* rojizo · base #c96b65 · H 24.8° · on white 3.64:1 · ink step 600 */
-[data-brand='rojizo'] {
-  --b-50: oklch(0.980 0.016 24.8);  /* #fff5f3  1.07:1 */
-  --b-100: oklch(0.947 0.029 24.8);  /* #ffe7e4  1.18:1 */
-  --b-200: oklch(0.879 0.053 24.8);  /* #f9cac6  1.47:1 */
-  --b-300: oklch(0.808 0.079 24.8);  /* #efada7  1.87:1 */
-  --b-400: oklch(0.731 0.105 24.8);  /* #e28d87  2.50:1 */
-  --b-500: oklch(0.634 0.120 24.8);  /* #c96b65  3.64:1 */
-  --b-600: oklch(0.535 0.124 24.8);  /* #a94c48  5.51:1 */
-  --b-700: oklch(0.449 0.114 24.8);  /* #893633  7.96:1 */
-  --b-800: oklch(0.368 0.097 24.8);  /* #692624  11.03:1 */
-  --b-900: oklch(0.289 0.079 24.8);  /* #4b1716  14.65:1 */
-  --b-950: oklch(0.250 0.066 24.8);  /* #3c1211  16.32:1 */
-  --b-ink: var(--b-600);
+/* amarillo · base #faf32d · H 107.4° · on white 1.17:1 · ink step 800 */
+/* sRGB runs out of yellow chroma below L 0.62, so 600-950 sit on the gamut
+   edge and read olive. There is no yellow at 4.5:1 on white — hence ink 800. */
+[data-brand='amarillo'] {
+  --b-50: oklch(0.980 0.025 107.4);  /* #fafae7  1.06:1 */
+  --b-100: oklch(0.976 0.046 107.4);  /* #fafad7  1.06:1 */
+  --b-200: oklch(0.968 0.085 107.4);  /* #faf9b6  1.09:1 */
+  --b-300: oklch(0.960 0.127 107.4);  /* #fbf890  1.11:1 */
+  --b-400: oklch(0.951 0.168 107.4);  /* #fbf660  1.14:1 */
+  --b-500: oklch(0.940 0.193 107.4);  /* #faf32d  1.17:1 */
+  --b-600: oklch(0.762 0.163 107.4);  /* #beb805  2.09:1 */
+  --b-700: oklch(0.608 0.130 107.4);  /* #8c8703  3.76:1 */
+  --b-800: oklch(0.462 0.099 107.4);  /* #5f5c01  6.96:1 */
+  --b-900: oklch(0.320 0.069 107.4);  /* #373500  12.56:1 */
+  --b-950: oklch(0.250 0.054 107.4);  /* #252300  15.92:1 */
+  --b-ink: var(--b-800);
 }
 
 /* indigo · base #6574c9 · H 274.1° · on white 4.29:1 · ink step 600 */

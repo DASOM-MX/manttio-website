@@ -118,7 +118,7 @@ export function magnetic(el: HTMLElement, strength = 6) {
 	});
 }
 
-export const BRANDS = ['indigo', 'rojizo', 'verde', 'violeta'] as const;
+export const BRANDS = ['indigo', 'amarillo', 'verde', 'violeta'] as const;
 export type Brand = (typeof BRANDS)[number];
 
 type CycleController = {
