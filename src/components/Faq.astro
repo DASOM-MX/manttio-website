@@ -1,32 +1,35 @@
 ---
 const faqs = [
 	{
-		q: '¿Funciona sin internet?',
-		a: 'Sí. La app de campo guarda todo en el teléfono: el técnico captura sin señal y la información sube sola en cuanto recupera la red. En sótanos, azoteas y naves industriales ese es el caso normal, no la excepción.',
+		q: '¿Cuánto tiempo tarda mi instancia en estar lista?',
+		a: 'De un día a una semana, dependiendo del flujo de información entre el cliente y nosotros. Los requerimientos especiales también influyen en los tiempos de entrega.',
 	},
 	{
-		q: '¿Pueden migrar mis datos actuales?',
-		a: 'Sí. Durante la implementación cargamos tu cartera de clientes, tu catálogo de servicios y el historial de tus equipos. Los reportes anteriores, en papel o en PDF, se pueden adjuntar al cliente que corresponde.',
+		q: '¿Qué tan tardado es el proceso de migración?',
+		a: 'La migración de clientes, servicios e inventario tarda menos de un día, ya que nuestro sistema los procesa rápidamente. La migración de reportes y demás registros dependerá del tiempo de entrega por parte del cliente.',
 	},
 	{
-		q: '¿El sistema lleva mi marca o la de ustedes?',
-		a: 'La tuya. Nombre, logotipo, colores y tipografía se aplican a la app, a tu sitio web, a los PDF y a los correos que reciben tus clientes. Manttio no aparece en nada de lo que ve tu cliente.',
+		q: '¿Qué pasa si no tengo un dominio propio?',
+		a: 'Nosotros nos encargamos de obtenerlo y cubrimos el costo anual del dominio, siempre y cuando su renovación no pase de los $15.00 USD al año. También proveemos seguridad por medio de SSL y TLS. Si el cliente ya tiene un dominio, nos encargamos de hacer la migración y de proveer seguridad por medio de los protocolos anteriormente mencionados.',
 	},
 	{
-		q: '¿Facturan CFDI ante el SAT?',
-		a: 'No. Manttio lleva tu cobranza y tus saldos por dentro —cuánto te deben, por qué reportes y desde cuándo—, pero el timbrado ante el SAT lo sigues haciendo donde lo haces hoy.',
+		q: '¿El sistema es deducible de impuestos ante el SAT?',
+		a: 'Sí, en la mayoría de los casos. Podemos generar facturas por la renta mensual del sistema y por los requerimientos o servicios especiales, en caso de ser necesarios.',
 	},
 	{
-		q: '¿Cuánto tarda la implementación?',
-		a: 'Depende del tamaño de tu cartera y de cuántos módulos enciendas. Una operación de reportes y clientes arranca rápido; almacén y facturación requieren más preparación de datos. Lo definimos contigo en la demo.',
+		q: '¿El sistema va a atraer más clientes?',
+		a: 'No necesariamente. Proveemos las herramientas para facilitar la atención y la medición de la captación de tus clientes, pero el flujo de clientes potenciales dependerá de tu presencia en medios tanto físicos como digitales. No aseguramos un aumento en la captación.',
+	},
+	{
+		q: 'Si tengo mis procesos definidos, ¿necesito adaptarme al sistema?',
+		a: 'No, puedes adaptar el sistema a tus procesos. Nosotros nos encargamos de proveer herramientas para que tengas tus registros en un solo lugar; los procesos los define tu negocio con base en esa información.',
 	},
 ];
 ---
 
 <section id="preguntas" class="border-t border-hair bg-mist py-16 sm:py-24">
 	<div class="shell">
-	<p class="label" data-reveal-f>Preguntas frecuentes</p>
-	<h2 class="mt-3 text-h1 font-semibold tracking-[-0.025em]" data-reveal-f>Lo que nos preguntan siempre.</h2>
+	<h2 class="mt-3 text-h1 font-semibold tracking-[-0.025em]" data-reveal-f>Preguntas frecuentes.</h2>
 
 	<div class="mt-10 flex flex-col gap-3">
 		{

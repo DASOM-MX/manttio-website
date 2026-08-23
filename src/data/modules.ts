@@ -63,7 +63,7 @@ export const MODULES: Module[] = [
 		shipped: true,
 		crumb: 'Reportes / Plantillas',
 		claim:
-			'Diseña tus propios formatos de reporte. Sin la firma del cliente, el reporte no se cierra ni se envía.',
+			'Dale forma a tus reportes cuando lo necesites: edita, crea y revisa. Todos los reportes requieren imágenes de evidencia y la firma de tu cliente para un mejor seguimiento.',
 		stats: [
 			{ value: '4', label: 'Plantillas activas', hi: true },
 			{ value: '128', label: 'Reportes del mes' },
@@ -76,6 +76,27 @@ export const MODULES: Module[] = [
 		],
 	},
 	{
+		id: 'cotizaciones',
+		shot: superadminCotizaciones,
+		shotKind: 'desktop',
+		name: 'Cotizaciones',
+		icon: 'lucide:file-check',
+		plan: '20',
+		shipped: true,
+		crumb: 'Cotizaciones / COT-0184',
+		claim:
+			'Olvídate de enviar las cotizaciones en PowerPoint o Excel. Con Manttio, tus clientes pueden aprobar o declinar tus cotizaciones en un solo lugar, sin largas esperas y con respuesta inmediata.',
+		stats: [
+			{ value: '$184,200', label: 'En revisión', hi: true },
+			{ value: '5', label: 'Esperando aprobación' },
+		],
+		rows: [
+			{ title: 'COT-0184 · Hotel Vista Real', meta: '18 ago', chip: 'Esperando', state: 'act' },
+			{ title: 'COT-0183 · Planta Norte', meta: '16 ago', chip: 'Aprobada', state: 'ok' },
+			{ title: 'COT-0179 · Bodega Sur', meta: '11 ago', chip: 'Rechazada', state: 'wait' },
+		],
+	},
+	{
 		id: 'ordenes',
 		shot: superadminOrdenes,
 		shotKind: 'desktop',
@@ -85,7 +106,7 @@ export const MODULES: Module[] = [
 		shipped: true,
 		crumb: 'Órdenes / OS-0442',
 		claim:
-			'Nacen de una cotización aprobada y se convierten en visitas y reportes pendientes. Todo el historial del trabajo vive en una sola bitácora.',
+			'Abre órdenes de servicio para tus clientes después de que las cotizaciones hayan sido aprobadas, genera reportes automáticamente, agenda visitas, registra contratos y deja de traspapelar órdenes de servicio. Nosotros enviamos todo lo necesario a tus clientes en PDF.',
 		stats: [
 			{ value: '9', label: 'Órdenes abiertas', hi: true },
 			{ value: '3', label: 'Visitas esta semana' },
@@ -106,7 +127,7 @@ export const MODULES: Module[] = [
 		shipped: true,
 		crumb: 'CRM / Dashboard',
 		claim:
-			'Cuántos leads entraron, cuántos se volvieron clientes y por qué canal llegaron. El origen se graba una sola vez y ya nadie lo puede modificar.',
+			'¿Sabes cuántos clientes llegan a tu negocio después de pagar por publicidad en redes sociales? Nosotros sí. Revisa qué medios de publicidad funcionan mejor para tu negocio e invierte inteligentemente.',
 		stats: [
 			{ value: '37', label: 'Leads del mes', hi: true },
 			{ value: '11', label: 'Nuevos activos' },
@@ -128,7 +149,7 @@ export const MODULES: Module[] = [
 		shipped: true,
 		crumb: 'Clientes / Hotel Vista Real',
 		claim:
-			'Una ficha completa por cliente y una bitácora de actividad que no se edita ni se borra. Cada llamada, cada visita y cada acuerdo con su fecha y su responsable.',
+			'No pierdas nunca de vista a tus clientes: guarda contactos, crea recordatorios de seguimiento y deja de olvidar las interacciones que has tenido con ellos. Con Manttio, mejora la relación con tus clientes.',
 		stats: [
 			{ value: '38', label: 'Clientes activos' },
 			{ value: '6', label: 'Seguimientos hoy', hi: true },
@@ -150,7 +171,7 @@ export const MODULES: Module[] = [
 		shipped: true,
 		crumb: 'Calendario / Semana 34',
 		claim:
-			'Quién va, a dónde y cuándo. Cada reasignación queda registrada y la agenda se refleja en Google Calendar.',
+			'Nunca olvides lo que tú y tus técnicos tienen planeado para esta semana: revísalo directamente en el calendario y agenda visitas fácilmente. Tus técnicos las pueden ver desde la aplicación de campo.',
 		stats: [
 			{ value: '17', label: 'Visitas de la semana', hi: true },
 			{ value: '4', label: 'Sin asignar' },
@@ -171,7 +192,7 @@ export const MODULES: Module[] = [
 		shipped: true,
 		crumb: 'Contratos / Pólizas vigentes',
 		claim:
-			'El documento firmado, clasificado y fechado, vinculado al cliente y a la orden que lo generó. Sin volver a buscar el PDF en un correo de hace ocho meses.',
+			'No pierdas nunca las pólizas de servicio y recuerda de qué orden de servicio salieron. Deja de traspapelar tus contratos y mantenlos todos en un mismo lugar.',
 		stats: [
 			{ value: '11', label: 'Vigentes' },
 			{ value: '2', label: 'Vencen en 30 días', hi: true },
@@ -190,7 +211,7 @@ export const MODULES: Module[] = [
 		shipped: true,
 		crumb: 'Sitio web / Contenido',
 		claim:
-			'Tu sitio público se edita desde el mismo sistema: contenido, secciones y publicación, con tu nombre, tus colores y tu logotipo. Es exactamente la página que estás leyendo.',
+			'¿Necesitas una página web para inspirar más confianza en tus clientes? ¡Nosotros te tenemos cubierto! Tu página web viene incluida en cualquier plan, totalmente personalizable, con la identidad de tu negocio por defecto, optimizada para SEO y con las mejores métricas para empujarla directamente a los primeros resultados en Google.',
 		stats: [
 			{ value: '1', label: 'Sitio publicado', hi: true },
 			{ value: '2', label: 'Escalas de color' },
@@ -210,7 +231,7 @@ export const MODULES: Module[] = [
 		shipped: false,
 		crumb: 'Almacén / Existencias',
 		claim:
-			'Existencias por técnico y por camioneta, reabastecimientos con evidencia y material descontado desde el reporte. Ningún movimiento se edita después.',
+			'Revisa todo tu inventario y el de tus técnicos, separa material para tus visitas y descuenta piezas después de cada reporte. Mantén toda la trazabilidad de tu inventario de inicio a fin con nosotros.',
 		stats: [
 			{ value: '312', label: 'SKU en catálogo' },
 			{ value: '4', label: 'Almacenes' },
@@ -223,27 +244,6 @@ export const MODULES: Module[] = [
 		],
 	},
 	{
-		id: 'cotizaciones',
-		shot: superadminCotizaciones,
-		shotKind: 'desktop',
-		name: 'Cotizaciones',
-		icon: 'lucide:file-check',
-		plan: '20',
-		shipped: true,
-		crumb: 'Cotizaciones / COT-0184',
-		claim:
-			'El cliente aprueba o rechaza desde un enlace, sin crear cuenta ni contraseña. Precio, unidad y cantidad quedan fijos desde que se crea la cotización.',
-		stats: [
-			{ value: '$184,200', label: 'En revisión', hi: true },
-			{ value: '5', label: 'Esperando aprobación' },
-		],
-		rows: [
-			{ title: 'COT-0184 · Hotel Vista Real', meta: '18 ago', chip: 'Esperando', state: 'act' },
-			{ title: 'COT-0183 · Planta Norte', meta: '16 ago', chip: 'Aprobada', state: 'ok' },
-			{ title: 'COT-0179 · Bodega Sur', meta: '11 ago', chip: 'Rechazada', state: 'wait' },
-		],
-	},
-	{
 		id: 'equipos',
 		shot: superadminEquipos,
 		shotKind: 'desktop',
@@ -253,7 +253,7 @@ export const MODULES: Module[] = [
 		shipped: true,
 		crumb: 'Clientes / Hotel Vista Real / Equipos',
 		claim:
-			'Historial de servicio por unidad. Convierte «visitamos el hotel» en «este compresor lleva tres reparaciones, conviene reemplazarlo».',
+			'Mantén los equipos de tus clientes en orden, nunca olvides dónde se encuentran y qué servicios se les han hecho, y liga reportes y órdenes de servicio para no perder de vista ningún trabajo.',
 		stats: [
 			{ value: '14', label: 'Equipos registrados' },
 			{ value: '3', label: 'Servicios de la unidad', hi: true },
@@ -272,7 +272,7 @@ export const MODULES: Module[] = [
 		shipped: false,
 		crumb: 'Facturación / Saldos',
 		claim:
-			'Cobranza por reportes y control de saldos dentro del sistema. El timbrado CFDI ante el SAT no está incluido.',
+			'Deja de pagar por otras aplicaciones para facturar: nosotros mismos nos encargamos de ello. Evita dolores de cabeza y de bolsillo.',
 		stats: [
 			{ value: '$312,480', label: 'Por cobrar', hi: true },
 			{ value: '3', label: 'Vencidas' },
@@ -293,7 +293,7 @@ export const MODULES: Module[] = [
 		shipped: true,
 		crumb: 'App de campo / Sincronización',
 		claim:
-			'Funciona sin señal. El técnico captura en el sótano y todo sube solo en cuanto recupera la red.',
+			'Funciona en cualquier dispositivo con un navegador web, incluso sin señal. Tus técnicos capturan desde cualquier lugar y todo sube solo en cuanto se recupera la red.',
 		stats: [
 			{ value: '3', label: 'Por sincronizar', hi: true },
 			{ value: '12', label: 'Técnicos activos' },
