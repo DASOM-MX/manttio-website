@@ -25,14 +25,14 @@ const pairs: {
   {
     module: "reportes",
     ask: "¿Las fotos y los reportes se pierden en el chat?",
-    title: "Nosotros los enviamos automáticamente, en un solo lugar",
+    title: "Todo en un mismo reporte",
     answer:
       "Tus técnicos solo tienen que llenar el reporte con la firma del cliente y tu cliente recibe un PDF con el reporte. Nadie tiene que traspasarlo al llegar a la oficina ni acordarse de mandarlo.",
   },
   {
     module: "cotizaciones",
-    ask: "¿Cotizaste por teléfono y ahora nadie recuerda el precio?",
-    title: "Todo queda por escrito y sin tiempos de espera para enviarla",
+    ask: "¿Olvidaste la cotización que pidieron hace meses?",
+    title: "Cotiza y entrega de inmediato",
     answer:
       "Envía la cotización inmediatamente después de crearla en el sistema: el cliente la aprueba o la rechaza ahí mismo y el precio queda fijo desde ese momento. Siempre hay constancia de quién aprobó y cuándo.",
   },
@@ -46,7 +46,7 @@ const pairs: {
   {
     module: "contratos",
     ask: "¿Las pólizas se vencen sin que nadie lo note?",
-    title: "El sistema notifica con tiempo",
+    title: "El sistema te recuerda",
     answer:
       "Las pólizas por vencer, los seguimientos pendientes y la agenda de la semana aparecen desde que entras. Lo que hoy recuerdas tú, mañana lo recuerda el sistema.",
   },
@@ -70,12 +70,12 @@ const cards = pairs.map((p) => {
     <ul class="cards">
       {
         cards.map((c) => (
-          <li class="card" data-card>
-            <p class="card-ask">{c.ask}</p>
-            <h3 class="card-title">{c.title}</h3>
+          <li class="min-w-0 flex flex-col justify-between items-start px-6 py-4 gap-3 card" data-card>
+            <p class="card-ask h-6">{c.ask}</p>
+            <h3 class="card-title h-16">{c.title}</h3>
             <p class="card-body">{c.answer}</p>
 
-            <ArtSlot illustration={c.illustration} class="card-art" />
+            <ArtSlot illustration={c.illustration} class="w-full aspect-video" />
 
             <a class="card-link" href={`/features#${c.mod.id}`}>
               {c.mod.name}

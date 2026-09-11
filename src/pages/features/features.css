@@ -14,6 +14,7 @@
   max-width: 19ch;
   font-size: var(--text-display);
   line-height: var(--text-display--line-height);
+  font-family: var(--font-display);
   font-weight: 600;
   letter-spacing: var(--tracking-display);
 }
@@ -73,6 +74,7 @@
 .mod-name {
   font-size: var(--text-h2);
   line-height: var(--text-h2--line-height);
+  font-family: var(--font-subhead);
   font-weight: 600;
   letter-spacing: var(--tracking-heading);
   color: var(--color-ink);

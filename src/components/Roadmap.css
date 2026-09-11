@@ -114,6 +114,7 @@
 .zig-title {
   font-size: var(--text-h3);
   line-height: var(--text-h3--line-height);
+  font-family: var(--font-subhead);
   font-weight: 600;
   letter-spacing: var(--tracking-heading);
 }
@@ -139,6 +140,7 @@
   max-width: 22ch;
   font-size: var(--text-h2);
   line-height: var(--text-h2--line-height);
+  font-family: var(--font-subhead);
   font-weight: 600;
   letter-spacing: var(--tracking-heading);
 }
@@ -216,6 +218,7 @@
   margin-top: 1.25rem;
   font-size: var(--text-h2);
   line-height: var(--text-h2--line-height);
+  font-family: var(--font-subhead);
   font-weight: 600;
   letter-spacing: var(--tracking-heading);
 }
@@ -229,7 +232,10 @@
   color: var(--color-brand-ink);
 }
 
+/* Vive dentro del h4, así que heredaría la display. El numeral vuelve a la cara
+   de cuerpo, que es la que trae cifras tabulares. */
 .beat-n {
+  font-family: var(--font-sans);
   font-size: var(--text-caption);
   font-weight: 600;
   color: var(--color-brand-500);

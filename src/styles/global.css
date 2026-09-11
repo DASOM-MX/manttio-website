@@ -27,8 +27,16 @@
 }
 
 @theme {
-  /* ---- type: one family, four weights ---- */
-  --font-sans: var(--font-figtree), ui-sans-serif, system-ui, sans-serif;
+  /* ---- type: Instrument Sans titula, Archivo hace el resto ----
+     `display`  h1 y los h2 de sección — las frases grandes de la página
+     `subhead`  subtítulos y títulos de tarjeta, dentro de una sección
+     `sans`     cuerpo, UI, cifras
+     Subhead y sans son la misma cara hoy; siguen separados porque son roles
+     distintos y uno puede cambiar sin arrastrar al otro. Figtree salió del
+     proyecto al pasar el cuerpo a Archivo: ya no la usaba nadie. */
+  --font-sans: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-instrument), var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-subhead: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
 
   /* Modular scale, ratio 1.25 from a 1rem base. Fluid only where the plan
      calls for it (marketing headings); body stays fixed so zoom behaves. */
@@ -138,7 +146,14 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  h1, h2, h3 { text-wrap: balance; }
+  h1, h2, h3, h4 { text-wrap: balance; }
+
+  /* La display es variable (200–700), así que cada peso que pedimos existe de
+     verdad. Esto solo cierra la puerta a que un navegador sintetice algo fuera
+     del eje si algún día se pide un 800. */
+  h1, h2, h3, h4 {
+    font-synthesis-weight: none;
+  }
   p { text-wrap: pretty; }
 
   :focus-visible {
@@ -176,6 +191,7 @@
 /* Section heading — the size/weight/tracking triple that every `h2` on the
    site shares. Pulled out of the templates so the hierarchy is declared once. */
 @utility section-title {
+  font-family: var(--font-display);
   font-size: var(--text-h1);
   line-height: var(--text-h1--line-height);
   font-weight: 600;

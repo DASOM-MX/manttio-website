@@ -18,6 +18,7 @@
   max-width: 19ch;
   font-size: var(--text-h1);
   line-height: var(--text-h1--line-height);
+  font-family: var(--font-display);
   font-weight: 600;
   letter-spacing: var(--tracking-heading);
 }

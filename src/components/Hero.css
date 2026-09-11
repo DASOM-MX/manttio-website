@@ -1,7 +1,16 @@
 /* Hero — see Hero.astro for why the composition is asymmetric. */
 
 .hero {
-  /* El nav es fijo: el bloque superior tiene que librarlo, no pasarle por debajo. */
+  /* 75% de la pantalla: deja ver el borde de la siguiente sección, que es lo
+     que dice "esto sigue" sin necesidad de una flecha de scroll.
+     `svh` y no `vh`: en móvil `vh` mide contra el viewport grande — el que
+     existe solo cuando la barra del navegador está retraída — y la sección
+     acaba más alta de lo que se ve. `min-height` y no `height`: si el contenido
+     crece (texto largo, zoom), la sección crece con él en vez de recortarlo. */
+  min-height: 75svh;
+  display: grid;
+  align-items: center;
+  /* El nav es fijo: el padding superior lo libra aunque el contenido se centre. */
   padding-block: 7rem 4rem;
 }
 @media (min-width: 1024px) {
@@ -28,9 +37,9 @@
 }
 
 .hero-title {
-  margin-top: 0.75rem;
   font-size: var(--text-display);
   line-height: var(--text-display--line-height);
+  font-family: var(--font-display);
   font-weight: 600;
   letter-spacing: var(--tracking-display);
 }

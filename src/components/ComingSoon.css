@@ -44,6 +44,7 @@
 .soon-name {
   font-size: var(--text-h3);
   line-height: var(--text-h3--line-height);
+  font-family: var(--font-subhead);
   font-weight: 600;
   letter-spacing: var(--tracking-heading);
   color: var(--color-ink);
