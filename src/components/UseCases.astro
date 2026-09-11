@@ -1,0 +1,137 @@
+---
+import { MODULES } from "../data/modules";
+import { USE_CASES } from "../data/use-cases";
+import AppShot from "./AppShot.astro";
+
+/**
+ * Casos de uso — cinco sectores, un panel a la vez.
+ *
+ * Es un tablist real (no un carrusel automático y no está atado al scroll):
+ * el visitante elige su sector y el panel cambia. Sin JS los cinco paneles se
+ * apilan y se leen todos, que es la razón de que cada uno sea un `[hidden]`
+ * quitado por script y no un panel oculto por CSS.
+ */
+const byId = new Map(MODULES.map((m) => [m.id, m]));
+const cases = USE_CASES.map((c) => {
+  const shot = byId.get(c.shot);
+  if (!shot) throw new Error(`UseCases: no existe el módulo "${c.shot}"`);
+  return {
+    ...c,
+    shotModule: shot,
+    links: c.modules.map((id) => {
+      const m = byId.get(id);
+      if (!m) throw new Error(`UseCases: no existe el módulo "${id}"`);
+      return m;
+    }),
+  };
+});
+---
+
+<section id="casos" class="cases">
+  <div class="shell">
+    <p class="label">Casos de uso</p>
+    <h2 class="section-title measure-head mt-3" data-reveal-c>
+      Para quien vive de dar servicio.
+    </h2>
+
+    <div class="cases-body" data-cases>
+      <div class="tabs" role="tablist" aria-label="Sectores">
+        {
+          cases.map((c, i) => (
+            <button
+              type="button"
+              role="tab"
+              id={`uc-tab-${c.id}`}
+              aria-controls={`uc-panel-${c.id}`}
+              aria-selected={i === 0 ? "true" : "false"}
+              tabindex={i === 0 ? 0 : -1}
+              class="tab"
+              data-tab
+            >
+              {c.label}
+            </button>
+          ))
+        }
+      </div>
+
+      <div class="panels">
+        {
+          cases.map((c, i) => (
+            <div
+              role="tabpanel"
+              id={`uc-panel-${c.id}`}
+              aria-labelledby={`uc-tab-${c.id}`}
+              tabindex="0"
+              class="panel"
+              data-panel
+              data-active={i === 0 ? "true" : undefined}
+            >
+              <div class="panel-copy">
+                <h3 class="panel-title">{c.headline}</h3>
+                <p class="measure mt-4 text-ink-muted">{c.body}</p>
+                <ul class="chips">
+                  {c.links.map((m) => (
+                    <li>
+                      <a href={`/features#${m.id}`} class="chip">
+                        {m.name}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div class="panel-shot">
+                <AppShot module={c.shotModule} />
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>@import './UseCases.css';</style>
+
+<script>
+  import { reveal } from "../scripts/motion";
+
+  reveal("[data-reveal-c]");
+
+  const root = document.querySelector<HTMLElement>("[data-cases]");
+  if (root) {
+    const tabs = Array.from(root.querySelectorAll<HTMLButtonElement>("[data-tab]"));
+    const panels = Array.from(root.querySelectorAll<HTMLElement>("[data-panel]"));
+
+    // Only now that a script is running does hiding panels become safe.
+    root.dataset.ready = "true";
+
+    const select = (next: number, focus = true) => {
+      tabs.forEach((t, i) => {
+        const on = i === next;
+        t.setAttribute("aria-selected", String(on));
+        t.tabIndex = on ? 0 : -1;
+        if (on) panels[i].setAttribute("data-active", "true");
+        else panels[i].removeAttribute("data-active");
+      });
+      if (focus) tabs[next].focus();
+    };
+
+    tabs.forEach((tab, i) => {
+      tab.addEventListener("click", () => select(i, false));
+      tab.addEventListener("keydown", (e) => {
+        const keys: Record<string, number> = {
+          ArrowRight: i + 1,
+          ArrowDown: i + 1,
+          ArrowLeft: i - 1,
+          ArrowUp: i - 1,
+          Home: 0,
+          End: tabs.length - 1,
+        };
+        const target = keys[e.key];
+        if (target === undefined) return;
+        e.preventDefault();
+        select((target + tabs.length) % tabs.length);
+      });
+    });
+  }
+</script>

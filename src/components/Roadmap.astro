@@ -1,0 +1,155 @@
+---
+import type { ImageMetadata } from "astro";
+import { MODULES } from "../data/modules";
+import AppShot from "./AppShot.astro";
+import ArtSlot from "./ArtSlot.astro";
+
+/**
+ * Roadmap — dos bandas.
+ *
+ * 1. Onboarding: los cuatro pasos que van de la primera llamada al primer
+ *    cobro, en zig-zag sobre una espina punteada. Sin capturas — estos pasos
+ *    son el trato, no el producto — y con su hueco de ilustración listo.
+ * 2. Flujo de servicio: una línea de tiempo vertical. Cada beat lleva su
+ *    conector punteado, su pastilla, su título y la captura REAL del módulo
+ *    que ejecuta ese paso. La sección funciona además como índice: cada beat
+ *    liga a su módulo en /features.
+ *
+ * El conector se dibuja al entrar en viewport (`drawOnView`, que por dentro es
+ * un IntersectionObserver). Se revela con `translateY` dentro de un contenedor
+ * recortado — nunca animando `height` — así que sigue siendo transform puro y,
+ * sobre todo, NO está atado a la posición del scroll: la página nunca se
+ * frena ni se queda pegada esperando una animación.
+ */
+const steps: { n: string; title: string; body: string; illustration?: ImageMetadata }[] = [
+  {
+    n: "01",
+    title: "Inyectamos tu identidad",
+    body: "Personalizamos tu sistema desde el día 0 para que esté listo para usar.",
+  },
+  {
+    n: "02",
+    title: "Cargamos tus clientes",
+    body: "Importamos tu cartera completa y tu catálogo de servicios con sus precios y unidades.",
+  },
+  {
+    n: "03",
+    title: "Tus técnicos capturan",
+    body: "Desde el celular, con señal o sin ella. Los reportes se cierran con la firma del cliente.",
+  },
+  {
+    n: "04",
+    title: "Tú cobras y das seguimiento",
+    body: "Cada reporte cerrado se convierte en cobro, y ningún cliente se queda sin seguimiento.",
+  },
+];
+
+/** El recorrido de un trabajo. `module` es el id en `../data/modules.ts`. */
+const flow = [
+  { module: "crm", badge: "Entra el trabajo", label: "Reporte de falla", body: "El cliente reporta y queda registrado en su ficha, con la fecha y quién lo tomó." },
+  { module: "cotizaciones", badge: "Antes de mover un dedo", label: "Cotización", body: "Se envía y el cliente la aprueba o la rechaza en línea. El precio queda congelado desde ese momento." },
+  { module: "ordenes", badge: "Ya hay trato", label: "Orden de servicio", body: "Nace de la cotización aprobada y explota en las visitas y los reportes que hacen falta." },
+  { module: "calendario", badge: "A la calle", label: "Visitas", body: "Se agendan y se asignan a un técnico, que las ve desde la app de campo." },
+  { module: "reportes", badge: "En sitio", label: "Reportes", body: "Se capturan en campo, con evidencia, y se cierran con la firma del cliente." },
+  { module: "contratos", badge: "Y queda constancia", label: "Contrato o póliza", body: "Queda colgado del cliente y de la orden, con su fecha de vencimiento." },
+];
+
+const byId = new Map(MODULES.map((m) => [m.id, m]));
+const beats = flow.map((f) => {
+  const mod = byId.get(f.module);
+  if (!mod) throw new Error(`Roadmap: no existe el módulo "${f.module}"`);
+  return { ...f, mod };
+});
+---
+
+<section id="roadmap" class="roadmap">
+  <div class="shell">
+    <p class="label">Cómo funciona</p>
+    <h2 class="section-title measure-head mt-3" data-reveal-r>
+      De la primera llamada al primer cobro.
+    </h2>
+
+    <ol class="zig">
+      {
+        steps.map((s, i) => (
+          <li class="zig-step" data-side={i % 2 === 1 ? "right" : "left"}>
+            {/* La espina va primero en el DOM para que entre en viewport antes
+                que la tarjeta y la línea llegue delante del contenido. */}
+            <span class="zig-spine" aria-hidden="true" data-connector>
+              <span class="connector-ink" />
+            </span>
+            <span class="zig-node nums" aria-hidden="true">{s.n}</span>
+
+            <div class="zig-card" data-zig>
+              <h3 class="zig-title">{s.title}</h3>
+              <p class="zig-body">{s.body}</p>
+              <ArtSlot illustration={s.illustration} minHeight="7.5rem" class="zig-art" />
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+
+  <div class="shell flow-head">
+    <h3 class="flow-title">Y así se mueve un trabajo por dentro.</h3>
+    <p class="measure-lead mt-3 text-ink-muted">
+      Cada paso ocurre en un módulo distinto, y cada uno deja constancia de
+      quién hizo qué y cuándo.
+    </p>
+  </div>
+
+  <ol class="timeline">
+    {
+      beats.map((b, i) => (
+        <li class="beat">
+          {/* El conector va ANTES del contenido, así que la línea entra en
+              viewport primero y el texto la sigue. */}
+          <span class="connector" aria-hidden="true" data-connector>
+            <span class="connector-ink" />
+          </span>
+
+          <span class="badge" data-beat>{b.badge}</span>
+          <h4 class="beat-title" data-beat>
+            <a href={`/features#${b.mod.id}`}>
+              <span class="beat-n nums">{String(i + 1).padStart(2, "0")}</span>
+              {b.label}
+            </a>
+          </h4>
+          <p class="beat-body" data-beat>{b.body}</p>
+          <div class="beat-shot" data-beat>
+            <AppShot module={b.mod} />
+          </div>
+        </li>
+      ))
+    }
+  </ol>
+</section>
+
+<style>@import './Roadmap.css';</style>
+
+<script>
+  import { drawOnView, reveal, revealStagger } from "../scripts/motion";
+
+  reveal("[data-reveal-r]");
+
+  // Cada tarjeta del zig-zag entra desde su lado. En móvil la espina se va a la
+  // izquierda y todas las tarjetas quedan del mismo lado, así que el
+  // desplazamiento horizontal se apaga y solo suben.
+  const sideways = window.matchMedia("(min-width: 900px)").matches;
+  document.querySelectorAll<HTMLElement>(".zig-step").forEach((step) => {
+    const card = step.querySelector<HTMLElement>("[data-zig]");
+    if (!card) return;
+    reveal(card, { x: sideways ? (step.dataset.side === "right" ? 28 : -28) : 0, y: 20 });
+  });
+
+  // La línea punteada se dibuja al entrar; el contenido de cada beat sube
+  // escalonado detrás de ella.
+  drawOnView("[data-connector]");
+  document.querySelectorAll<HTMLElement>(".beat").forEach((beat) => {
+    revealStagger(Array.from(beat.querySelectorAll("[data-beat]")), {
+      each: 0.08,
+      y: 16,
+    });
+  });
+</script>

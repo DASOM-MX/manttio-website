@@ -1,0 +1,74 @@
+/* El cierre — la única banda oscura de la página, y por eso pega. */
+
+.closer {
+  background: var(--color-night);
+  color: var(--color-paper);
+}
+
+.closer-inner {
+  padding-block: 5rem;
+}
+@media (min-width: 640px) {
+  .closer-inner {
+    padding-block: 7rem;
+  }
+}
+
+.closer-title {
+  max-width: 19ch;
+  font-size: var(--text-h1);
+  line-height: var(--text-h1--line-height);
+  font-weight: 600;
+  letter-spacing: var(--tracking-heading);
+}
+
+.closer-sub {
+  color: color-mix(in oklab, var(--color-paper) 65%, transparent);
+}
+
+.closer-ctas {
+  margin-top: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+@media (min-width: 640px) {
+  .closer-ctas {
+    flex-direction: row;
+  }
+}
+
+.closer-primary,
+.closer-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
+  border-radius: var(--radius-control);
+  padding: 0.875rem 1.75rem;
+  font-weight: 500;
+  transition:
+    transform 200ms var(--ease-out),
+    background-color 200ms var(--ease-out);
+}
+.closer-primary {
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+.closer-primary:hover {
+  transform: translateY(-2px);
+}
+.closer-ghost {
+  background: color-mix(in oklab, var(--color-paper) 10%, transparent);
+  color: var(--color-paper);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--color-paper) 15%, transparent);
+}
+.closer-ghost:hover {
+  background: color-mix(in oklab, var(--color-paper) 16%, transparent);
+}
+
+/* El foco por defecto usa el azul de marca, que sobre la banda oscura casi no
+   se ve. Aquí el anillo es papel. */
+.closer :focus-visible {
+  outline-color: var(--color-paper);
+}

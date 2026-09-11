@@ -1,0 +1,213 @@
+/* Nav — transparent over the hero, translucent paper past 80px. */
+
+.nav {
+  position: fixed;
+  inset-inline: 0;
+  top: 0;
+  z-index: 40;
+  transition:
+    background-color 300ms var(--ease-out),
+    box-shadow 300ms var(--ease-out),
+    backdrop-filter 300ms var(--ease-out);
+}
+/* Set by the scroll listener rather than by toggling utility classes, so the
+   whole scroll state lives in one place instead of split across JS and markup. */
+.nav[data-solid] {
+  background: color-mix(in oklab, var(--color-paper) 80%, transparent);
+  backdrop-filter: blur(16px);
+  box-shadow: var(--shadow-e1);
+}
+
+.nav-bar {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding-block: 1rem;
+}
+
+.wordmark {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  font-weight: 700;
+  letter-spacing: var(--tracking-heading);
+}
+
+.nav-links {
+  display: none;
+}
+@media (min-width: 768px) {
+  .nav-links {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 1.75rem;
+  }
+}
+
+.nav-link {
+  color: var(--color-ink-muted);
+  transition: color 200ms var(--ease-out);
+}
+.nav-link:hover {
+  color: var(--color-ink);
+}
+
+.nav-cta {
+  border-radius: var(--radius-control);
+  background: var(--color-brand-ink);
+  color: var(--color-paper);
+  padding: 0.625rem 1.25rem;
+  font-weight: 500;
+  box-shadow: var(--shadow-cta);
+  transition: transform 200ms var(--ease-out);
+}
+.nav-cta:hover {
+  transform: translateY(-1px);
+}
+
+.burger-btn {
+  margin-left: auto;
+  margin-right: -0.25rem;
+  border-radius: 999px;
+  padding: 0.625rem;
+  color: var(--color-ink);
+  cursor: pointer;
+  transition: color 200ms var(--ease-out);
+}
+.burger-btn:hover {
+  color: var(--color-ink-muted);
+}
+@media (min-width: 768px) {
+  .burger-btn {
+    display: none;
+  }
+}
+
+/* ---- the burger ---- */
+.burger {
+  position: relative;
+  display: block;
+  width: 20px;
+  height: 20px;
+}
+.bar {
+  position: absolute;
+  left: 0;
+  height: 2px;
+  width: 100%;
+  border-radius: 2px;
+  background: currentColor;
+  transition:
+    transform 320ms var(--ease-out),
+    opacity 140ms linear;
+}
+.bar-1 { top: 4px; }
+.bar-2 { top: 10px; }
+.bar-3 { top: 16px; }
+
+[aria-expanded='true'] .bar-1 { transform: translateY(6px) rotate(45deg); }
+[aria-expanded='true'] .bar-2 { opacity: 0; transform: scaleX(0.3); }
+[aria-expanded='true'] .bar-3 { transform: translateY(-6px) rotate(-45deg); }
+
+/* ---- the panel ----
+   0fr → 1fr on a grid row is the one way to transition to an unknown height
+   without measuring it in JS. `visibility` (not just the clip) is what keeps
+   the links out of the tab order while collapsed; its transition is delayed
+   so it only flips once the collapse has finished. */
+.menu {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 180ms var(--ease-out);
+}
+/* Over the hero the bar is fully transparent, so the panel brings its own
+   ground — otherwise the links open straight onto whatever is behind them.
+   Same treatment as the bar: translucent paper plus the blur, never a card —
+   no radius, no shadow, no border. */
+.menu-clip {
+  overflow: hidden;
+  visibility: hidden;
+  background: color-mix(in oklab, var(--color-paper) 65%, transparent);
+  backdrop-filter: blur(16px);
+  transition:
+    visibility 0s linear 180ms,
+    background-color 300ms;
+}
+/* Past the scroll threshold the header paints 80% paper across its whole box —
+   the panel included. A second layer here would stack on top of that and leave
+   the panel reading whiter than the bar above it, so it drops out and lets the
+   bar's own ground show through. */
+[data-solid] .menu-clip {
+  background: transparent;
+  backdrop-filter: none;
+}
+.menu[data-open] {
+  grid-template-rows: 1fr;
+  transition-duration: 420ms;
+}
+.menu[data-open] .menu-clip {
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+.menu-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+  padding-top: 0.5rem;
+  padding-bottom: 1.5rem;
+}
+
+.menu-link {
+  padding-block: 0.75rem;
+  font-size: var(--text-lead);
+  color: var(--color-ink-muted);
+}
+.menu-link:hover {
+  color: var(--color-ink);
+}
+
+.menu-cta {
+  margin-top: 0.75rem;
+  border-radius: var(--radius-control);
+  background: var(--color-brand-ink);
+  color: var(--color-paper);
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+}
+
+/* Items rise into place behind the panel, one after another. Closing runs with
+   no delay, so the whole thing exits in one short beat. */
+.menu [data-menu-link] {
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity 140ms linear,
+    transform 140ms var(--ease-out),
+    color 200ms ease;
+}
+.menu[data-open] [data-menu-link] {
+  opacity: 1;
+  transform: none;
+  transition-duration: 300ms;
+  transition-delay: calc(var(--i) * 45ms + 70ms);
+}
+
+/* The panel is mobile-only. */
+@media (min-width: 768px) {
+  .menu {
+    display: none;
+  }
+}
+
+/* The global reduced-motion rule zeroes durations but not delays, which would
+   leave the links waiting on a stagger that no longer animates. */
+@media (prefers-reduced-motion: reduce) {
+  .menu[data-open] [data-menu-link] {
+    transition-delay: 0s;
+  }
+  .menu-clip {
+    transition-delay: 0s;
+  }
+}

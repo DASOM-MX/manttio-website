@@ -1,0 +1,89 @@
+/* /features — el catálogo. Nada aquí está atado al scroll. */
+
+.intro {
+  padding-block: 7rem 3rem;
+}
+@media (min-width: 640px) {
+  .intro {
+    padding-block: 9rem 4rem;
+  }
+}
+
+.intro-title {
+  margin-top: 0.75rem;
+  max-width: 19ch;
+  font-size: var(--text-display);
+  line-height: var(--text-display--line-height);
+  font-weight: 600;
+  letter-spacing: var(--tracking-display);
+}
+
+.mods {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Las bandas alternan fondo para que doce secciones seguidas no se lean como
+   una sola lista infinita. */
+.mod {
+  padding-block: 3rem;
+  background: var(--color-ground);
+}
+.mod[data-alt] {
+  background: var(--color-paper);
+}
+@media (min-width: 640px) {
+  .mod {
+    padding-block: 4.5rem;
+  }
+}
+
+.mod-grid {
+  display: grid;
+  gap: 2rem;
+  align-items: center;
+}
+@media (min-width: 1024px) {
+  .mod-grid {
+    grid-template-columns: 5fr 7fr;
+    gap: 4rem;
+  }
+  /* y el lado de la captura también alterna */
+  .mod[data-alt] .mod-copy {
+    order: 2;
+  }
+  .mod[data-alt] .mod-shot {
+    order: 1;
+  }
+}
+
+.mod-copy,
+.mod-shot {
+  min-width: 0;
+}
+
+.mod-head {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  color: var(--color-brand-ink);
+}
+
+.mod-name {
+  font-size: var(--text-h2);
+  line-height: var(--text-h2--line-height);
+  font-weight: 600;
+  letter-spacing: var(--tracking-heading);
+  color: var(--color-ink);
+}
+
+.mod-chip {
+  border-radius: 999px;
+  background: var(--color-mist);
+  color: var(--color-ink-faint);
+  padding: 0.2rem 0.65rem;
+  font-size: var(--text-caption);
+  font-weight: 500;
+  box-shadow: var(--shadow-ring);
+}

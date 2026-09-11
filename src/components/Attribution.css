@@ -1,0 +1,109 @@
+/* Atribución de leads — ver Attribution.astro para qué superficie reales
+   reproduce cada mitad. */
+
+/* Ambas columnas topadas: una pista `auto` crece hasta el ancho mínimo de la
+   línea del URL y el panel se sale del viewport en vez de truncar. */
+.panel-split {
+display: grid;
+grid-template-columns: minmax(0, 1fr);
+gap: 2.5rem;
+}
+@media (min-width: 1024px) {
+.panel-split {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 3.5rem;
+}
+}
+
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: var(--radius-control);
+    background: var(--color-mist);
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    color: var(--color-ink-muted);
+    box-shadow: var(--shadow-ring);
+    cursor: pointer;
+    transition:
+      background-color 300ms ease,
+      color 300ms ease;
+}
+.chip[aria-pressed="true"] {
+    background: var(--color-brand-50);
+    color: var(--color-brand-ink);
+    font-weight: 500;
+}
+
+.copy {
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    flex-shrink: 0;
+    border-radius: 12px;
+    background: var(--color-paper);
+    color: var(--color-ink-muted);
+    box-shadow: var(--shadow-ring);
+    cursor: pointer;
+    transition: color 200ms ease;
+}
+.copy:hover {
+    color: var(--color-ink);
+}
+.copy [data-copy-done] {
+    display: none;
+}
+.copy[data-done] {
+    color: var(--color-ok);
+}
+.copy[data-done] [data-copy-idle] {
+    display: none;
+}
+.copy[data-done] [data-copy-done] {
+    display: block;
+}
+
+.tag {
+    flex-shrink: 0;
+    border-radius: 999px;
+    background: var(--color-paper);
+    padding: 0.1rem 0.55rem;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-ink-faint);
+    box-shadow: var(--shadow-ring);
+}
+
+/* Bars re-scale when a capture lands; width is the only thing that moves. */
+.bar {
+    transition: width 520ms var(--ease-out);
+}
+.row-name {
+    color: var(--color-ink-muted);
+}
+[data-row][data-hot] .row-name {
+    color: var(--color-brand-ink);
+    font-weight: 500;
+}
+[data-row][data-hot] .bar {
+    background: var(--color-brand-ink);
+}
+
+/* The card re-enters on each capture, so a new lead reads as arriving. */
+@keyframes land {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+}
+[data-lead][data-landing] {
+    animation: land 380ms var(--ease-out);
+}

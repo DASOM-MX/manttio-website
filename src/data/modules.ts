@@ -1,6 +1,11 @@
 import type { ImageMetadata } from 'astro';
 
 import fieldappReportes from '../assets/app/fieldapp-reportes.png';
+import fieldappReportesDetalle from '../assets/app/fieldapp-reportes-detalle.png';
+import superadminClientesDetalle from '../assets/app/superadmin-clientes-detalle.png';
+import superadminContratosDetalle from '../assets/app/superadmin-contratos-detalle.png';
+import superadminCotizacionesDetalle from '../assets/app/superadmin-cotizaciones-detalle.png';
+import superadminReportesDetalle from '../assets/app/superadmin-reportes-detalle.png';
 import superadminMetricas from '../assets/app/superadmin-metricas.png';
 import superadminCalendario from '../assets/app/superadmin-calendario.png';
 import superadminClientes from '../assets/app/superadmin-clientes.png';
@@ -49,14 +54,23 @@ export type Module = {
 	 * the HTML faux-UI, which is also what keeps "Próximamente" honest.
 	 */
 	shot?: ImageMetadata;
-	/** `mobile` renders narrow, in a phone frame. */
+	/** `mobile` renders narrow, in a phone frame. Applies to both captures. */
 	shotKind?: 'desktop' | 'mobile';
+	/**
+	 * The same module with ONE record open, from the same harnesses. `shot`
+	 * proves the module exists; this proves what a record holds, which is the
+	 * argument the "Dolores" panels make — see `AppShot`'s `variant` prop.
+	 * Absent where the module's own screen already IS a detail view (the CMS
+	 * editor) or where nothing is shipped to capture.
+	 */
+	shotDetail?: ImageMetadata;
 };
 
 export const MODULES: Module[] = [
 	{
 		id: 'reportes',
 		shot: superadminReportes,
+		shotDetail: superadminReportesDetalle,
 		shotKind: 'desktop',
 		name: 'Reportes y plantillas',
 		icon: 'lucide:file-text',
@@ -79,6 +93,7 @@ export const MODULES: Module[] = [
 	{
 		id: 'cotizaciones',
 		shot: superadminCotizaciones,
+		shotDetail: superadminCotizacionesDetalle,
 		shotKind: 'desktop',
 		name: 'Cotizaciones',
 		icon: 'lucide:file-check',
@@ -143,6 +158,7 @@ export const MODULES: Module[] = [
 	{
 		id: 'crm',
 		shot: superadminClientes,
+		shotDetail: superadminClientesDetalle,
 		shotKind: 'desktop',
 		name: 'Clientes',
 		icon: 'lucide:users',
@@ -186,6 +202,7 @@ export const MODULES: Module[] = [
 	{
 		id: 'contratos',
 		shot: superadminContratos,
+		shotDetail: superadminContratosDetalle,
 		shotKind: 'desktop',
 		name: 'Contratos y pólizas',
 		icon: 'lucide:file-signature',
@@ -289,6 +306,7 @@ export const MODULES: Module[] = [
 	{
 		id: 'campo',
 		shot: fieldappReportes,
+		shotDetail: fieldappReportesDetalle,
 		shotKind: 'mobile',
 		name: 'App de campo',
 		icon: 'lucide:smartphone',

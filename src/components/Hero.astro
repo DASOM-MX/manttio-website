@@ -1,0 +1,103 @@
+---
+import { Icon } from "astro-icon/components";
+import { MODULES } from "../data/modules";
+import AppShot from "./AppShot.astro";
+
+/**
+ * Hero — copy left, real product shot right, deliberately asymmetric (7/5 on
+ * desktop) so it does not read as the centered two-CTA template.
+ *
+ * The shot is a REAL capture of the running superadmin, not a faux-UI mock:
+ * that is the one thing this page has that a generated landing page does not,
+ * so it lands above the fold rather than four sections down.
+ *
+ * There is no decorative glow behind it. The old radial blob was removed with
+ * the scene — a blurred gradient shape with no referent is filler, and the
+ * shot is the thing worth looking at.
+ */
+const SUBJECTS = [
+  "Tu negocio",
+  "Tus reportes",
+  "Tus clientes",
+  "Tus órdenes",
+  "Tu calendario",
+  "Tus contratos",
+  "Tu inventario",
+];
+---
+
+<section id="inicio" class="hero">
+  <div class="shell hero-grid">
+    <div class="hero-copy">
+      <p class="label">Software de servicio en campo</p>
+
+      <!-- The rotator stack is aria-hidden and the sr-only span carries the
+           heading's accessible name, so a screen reader hears one sentence
+           instead of a list that re-announces itself every 2.4 s. -->
+      <h1 class="hero-title" data-rot>
+        <span class="rot" aria-hidden="true">
+          {
+            SUBJECTS.map((subject, i) => (
+              <span class="rot-item" data-rot-item data-active={i === 0 ? "true" : undefined}>
+                {subject}
+              </span>
+            ))
+          }
+        </span>
+        <span class="sr-only">{SUBJECTS[0]}</span>
+        <span class="rot-tail">en un solo lugar.</span>
+      </h1>
+
+      <p class="measure-lead mt-6 text-lead text-ink-muted">
+        Mantén en orden la operación y la información de tu negocio de
+        servicios técnicos: reportes, clientes, órdenes de servicio,
+        cotizaciones, contratos e inventario en un solo sistema.
+      </p>
+
+      <div class="cta-row">
+        <a href="#contacto" class="cta-primary">
+          Solicitar demo
+          <Icon name="lucide:arrow-right" class="size-4" />
+        </a>
+        <a href="/features" class="cta-ghost">Ver los módulos</a>
+      </div>
+    </div>
+
+    <div class="hero-shot">
+      <AppShot module={MODULES[0]} loading="eager" />
+    </div>
+  </div>
+</section>
+
+<style>@import './Hero.css';</style>
+
+<script>
+  import { prefersReduced } from "../scripts/motion";
+
+  const items = Array.from(document.querySelectorAll<HTMLElement>("[data-rot-item]"));
+
+  // Reduced motion keeps the first subject — which is also the one the sr-only
+  // span names, so the heading a screen reader hears matches what is on screen.
+  if (items.length > 1 && !prefersReduced()) {
+    let i = 0;
+    let timer: number | null = null;
+
+    const step = () => {
+      items[i].removeAttribute("data-active");
+      i = (i + 1) % items.length;
+      items[i].setAttribute("data-active", "true");
+    };
+
+    const sync = () => {
+      if (timer !== null) {
+        clearInterval(timer);
+        timer = null;
+      }
+      // No repaints behind a hidden tab.
+      if (!document.hidden) timer = window.setInterval(step, 2400);
+    };
+
+    document.addEventListener("visibilitychange", sync);
+    sync();
+  }
+</script>

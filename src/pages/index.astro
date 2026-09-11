@@ -1,35 +1,32 @@
 ---
 import Attribution from '../components/Attribution.astro';
 import Closer from '../components/Closer.astro';
+import ComingSoon from '../components/ComingSoon.astro';
 import Faq from '../components/Faq.astro';
-import HeroScene from '../components/HeroScene.astro';
-import HowItWorks from '../components/HowItWorks.astro';
-import Modularity from '../components/Modularity.astro';
+import Footer from '../components/Footer.astro';
+import Hero from '../components/Hero.astro';
 import Nav from '../components/Nav.astro';
 import Pains from '../components/Pains.astro';
-import Whitelabel from '../components/Whitelabel.astro';
+import Roadmap from '../components/Roadmap.astro';
+import UseCases from '../components/UseCases.astro';
 import Layout from '../layouts/Layout.astro';
 ---
 
 <Layout>
 	<Nav />
 	<main id="contenido">
-		<!-- Grounds alternate the way the reference template does: ground → night
-		     → ground → paper → ground → paper → ground → mist → night. The first
-		     two beats belong to one component — the scene cross-fades ground into
-		     night as the hero's shot locks into the module stage. -->
-		<HeroScene />
+		<!-- Orden fijado por el dueño (2026-09-10). Ninguna sección retiene el
+		     scroll: la página se lee de arriba a abajo a la velocidad del dedo.
+		     Las preguntas van DESPUÉS del CTA a propósito — quien ya está
+		     convencido no tiene que pasar por encima de ellas. -->
+		<Hero />
 		<Pains />
-		<Whitelabel />
+		<UseCases />
 		<Attribution />
-		<Modularity />
-		<HowItWorks />
-		<Faq />
+		<Roadmap />
+		<ComingSoon />
 		<Closer />
+		<Faq />
 	</main>
+	<Footer />
 </Layout>
-
-<script>
-	// Starts the ambient brand rotation for the page (§3.2).
-	import '../scripts/brand';
-</script>

@@ -76,7 +76,7 @@ const pct = (r: { leads: number; active: number }) =>
 
 <section id="origen" class="shell py-16 sm:py-24">
   <h2
-    class="measure-head mt-3 text-h1 font-semibold tracking-[-0.025em]"
+    class="measure-head mt-3 text-h1 font-semibold tracking-heading"
     data-reveal-o
   >
     Deja de pagar por publicidad que no da resultados.
@@ -91,15 +91,11 @@ const pct = (r: { leads: number; active: number }) =>
     class="mt-10 rounded-card bg-paper p-6 shadow-e2 sm:mt-12 sm:p-10"
     data-reveal-o
   >
-    <!-- Both tracks capped: an `auto` track grows to the URL line's min-content
-			     width and the panel blows past the viewport instead of truncating. -->
-    <div
-      class="grid grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-14"
-    >
+    <div class="panel-split">
       <!-- ---------- pick a channel, get a link ---------- -->
       <div>
         <p class="mt-5 flex items-center gap-2.5 text-lead font-medium">
-          <span class="tint nums grid size-7 shrink-0 place-items-center rounded-full bg-brand-ink text-caption font-semibold text-paper">1</span>
+          <span class="nums grid size-7 shrink-0 place-items-center rounded-full bg-brand-ink text-caption font-semibold text-paper">1</span>
           Elige tu canal favorito
         </p>
         <div
@@ -126,7 +122,7 @@ const pct = (r: { leads: number; active: number }) =>
         </div>
 
         <p class="mt-5 flex items-center gap-2.5 text-lead font-medium">
-          <span class="tint nums grid size-7 shrink-0 place-items-center rounded-full bg-brand-ink text-caption font-semibold text-paper">2</span>
+          <span class="nums grid size-7 shrink-0 place-items-center rounded-full bg-brand-ink text-caption font-semibold text-paper">2</span>
           Comparte
         </p>
         <!-- the same row the superadmin shows under Clientes → Enlaces de contacto -->
@@ -134,7 +130,7 @@ const pct = (r: { leads: number; active: number }) =>
           class="mt-3 flex items-center gap-3 rounded-frame bg-mist p-3.5 shadow-ring"
         >
           <span
-            class="tint grid size-9 shrink-0 place-items-center rounded-soft bg-brand-50 text-brand-ink"
+            class="grid size-9 shrink-0 place-items-center rounded-soft bg-brand-50 text-brand-ink"
           >
             <Icon name={CHANNELS[0].icon} class="size-4" data-link-icon />
           </span>
@@ -147,7 +143,7 @@ const pct = (r: { leads: number; active: number }) =>
 						     whole point of the row. The <wbr> puts the break right before the `?`. -->
             <p class="font-mono text-caption break-all text-ink-faint">
               <span>{SITE}/contact-us</span><wbr /><span
-                class="tint text-brand-ink"
+                class="text-brand-ink"
                 data-link-query>?{CHANNELS[0].query}</span
               >
             </p>
@@ -177,7 +173,7 @@ const pct = (r: { leads: number; active: number }) =>
       <div class="flex flex-col gap-9">
         <div>
           <p class="mt-5 flex items-center gap-2.5 text-lead font-medium">
-            <span class="tint nums grid size-7 shrink-0 place-items-center rounded-full bg-brand-ink text-caption font-semibold text-paper">3</span>
+            <span class="nums grid size-7 shrink-0 place-items-center rounded-full bg-brand-ink text-caption font-semibold text-paper">3</span>
             Ve los resultados
           </p>
           <div class="mt-3 rounded-frame bg-mist p-4 shadow-ring" data-lead>
@@ -197,7 +193,7 @@ const pct = (r: { leads: number; active: number }) =>
               class="mt-4 flex items-baseline gap-2 border-t border-hair pt-3 text-caption"
             >
               <dt class="text-ink-faint">Origen</dt>
-              <dd class="tint font-medium text-brand-ink" data-lead-source>
+              <dd class="font-medium text-brand-ink" data-lead-source>
                 Facebook
               </dd>
             </dl>
@@ -226,7 +222,7 @@ const pct = (r: { leads: number; active: number }) =>
                   </div>
                   <div class="mt-1.5 h-1.5 rounded-full bg-ground">
                     <div
-                      class="tint bar h-1.5 rounded-full bg-brand-400"
+                      class="bar h-1.5 rounded-full bg-brand-400"
                       style={`width:${pct(r)}%`}
                       data-row-bar
                     />
@@ -251,102 +247,7 @@ const pct = (r: { leads: number; active: number }) =>
   <p class="sr-only" role="status" data-status></p>
 </section>
 
-<style>
-  .chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    border-radius: 999px;
-    background: var(--color-mist);
-    padding: 0.5rem 1rem;
-    font-size: 0.9rem;
-    color: var(--color-ink-muted);
-    box-shadow: var(--shadow-ring);
-    cursor: pointer;
-    transition:
-      background-color 300ms ease,
-      color 300ms ease;
-  }
-  .chip[aria-pressed="true"] {
-    background: var(--color-brand-50);
-    color: var(--color-brand-ink);
-    font-weight: 500;
-  }
-
-  .copy {
-    display: grid;
-    place-items: center;
-    width: 2.25rem;
-    height: 2.25rem;
-    flex-shrink: 0;
-    border-radius: 12px;
-    background: var(--color-paper);
-    color: var(--color-ink-muted);
-    box-shadow: var(--shadow-ring);
-    cursor: pointer;
-    transition: color 200ms ease;
-  }
-  .copy:hover {
-    color: var(--color-ink);
-  }
-  .copy [data-copy-done] {
-    display: none;
-  }
-  .copy[data-done] {
-    color: var(--color-ok);
-  }
-  .copy[data-done] [data-copy-idle] {
-    display: none;
-  }
-  .copy[data-done] [data-copy-done] {
-    display: block;
-  }
-
-  .tag {
-    flex-shrink: 0;
-    border-radius: 999px;
-    background: var(--color-paper);
-    padding: 0.1rem 0.55rem;
-    font-size: 0.6875rem;
-    font-weight: 500;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: var(--color-ink-faint);
-    box-shadow: var(--shadow-ring);
-  }
-
-  /* Bars re-scale when a capture lands; width is the only thing that moves. */
-  .bar {
-    transition:
-      width 520ms var(--ease-out),
-      background-color 1200ms ease;
-  }
-  .row-name {
-    color: var(--color-ink-muted);
-  }
-  [data-row][data-hot] .row-name {
-    color: var(--color-brand-ink);
-    font-weight: 500;
-  }
-  [data-row][data-hot] .bar {
-    background: var(--color-brand-ink);
-  }
-
-  /* The card re-enters on each capture, so a new lead reads as arriving. */
-  @keyframes land {
-    from {
-      opacity: 0;
-      transform: translateY(6px);
-    }
-    to {
-      opacity: 1;
-      transform: none;
-    }
-  }
-  [data-lead][data-landing] {
-    animation: land 380ms var(--ease-out);
-  }
-</style>
+<style>@import './Attribution.css';</style>
 
 <script>
   import { reveal } from "../scripts/motion";

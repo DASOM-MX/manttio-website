@@ -1,138 +1,97 @@
 ---
-import { Icon } from "astro-icon/components";
+import type { ImageMetadata } from "astro";
+import { MODULES } from "../data/modules";
+import ArtSlot from "./ArtSlot.astro";
 
 /**
- * Pregunta → respuesta. Las respuestas sin `soon` son cosas que el producto ya
- * hace hoy (ver `shipped: true` en `../data/modules.ts`). `soon: true` marca la
- * fila con el mismo chip "Próximamente" que usa el riel de módulos, para no
- * prometer en presente lo que todavía no está.
+ * Pregunta → respuesta, en tarjetas.
+ *
+ * Las capturas del producto salieron de aquí (owner 2026-09-10): los dolores
+ * se ilustran, no se demuestran — la demostración con capturas reales vive en
+ * los casos de uso, en la línea de tiempo y en /features, que es donde el
+ * visitante ya quiere ver la app.
+ *
+ * ILUSTRACIONES PENDIENTES. Cada tarjeta tiene su hueco listo: en cuanto
+ * exista el archivo, se importa arriba y se pone en `illustration`. El hueco lo
+ * dibuja `ArtSlot`, que es el mismo que usa la línea de tiempo del roadmap.
  */
-const pairs = [
+const pairs: {
+  module: string;
+  ask: string;
+  title: string;
+  answer: string;
+  illustration?: ImageMetadata;
+}[] = [
   {
-    icon: "lucide:send",
+    module: "reportes",
     ask: "¿Las fotos y los reportes se pierden en el chat?",
     title: "Nosotros los enviamos automáticamente, en un solo lugar",
     answer:
       "Tus técnicos solo tienen que llenar el reporte con la firma del cliente y tu cliente recibe un PDF con el reporte. Nadie tiene que traspasarlo al llegar a la oficina ni acordarse de mandarlo.",
   },
   {
-    icon: "lucide:notebook-pen",
-    ask: "¿No recuerdas tu último contacto con un cliente?",
-    title: "Nosotros sí",
-    answer:
-      "Anota cada llamada, cada visita, cada acuerdo y cada interacción en nuestro sistema. Olvídate de preguntar y de hacer trabajo forense para recordar.",
-  },
-  {
-    icon: "lucide:file-check",
+    module: "cotizaciones",
     ask: "¿Cotizaste por teléfono y ahora nadie recuerda el precio?",
     title: "Todo queda por escrito y sin tiempos de espera para enviarla",
     answer:
       "Envía la cotización inmediatamente después de crearla en el sistema: el cliente la aprueba o la rechaza ahí mismo y el precio queda fijo desde ese momento. Siempre hay constancia de quién aprobó y cuándo.",
   },
   {
-    icon: "lucide:wifi-off",
+    module: "campo",
     ask: "¿Tus técnicos no pueden abrir reportes si no hay señal?",
     title: "La app funciona sin internet",
     answer:
       "En sótanos, azoteas y naves industriales la app responde igual. El técnico captura ahí mismo y la información sube sola en cuanto recupera la red. Nadie tiene que volver a escribirla en la oficina.",
   },
   {
-    icon: "lucide:bell-ring",
+    module: "contratos",
     ask: "¿Las pólizas se vencen sin que nadie lo note?",
     title: "El sistema notifica con tiempo",
     answer:
       "Las pólizas por vencer, los seguimientos pendientes y la agenda de la semana aparecen desde que entras. Lo que hoy recuerdas tú, mañana lo recuerda el sistema.",
   },
-  {
-    icon: "lucide:globe",
-    ask: "¿Tus clientes te buscan en internet y no te encuentran?",
-    title: "Tu sitio web personalizado va incluido",
-    answer:
-      "Una página con tu nombre, tus colores y tu logotipo, publicada desde el mismo sistema y actualizada por ti sin depender de nadie. Olvídate de contactar a la persona que te hizo la página para pedir un cambio: ahorra tiempo y dinero.",
-  },
-  {
-    icon: "lucide:package",
-    soon: true,
-    ask: "¿Sabes qué material va en cada camioneta?",
-    title: "El inventario se actualiza con los trabajos de campo",
-    answer:
-      "Revisa cuánto hay en bodega y cuánto carga cada técnico, descuenta y asigna material para tus trabajos y regístralo después de generar reportes. Cada movimiento queda auditado.",
-  },
-  {
-    icon: "lucide:circle-dollar-sign",
-    soon: true,
-    ask: "¿Tienes que pagar por timbres y tu sistema de facturación?",
-    title: "Nosotros te tenemos cubierto",
-    answer:
-      "Deja de pagar de más por facturación y olvídate de cambiar de pestaña: tu plan incluye timbres gratis cada mes.",
-  },
 ];
+
+const byId = new Map(MODULES.map((m) => [m.id, m]));
+const cards = pairs.map((p) => {
+  const mod = byId.get(p.module);
+  // Falla el build en vez de renderizar media tarjeta vacía.
+  if (!mod) throw new Error(`Pains: no existe el módulo "${p.module}"`);
+  return { ...p, mod };
+});
 ---
 
-<section id="dolores" class="shell py-16 sm:py-24">
-  <div class="mx-auto max-w-2xl lg:text-center">
-    <h2
-      class="mt-3 text-h1 font-semibold tracking-[-0.025em] text-balance"
-      data-reveal-p
-    >
+<section id="dolores" class="pains">
+  <div class="shell">
+    <h2 class="section-title measure-head" data-reveal-p>
       Olvídate del papel y el lápiz.
     </h2>
-    <p class="mt-6 text-lead text-ink-muted" data-reveal-p>
-      Sabemos que tu equipo es experto en su área; deja que nosotros nos
-      encarguemos del resto, mejora las relaciones con tus clientes y mantén tu
-      negocio bien administrado. Olvídate de todo esto:
-    </p>
-  </div>
 
-  <div class="mx-auto mt-14 max-w-2xl sm:mt-16 lg:mt-20 lg:max-w-4xl">
-    <dl class="grid grid-cols-1 gap-x-10 gap-y-10 lg:grid-cols-2 lg:gap-y-14">
+    <ul class="cards">
       {
-        pairs.map((p) => (
-          <div class="relative pl-16" data-pair>
-            {/* The pregunta carries the item: it is what the reader recognizes
-						    before they care what the module is called. */}
-            <dt class="text-lead font-semibold tracking-tight text-balance">
-              <span class="tint absolute top-0 left-0 grid size-10 place-items-center rounded-soft bg-brand-ink text-paper">
-                <Icon name={p.icon} class="size-5" />
-              </span>
-              {p.ask}
-              {p.soon && (
-                <>
-                  <span class="soon">Próximamente</span>{" "}
-                </>
-              )}
-            </dt>
-            <dd class="mt-2 text-ink-muted">
-              <span class="tint font-medium text-brand-ink">{p.title}.</span>{" "}
-              {p.answer}
-            </dd>
-          </div>
+        cards.map((c) => (
+          <li class="card" data-card>
+            <p class="card-ask">{c.ask}</p>
+            <h3 class="card-title">{c.title}</h3>
+            <p class="card-body">{c.answer}</p>
+
+            <ArtSlot illustration={c.illustration} class="card-art" />
+
+            <a class="card-link" href={`/features#${c.mod.id}`}>
+              {c.mod.name}
+              <span aria-hidden="true">&rarr;</span>
+            </a>
+          </li>
         ))
       }
-    </dl>
+    </ul>
   </div>
 </section>
 
-<style>
-  /* Same chip as the module rail, so "Próximamente" reads the same twice. */
-  .soon {
-    display: inline-block;
-    border-radius: 999px;
-    background: var(--color-mist);
-    padding: 0.15rem 0.5rem;
-    font-size: 0.6875rem;
-    font-weight: 500;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--color-ink-faint);
-    white-space: nowrap;
-    box-shadow: var(--shadow-ring);
-    vertical-align: middle;
-  }
-</style>
+<style>@import './Pains.css';</style>
 
 <script>
   import { reveal, revealStagger } from "../scripts/motion";
   reveal("[data-reveal-p]");
-  revealStagger("[data-pair]");
+  revealStagger("[data-card]", { each: 0.08 });
 </script>

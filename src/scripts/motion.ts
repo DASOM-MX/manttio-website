@@ -1,13 +1,26 @@
 /**
- * Motion primitives — plan §4.
+ * Motion primitives.
  *
  * Binding rules: transform/opacity only, enter 400–600 ms, exit ≤ 200 ms,
  * everything interruptible, and `prefers-reduced-motion` collapses each effect
  * to its final state rather than hiding content behind an animation.
+ *
+ * Nothing here drives scroll. The pinned scenes this file used to serve
+ * (`scrollProgress`) were removed 2026-09-10 along with `brandCycle` (the
+ * four-hue rotation), `counter`, and `magnetic`. Every section on the site now
+ * reveals once on entry and then holds still.
  */
-import { animate, inView, scroll, stagger } from 'motion';
+import { animate, inView, stagger } from 'motion';
 
 const REDUCED = '(prefers-reduced-motion: reduce)';
+
+/**
+ * Un selector, un elemento, o un grupo ya recolectado. El array importa para
+ * los casos donde el llamador ya acotó el alcance — p. ej. los elementos de UN
+ * beat de la línea de tiempo, que deben escalonarse entre ellos y no con los
+ * de los otros cinco beats.
+ */
+export type Target = string | Element | Element[];
 
 export const prefersReduced = (): boolean =>
 	typeof window !== 'undefined' && window.matchMedia(REDUCED).matches;
@@ -23,13 +36,18 @@ export const prefersReduced = (): boolean =>
 const visibilityAmount = (el: Element, preferred: number): number | 'some' =>
 	(el as HTMLElement).offsetHeight > window.innerHeight * 0.8 ? 'some' : preferred;
 
-/** Fade + rise once, when the element first enters view. */
-export function reveal(target: string | Element, opts: { y?: number; delay?: number } = {}) {
+/**
+ * Fade + rise once, when the element first enters view.
+ *
+ * `x` desplaza además en horizontal — lo usa la línea de tiempo en zig-zag,
+ * donde cada tarjeta entra desde su propio lado de la espina.
+ */
+export function reveal(target: Target, opts: { y?: number; x?: number; delay?: number } = {}) {
 	const els = resolve(target);
 	if (!els.length) return;
 	if (prefersReduced()) return show(els);
 
-	const { y = 24, delay = 0 } = opts;
+	const { y = 24, x = 0, delay = 0 } = opts;
 	for (const el of els) {
 		(el as HTMLElement).style.opacity = '0';
 		inView(
@@ -37,7 +55,10 @@ export function reveal(target: string | Element, opts: { y?: number; delay?: num
 			() => {
 				animate(
 					el,
-					{ opacity: [0, 1], transform: [`translateY(${y}px)`, 'translateY(0px)'] },
+					{
+						opacity: [0, 1],
+						transform: [`translate(${x}px, ${y}px)`, 'translate(0px, 0px)'],
+					},
 					{ duration: 0.55, delay, ease: [0.2, 0.7, 0.3, 1] },
 				);
 			},
@@ -47,7 +68,7 @@ export function reveal(target: string | Element, opts: { y?: number; delay?: num
 }
 
 /** Same, staggered across a group. Capped so long lists never crawl. */
-export function revealStagger(target: string | Element, opts: { each?: number; y?: number } = {}) {
+export function revealStagger(target: Target, opts: { each?: number; y?: number } = {}) {
 	const els = resolve(target);
 	if (!els.length) return;
 	if (prefersReduced()) return show(els);
@@ -69,126 +90,76 @@ export function revealStagger(target: string | Element, opts: { each?: number; y
 	);
 }
 
-/** Normalized 0→1 progress across a sticky scene. */
-export function scrollProgress(section: Element, cb: (p: number) => void) {
-	if (prefersReduced()) {
-		cb(0);
-		return;
-	}
-	scroll((progress: number) => cb(progress), {
-		target: section as HTMLElement,
-		offset: ['start start', 'end end'],
-	});
-}
+/**
+ * The "writing" reveal — each `[data-word]` inside `target` fades up in turn.
+ *
+ * The words are split in the component's frontmatter and rendered as inline
+ * spans, so the heading's accessible name is still the whole sentence and
+ * `text-wrap: balance` still sees one run of text.
+ */
+export function revealWords(
+	target: Target,
+	opts: { each?: number; y?: number; duration?: number; delay?: number } = {},
+) {
+	const hosts = resolve(target);
+	if (!hosts.length) return;
 
-/** Count-up with tabular numerals. Reduced motion prints the final value. */
-export function counter(el: HTMLElement, to: number, opts: { suffix?: string; duration?: number } = {}) {
-	const { suffix = '', duration = 900 } = opts;
-	const print = (n: number) => {
-		el.textContent = Math.round(n).toLocaleString('es-MX') + suffix;
-	};
-	if (prefersReduced()) return print(to);
+	const words = hosts.flatMap((h) => Array.from(h.querySelectorAll<HTMLElement>('[data-word]')));
+	if (!words.length) return;
+	if (prefersReduced()) return show(words);
+
+	const { each = 0.045, y = 14, duration = 0.42, delay = 0 } = opts;
+	for (const el of words) el.style.opacity = '0';
 
 	inView(
-		el,
+		hosts[0],
 		() => {
-			const start = performance.now();
-			const step = (now: number) => {
-				const p = Math.min(1, (now - start) / duration);
-				print(to * (1 - Math.pow(1 - p, 3)));
-				if (p < 1) requestAnimationFrame(step);
-			};
-			requestAnimationFrame(step);
+			animate(
+				words,
+				{ opacity: [0, 1], transform: [`translateY(${y}px)`, 'translateY(0px)'] },
+				{ duration, delay: stagger(each, { startDelay: delay }), ease: [0.2, 0.7, 0.3, 1] },
+			);
 		},
-		{ amount: 0.6 },
+		{ amount: visibilityAmount(hosts[0], 0.25) },
 	);
 }
 
-/** Pointer-following nudge, ≤ 6 px, fine pointers only. */
-export function magnetic(el: HTMLElement, strength = 6) {
-	if (prefersReduced() || !window.matchMedia('(pointer: fine)').matches) return;
-	el.addEventListener('pointermove', (e) => {
-		const r = el.getBoundingClientRect();
-		const dx = (e.clientX - (r.left + r.width / 2)) / (r.width / 2);
-		const dy = (e.clientY - (r.top + r.height / 2)) / (r.height / 2);
-		animate(el, { x: dx * strength, y: dy * strength }, { duration: 0.18, ease: [0.2, 0.7, 0.3, 1] });
-	});
-	el.addEventListener('pointerleave', () => {
-		animate(el, { x: 0, y: 0 }, { duration: 0.3, ease: [0.2, 0.7, 0.3, 1] });
-	});
-}
-
-export const BRANDS = ['indigo', 'amarillo', 'verde', 'violeta'] as const;
-export type Brand = (typeof BRANDS)[number];
-
-type CycleController = {
-	hold: () => void;
-	release: () => void;
-	set: (brand: string) => void;
-	current: () => string;
-	onChange: (fn: (brand: string) => void) => void;
-};
-
 /**
- * The ambient whitelabel proof — one new primary every `intervalMs` (§3.2).
- * Pauses on a hidden tab, while held by the brand section, and entirely under
- * reduced motion.
+ * Marca un elemento cuando entra en viewport para que el CSS lo dibuje.
+ *
+ * No anima nada por sí misma: solo pone `data-drawn`, y la transición vive en
+ * el CSS del componente. Eso mantiene la regla de "solo transform y opacity"
+ * intacta — el conector de la línea punteada se revela con un `translateY`
+ * dentro de un contenedor recortado, nunca animando `height`.
+ *
+ * `inView` de motion.dev es un IntersectionObserver por dentro, así que esto
+ * comparte el mismo mecanismo (y el mismo presupuesto) que el resto de las
+ * primitivas en lugar de montar un observer aparte.
  */
-export function brandCycle(intervalMs = 10000): CycleController {
-	const root = document.documentElement;
-	const listeners: ((brand: string) => void)[] = [];
-	let index = Math.max(0, BRANDS.indexOf(root.dataset.brand as Brand));
-	let held = false;
-	let timer: number | null = null;
+export function drawOnView(target: Target, opts: { amount?: number } = {}) {
+	const els = resolve(target);
+	if (!els.length) return;
 
-	const emit = () => listeners.forEach((fn) => fn(root.dataset.brand ?? BRANDS[0]));
+	// Sin movimiento: la línea ya está dibujada desde el primer frame.
+	if (prefersReduced()) {
+		for (const el of els) el.setAttribute('data-drawn', '');
+		return;
+	}
 
-	const apply = (brand: string) => {
-		root.dataset.brand = brand;
-		emit();
-	};
-
-	const running = () => !prefersReduced() && !held && !document.hidden;
-
-	const sync = () => {
-		if (timer !== null) {
-			clearInterval(timer);
-			timer = null;
-		}
-		if (running()) {
-			timer = window.setInterval(() => {
-				index = (index + 1) % BRANDS.length;
-				apply(BRANDS[index]);
-			}, intervalMs);
-		}
-	};
-
-	document.addEventListener('visibilitychange', sync);
-	sync();
-
-	return {
-		hold() {
-			held = true;
-			sync();
-		},
-		release() {
-			held = false;
-			sync();
-		},
-		set(brand: string) {
-			const i = BRANDS.indexOf(brand as Brand);
-			if (i >= 0) index = i;
-			apply(brand);
-		},
-		current: () => root.dataset.brand ?? BRANDS[0],
-		onChange(fn) {
-			listeners.push(fn);
-		},
-	};
+	const { amount = 0.35 } = opts;
+	for (const el of els) {
+		// `data-anim` es lo que autoriza al CSS a esconder la tinta. Sin JS nunca
+		// se pone, así que la línea se queda dibujada y la sección se lee igual
+		// — mismo trato que `reveal`, que también aplica su estado inicial aquí
+		// y no en la hoja de estilos.
+		el.setAttribute('data-anim', '');
+		inView(el, () => el.setAttribute('data-drawn', ''), { amount: visibilityAmount(el, amount) });
+	}
 }
 
-function resolve(target: string | Element): Element[] {
+function resolve(target: Target): Element[] {
 	if (typeof target === 'string') return Array.from(document.querySelectorAll(target));
+	if (Array.isArray(target)) return target;
 	return [target];
 }
 

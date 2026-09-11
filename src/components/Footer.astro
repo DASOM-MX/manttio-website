@@ -1,0 +1,24 @@
+---
+import { SITE_TITLE } from "../consts";
+
+const year = new Date().getFullYear();
+
+const links = [
+  { href: "/features", label: "Módulos" },
+  { href: "/#casos", label: "Casos de uso" },
+  { href: "/#lo-que-viene", label: "Lo que viene" },
+  { href: "/#preguntas", label: "Preguntas" },
+  { href: "/aviso-de-privacidad", label: "Aviso de privacidad" },
+];
+---
+
+<footer class="footer">
+  <div class="shell footer-inner">
+    <p>© {year} {SITE_TITLE}. Todos los derechos reservados.</p>
+    <nav class="footer-nav" aria-label="Pie de página">
+      {links.map((l) => <a href={l.href}>{l.label}</a>)}
+    </nav>
+  </div>
+</footer>
+
+<style>@import './Footer.css';</style>

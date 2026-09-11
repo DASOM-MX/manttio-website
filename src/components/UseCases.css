@@ -1,0 +1,142 @@
+/* Casos de uso — tablist. Nothing here is driven by scroll position. */
+
+.cases {
+  border-top: 1px solid var(--color-hair);
+  background: var(--color-paper);
+  padding-block: 4rem;
+}
+@media (min-width: 640px) {
+  .cases {
+    padding-block: 6rem;
+  }
+}
+
+.cases-body {
+  margin-top: 2.5rem;
+}
+
+/* Riel de una sola línea con subrayado en el activo. Sin pastillas: las
+   pastillas competían con los chips de módulo que van justo debajo. */
+.tabs {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 2rem;
+  overflow-x: auto;
+  box-shadow: inset 0 -1px 0 var(--color-hair);
+  /* el riel se desliza de lado en el teléfono; la página nunca */
+  scrollbar-width: none;
+}
+.tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.tab {
+  position: relative;
+  flex: 0 0 auto;
+  padding: 0 0 0.875rem;
+  font-size: 0.95rem;
+  color: var(--color-ink-faint);
+  background: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 200ms var(--ease-out);
+}
+.tab:hover {
+  color: var(--color-ink-muted);
+}
+.tab[aria-selected='true'] {
+  color: var(--color-ink);
+  font-weight: 600;
+}
+/* La barra del activo se dibuja sobre la línea del riel. */
+.tab::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  bottom: -1px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--color-brand-ink);
+  transform: scaleX(0);
+  transition: transform 220ms var(--ease-out);
+}
+.tab[aria-selected='true']::after {
+  transform: scaleX(1);
+}
+/* El foco de teclado tiene que verse aunque la pestaña no esté activa. */
+.tab:focus-visible {
+  outline-offset: -4px;
+}
+
+.panels {
+  margin-top: 2rem;
+}
+
+/* Without JS every panel is visible and the section reads as five stacked
+   blocks. `data-ready` is what turns it into a one-at-a-time tablist. */
+.panel {
+  display: grid;
+  gap: 2rem;
+  align-items: center;
+}
+.panel + .panel {
+  margin-top: 3rem;
+}
+@media (min-width: 1024px) {
+  .panel {
+    grid-template-columns: 5fr 7fr;
+    gap: 4rem;
+  }
+}
+
+[data-ready] .panel {
+  display: none;
+}
+[data-ready] .panel + .panel {
+  margin-top: 0;
+}
+[data-ready] .panel[data-active] {
+  display: grid;
+}
+@media (min-width: 1024px) {
+  [data-ready] .panel[data-active] {
+    grid-template-columns: 5fr 7fr;
+  }
+}
+
+.panel-copy {
+  min-width: 0;
+}
+
+.panel-title {
+  font-size: var(--text-h3);
+  line-height: var(--text-h3--line-height);
+  font-weight: 600;
+  letter-spacing: var(--tracking-heading);
+}
+
+.chips {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  list-style: none;
+  padding: 0;
+}
+
+.chip {
+  display: inline-flex;
+  border-radius: var(--radius-control);
+  background: var(--color-brand-50);
+  color: var(--color-brand-ink);
+  padding: 0.4rem 0.85rem;
+  font-size: 0.85rem;
+  transition: background-color 200ms var(--ease-out);
+}
+.chip:hover {
+  background: var(--color-brand-100);
+}
+
+.panel-shot {
+  min-width: 0;
+}

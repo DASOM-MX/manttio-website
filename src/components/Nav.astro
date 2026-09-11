@@ -2,19 +2,16 @@
 import { SITE_TITLE } from '../consts';
 
 const links = [
-	{ href: '#modulos', label: 'Módulos' },
-	{ href: '#como-funciona', label: 'Cómo funciona' },
-	{ href: '#preguntas', label: 'Preguntas' },
+	{ href: '/features', label: 'Módulos' },
+	{ href: '/#casos', label: 'Casos de uso' },
+	{ href: '/#lo-que-viene', label: 'Lo que viene' },
+	{ href: '/#preguntas', label: 'Preguntas' },
 ];
 ---
 
-<header
-	id="nav"
-	class="fixed inset-x-0 top-0 z-40 transition-[background-color,box-shadow,backdrop-filter] duration-300"
-	data-nav
->
-	<nav class="shell flex items-center gap-6 py-4" aria-label="Principal">
-		<a href="/" class="flex items-center gap-2.5 font-bold tracking-tight">
+<header id="nav" class="nav" data-nav>
+	<nav class="shell nav-bar" aria-label="Principal">
+		<a href="/" class="wordmark">
 			<!-- Decorative: the wordmark beside it already names the site, so an alt
 			     here would make a screen reader announce "Manttio" twice for one
 			     link. The intrinsic width/height reserve the box before the PNG
@@ -29,25 +26,14 @@ const links = [
 			<span class="text-lead">{SITE_TITLE}</span>
 		</a>
 
-		<div class="ml-auto hidden items-center gap-7 md:flex">
-			{
-				links.map((l) => (
-					<a href={l.href} class="text-ink-muted transition-colors hover:text-ink">
-						{l.label}
-					</a>
-				))
-			}
-			<a
-				href="#contacto"
-				class="tint rounded-full bg-brand-ink px-5 py-2.5 font-medium text-paper shadow-[0_6px_18px_color-mix(in_oklab,var(--b-500)_30%,transparent)] transition-transform hover:-translate-y-px"
-			>
-				Solicitar demo
-			</a>
+		<div class="nav-links">
+			{links.map((l) => <a href={l.href} class="nav-link">{l.label}</a>)}
+			<a href="/#contacto" class="nav-cta">Solicitar demo</a>
 		</div>
 
 		<button
 			type="button"
-			class="-mr-1 ml-auto rounded-full p-2.5 text-ink transition-colors hover:text-ink-muted md:hidden"
+			class="burger-btn"
 			aria-expanded="false"
 			aria-controls="menu-movil"
 			aria-label="Abrir menú"
@@ -65,22 +51,17 @@ const links = [
 
 	<div id="menu-movil" class="menu" data-menu>
 		<div class="menu-clip">
-			<div class="shell flex flex-col items-start gap-1 pt-2 pb-6">
+			<div class="shell menu-inner">
 				{
 					links.map((l, i) => (
-						<a
-							href={l.href}
-							class="py-3 text-lead text-ink-muted transition-colors hover:text-ink"
-							style={`--i:${i}`}
-							data-menu-link
-						>
+						<a href={l.href} class="menu-link" style={`--i:${i}`} data-menu-link>
 							{l.label}
 						</a>
 					))
 				}
 				<a
-					href="#contacto"
-					class="tint mt-3 rounded-full bg-brand-ink px-6 py-3 font-medium text-paper"
+					href="/#contacto"
+					class="menu-cta"
 					style={`--i:${links.length}`}
 					data-menu-link
 				>
@@ -91,109 +72,7 @@ const links = [
 	</div>
 </header>
 
-<style>
-	/* ---- the burger ---- */
-	.burger {
-		position: relative;
-		display: block;
-		width: 20px;
-		height: 20px;
-	}
-	.bar {
-		position: absolute;
-		left: 0;
-		height: 2px;
-		width: 100%;
-		border-radius: 2px;
-		background: currentColor;
-		transition:
-			transform 320ms var(--ease-out),
-			opacity 140ms linear;
-	}
-	.bar-1 { top: 4px; }
-	.bar-2 { top: 10px; }
-	.bar-3 { top: 16px; }
-
-	[aria-expanded='true'] .bar-1 { transform: translateY(6px) rotate(45deg); }
-	[aria-expanded='true'] .bar-2 { opacity: 0; transform: scaleX(0.3); }
-	[aria-expanded='true'] .bar-3 { transform: translateY(-6px) rotate(-45deg); }
-
-	/* ---- the panel ----
-	   0fr → 1fr on a grid row is the one way to transition to an unknown height
-	   without measuring it in JS. `visibility` (not just the clip) is what keeps
-	   the links out of the tab order while collapsed; its transition is delayed
-	   so it only flips once the collapse has finished. */
-	.menu {
-		display: grid;
-		grid-template-rows: 0fr;
-		transition: grid-template-rows 180ms var(--ease-out);
-	}
-	/* Over the hero the bar is fully transparent, so the panel brings its own
-	   ground — otherwise the links open straight onto whatever is behind them.
-	   Same treatment as the bar: translucent paper plus the blur, never a
-	   card — no radius, no shadow, no border. */
-	.menu-clip {
-		overflow: hidden;
-		visibility: hidden;
-		background: color-mix(in oklab, var(--color-paper) 65%, transparent);
-		backdrop-filter: blur(16px);
-		transition:
-			visibility 0s linear 180ms,
-			background-color 300ms;
-	}
-	/* Past the scroll threshold the header paints 80% paper across its whole
-	   box — the panel included. A second layer here would stack on top of that
-	   and leave the panel reading whiter than the bar above it, so it drops out
-	   and lets the bar's own ground show through. */
-	[data-solid] .menu-clip {
-		background: transparent;
-		backdrop-filter: none;
-	}
-	.menu[data-open] {
-		grid-template-rows: 1fr;
-		transition-duration: 420ms;
-	}
-	.menu[data-open] .menu-clip {
-		visibility: visible;
-		transition-delay: 0s;
-	}
-
-	/* Items rise into place behind the panel, one after another. Closing runs
-	   with no delay, so the whole thing exits in one short beat. */
-	.menu [data-menu-link] {
-		opacity: 0;
-		transform: translateY(8px);
-		transition:
-			opacity 140ms linear,
-			transform 140ms var(--ease-out),
-			color 200ms ease;
-	}
-	.menu[data-open] [data-menu-link] {
-		opacity: 1;
-		transform: none;
-		transition-duration: 300ms;
-		transition-delay: calc(var(--i) * 45ms + 70ms);
-	}
-
-	/* The panel is mobile-only. This has to live here rather than as `md:hidden`:
-	   an Astro scoped rule is unlayered and would beat the utility. */
-	@media (min-width: 768px) {
-		.menu {
-			display: none;
-		}
-	}
-
-	/* The global reduced-motion rule zeroes durations but not delays, which would
-	   leave the links waiting on a stagger that no longer animates. */
-	@media (prefers-reduced-motion: reduce) {
-		.menu[data-open] [data-menu-link] {
-			transition-delay: 0s;
-		}
-		.menu-clip {
-			transition-delay: 0s;
-		}
-	}
-</style>
+<style>@import './Nav.css';</style>
 
 <script>
 	const nav = document.querySelector('[data-nav]') as HTMLElement | null;
@@ -202,12 +81,8 @@ const links = [
 
 	if (nav) {
 		const solid = () => {
-			const on = window.scrollY > 80;
-			nav.classList.toggle('bg-paper/80', on);
-			nav.classList.toggle('backdrop-blur-lg', on);
-			nav.classList.toggle('shadow-e1', on);
-			// The panel keys off this to avoid double-painting its ground.
-			nav.toggleAttribute('data-solid', on);
+			// The panel keys off this too, to avoid double-painting its ground.
+			nav.toggleAttribute('data-solid', window.scrollY > 80);
 		};
 		solid();
 		window.addEventListener('scroll', solid, { passive: true });

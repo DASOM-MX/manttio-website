@@ -1,0 +1,72 @@
+---
+import { Icon } from 'astro-icon/components';
+import AppShot from '../../components/AppShot.astro';
+import Closer from '../../components/Closer.astro';
+import Footer from '../../components/Footer.astro';
+import Nav from '../../components/Nav.astro';
+import { MODULES } from '../../data/modules';
+import Layout from '../../layouts/Layout.astro';
+
+/**
+ * El catálogo completo. Doce módulos apilados, cada uno con su captura real
+ * donde existe y su faux-UI donde el módulo todavía no está liberado.
+ *
+ * Sin riel fijo, sin etapa pegada y sin paso por scroll: es una página larga
+ * que se recorre normal. El orden es el de `../../data/modules.ts`, que es una
+ * decisión de venta y se cambia ahí, no aquí.
+ */
+const shipped = MODULES.filter((m) => m.shipped).length;
+---
+
+<Layout
+	title="Módulos"
+	description="Los doce módulos de Manttio: reportes con firma, cotizaciones en línea, órdenes de servicio, calendario de visitas, clientes, equipos, contratos, sitio web y app de campo."
+>
+	<Nav />
+	<main id="contenido">
+		<section class="intro">
+			<div class="shell">
+				<p class="label">Módulos</p>
+				<h1 class="intro-title">Doce módulos. Pagas los que uses.</h1>
+				<p class="measure mt-5 text-lead text-ink-muted">
+					Tu sistema crece con tu negocio: activas un módulo cuando lo
+					necesitas, sin reinstalar nada y sin perder la información que ya
+					tienes. {shipped} de los {MODULES.length} están disponibles hoy; los
+					demás aparecen marcados.
+				</p>
+			</div>
+		</section>
+
+		<div class="mods">
+			{
+				MODULES.map((m, i) => (
+					<section id={m.id} class="mod" data-alt={i % 2 === 1 ? 'true' : undefined} data-mod>
+						<div class="shell mod-grid">
+							<div class="mod-copy">
+								<p class="mod-head">
+									<Icon name={m.icon} class="size-5 shrink-0" />
+									<span class="mod-name">{m.name}</span>
+									{!m.shipped && <span class="mod-chip">Próximamente</span>}
+								</p>
+								<p class="measure mt-4 text-ink-muted">{m.claim}</p>
+							</div>
+							<div class="mod-shot">
+								<AppShot module={m} />
+							</div>
+						</div>
+					</section>
+				))
+			}
+		</div>
+
+		<Closer />
+	</main>
+	<Footer />
+</Layout>
+
+<style>@import './features.css';</style>
+
+<script>
+	import { reveal } from '../../scripts/motion';
+	reveal('[data-mod]');
+</script>

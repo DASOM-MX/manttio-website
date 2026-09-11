@@ -1,0 +1,258 @@
+/* Roadmap — pasos de onboarding, luego la línea de tiempo del servicio. */
+
+.roadmap {
+  border-top: 1px solid var(--color-hair);
+  background: var(--color-ground);
+  padding-block: 4rem;
+}
+@media (min-width: 640px) {
+  .roadmap {
+    padding-block: 6rem;
+  }
+}
+
+/* ---------- banda 1: onboarding, en zig-zag ---------- */
+
+.zig {
+  margin: 3rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Móvil: espina a la izquierda, todas las tarjetas del mismo lado. El zig-zag
+   solo existe cuando hay ancho para que se lea como tal. */
+.zig-step {
+  position: relative;
+  display: grid;
+  grid-template-columns: 2.75rem minmax(0, 1fr);
+  align-items: stretch;
+}
+@media (min-width: 900px) {
+  .zig-step {
+    grid-template-columns: minmax(0, 1fr) 5rem minmax(0, 1fr);
+  }
+}
+
+/* La espina: mismo mecanismo que el conector de la banda 2 — contenedor
+   recortado, la tinta punteada se desliza dentro. `stretch` hace que los
+   cuatro segmentos se toquen y lean como una sola línea continua. */
+.zig-spine {
+  grid-column: 1;
+  grid-row: 1;
+  justify-self: center;
+  align-self: stretch;
+  display: block;
+  overflow: hidden;
+  width: 2px;
+}
+@media (min-width: 900px) {
+  .zig-spine {
+    grid-column: 2;
+  }
+}
+
+/* El nodo numerado, montado sobre la espina. */
+.zig-node {
+  grid-row: 1;
+  grid-column: 1;
+  justify-self: center;
+  align-self: center;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 999px;
+  background: var(--color-brand-ink);
+  color: var(--color-paper);
+  font-size: var(--text-caption);
+  font-weight: 600;
+  /* separa el nodo de la línea que pasa por detrás */
+  box-shadow: 0 0 0 6px var(--color-ground);
+}
+@media (min-width: 900px) {
+  .zig-node {
+    grid-column: 2;
+  }
+}
+
+.zig-card {
+  grid-row: 1;
+  grid-column: 2;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-card);
+  background: var(--color-paper);
+  padding: 1.5rem;
+  margin-block: 0.75rem;
+  box-shadow: var(--shadow-e1);
+  transition:
+    transform 200ms var(--ease-out),
+    box-shadow 200ms var(--ease-out);
+}
+.zig-card:hover {
+  box-shadow: var(--shadow-e2);
+}
+@media (min-width: 900px) {
+  .zig-card {
+    max-width: 30rem;
+    padding: 1.75rem;
+    margin-block: 1.25rem;
+  }
+  /* Aquí nace el zig-zag: la tarjeta cae a un lado u otro de la espina. */
+  .zig-step[data-side='left'] .zig-card {
+    grid-column: 1;
+    justify-self: end;
+  }
+  .zig-step[data-side='right'] .zig-card {
+    grid-column: 3;
+    justify-self: start;
+  }
+}
+
+.zig-title {
+  font-size: var(--text-h3);
+  line-height: var(--text-h3--line-height);
+  font-weight: 600;
+  letter-spacing: var(--tracking-heading);
+}
+
+.zig-body {
+  margin-top: 0.625rem;
+  color: var(--color-ink-muted);
+}
+
+.zig-art {
+  margin-top: 1.5rem;
+}
+
+/* ---------- banda 2: la línea de tiempo ---------- */
+
+.flow-head {
+  margin-top: 5.5rem;
+  text-align: center;
+}
+
+.flow-title {
+  margin-inline: auto;
+  max-width: 22ch;
+  font-size: var(--text-h2);
+  line-height: var(--text-h2--line-height);
+  font-weight: 600;
+  letter-spacing: var(--tracking-heading);
+}
+.flow-head p {
+  margin-inline: auto;
+}
+
+.timeline {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.beat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* El conector: un contenedor recortado con la tinta punteada dentro. Se
+   revela con `translateY`, así que la animación es transform puro — nunca
+   `height`, que dispararía layout en cada frame. */
+.connector {
+  display: block;
+  overflow: hidden;
+  width: 2px;
+  height: 3.25rem;
+  margin-block: 1.75rem;
+}
+@media (min-width: 640px) {
+  .connector {
+    height: 4.5rem;
+    margin-block: 2.25rem;
+  }
+}
+
+.connector-ink {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    var(--color-brand-300) 0 4px,
+    transparent 4px 11px
+  );
+  /* Por defecto, dibujada: si el JS no corre, la línea se ve. */
+  transform: translateY(0);
+  transition: transform 700ms var(--ease-out);
+}
+/* `data-anim` lo pone `drawOnView` al arrancar; `data-drawn`, al entrar en
+   viewport. Misma especificidad, así que gana el de abajo. */
+[data-anim] .connector-ink {
+  transform: translateY(-100%);
+}
+[data-drawn] .connector-ink {
+  transform: translateY(0);
+}
+
+/* La pastilla de contexto. Es una etiqueta de estado, no una acción, así que
+   conserva el radio completo (misma regla que el superadmin). */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  background: var(--color-brand-50);
+  color: var(--color-brand-ink);
+  padding: 0.5rem 1.15rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  box-shadow: inset 0 0 0 1px var(--color-brand-200);
+}
+
+.beat-title {
+  margin-top: 1.25rem;
+  font-size: var(--text-h2);
+  line-height: var(--text-h2--line-height);
+  font-weight: 600;
+  letter-spacing: var(--tracking-heading);
+}
+.beat-title a {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  transition: color 200ms var(--ease-out);
+}
+.beat-title a:hover {
+  color: var(--color-brand-ink);
+}
+
+.beat-n {
+  font-size: var(--text-caption);
+  font-weight: 600;
+  color: var(--color-brand-500);
+}
+
+.beat-body {
+  margin-top: 0.875rem;
+  margin-inline: auto;
+  max-width: 46ch;
+  color: var(--color-ink-muted);
+}
+
+/* Topada a 760px: a 1000 cada beat medía ~890px de alto y la línea de tiempo
+   entera pasaba de 5300px — seis pantallas para una sección. La captura sigue
+   siendo legible y la sección se recorre en la mitad del scroll. */
+.beat-shot {
+  margin-top: 2rem;
+  width: 100%;
+  max-width: 760px;
+  margin-inline: auto;
+}
+/* La captura de la app de campo es vertical: a ancho completo se vuelve una
+   torre. `AppShot` ya la topa, esto solo recentra la columna. */
+.beat-shot :global(.mx-auto) {
+  margin-inline: auto;
+}

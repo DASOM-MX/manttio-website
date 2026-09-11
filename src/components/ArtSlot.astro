@@ -1,0 +1,36 @@
+---
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
+
+/**
+ * El hueco de una ilustración.
+ *
+ * Una sola fuente de verdad para los dos lugares que las usan (las tarjetas de
+ * dolores y la línea de tiempo de onboarding), así que el día que existan los
+ * archivos se conectan aquí y en los datos — no en cada componente.
+ *
+ * Mientras no haya imagen dibuja un marcador deliberadamente seco: tiene que
+ * leerse como un pendiente, porque un placeholder que parece contenido es el
+ * que termina publicándose por descuido.
+ */
+interface Props {
+  illustration?: ImageMetadata;
+  /** Alto mínimo del marcador vacío. */
+  minHeight?: string;
+  class?: string;
+}
+
+const { illustration, minHeight = "9rem", class: className = "" } = Astro.props;
+---
+
+<div class={`art ${className}`} style={`--art-min:${minHeight}`}>
+  {
+    illustration ? (
+      <Image src={illustration} alt="" widths={[280, 560]} sizes="280px" loading="lazy" />
+    ) : (
+      <span class="art-slot" aria-hidden="true">Ilustración pendiente</span>
+    )
+  }
+</div>
+
+<style>@import './ArtSlot.css';</style>

@@ -1,8 +1,11 @@
 ---
 /**
- * Faux product UI — plan §6.5. Built from the same tokens as the real app so it
- * animates per element, stays crisp at any DPR, and follows the brand rotation.
- * Deliberately not a screenshot.
+ * Faux product UI — la superficie que se dibuja cuando un módulo todavía no
+ * tiene captura real (es decir, cuando no está liberado). Hecha con los mismos
+ * tokens que la app, así que se ve como el producto y no como una ilustración.
+ *
+ * NO imprime el nombre ni el claim del módulo: quien la renderiza (ComingSoon,
+ * /features) ya los pone alrededor, y tenerlos aquí los duplicaba en pantalla.
  */
 import type { Module } from '../data/modules';
 
@@ -15,7 +18,7 @@ const { module, class: className = '' } = Astro.props;
 
 const chipClass: Record<string, string> = {
 	ok: 'bg-ok-soft text-ok',
-	act: 'bg-brand-50 text-brand-ink tint',
+	act: 'bg-brand-50 text-brand-ink',
 	wait: 'bg-mist text-ink-muted',
 };
 ---
@@ -31,16 +34,11 @@ const chipClass: Record<string, string> = {
 	</div>
 
 	<div class="flex flex-col gap-4 px-5 pt-5 pb-6">
-		<div>
-			<h3 class="text-h3 font-semibold tracking-tight">{module.name}</h3>
-			<p class="mt-1.5 max-w-[56ch] text-caption text-ink-muted sm:text-body">{module.claim}</p>
-		</div>
-
 		<div class="flex flex-wrap gap-2.5">
 			{
 				module.stats.map((s) => (
-					<div class="min-w-[104px] rounded-soft bg-mist px-3.5 py-2 shadow-ring">
-						<div class={`nums text-h3 font-semibold ${s.hi ? 'text-brand-ink tint' : ''}`}>{s.value}</div>
+					<div class="min-w-rail rounded-soft bg-mist px-3.5 py-2 shadow-ring">
+						<div class={`nums text-h3 font-semibold ${s.hi ? 'text-brand-ink' : ''}`}>{s.value}</div>
 						<div class="label">{s.label}</div>
 					</div>
 				))

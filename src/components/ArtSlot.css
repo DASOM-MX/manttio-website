@@ -1,0 +1,25 @@
+.art {
+  display: grid;
+  place-items: center;
+}
+
+.art img {
+  display: block;
+  width: 100%;
+  max-width: 17.5rem;
+  height: auto;
+}
+
+.art-slot {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-height: var(--art-min, 9rem);
+  border-radius: var(--radius-frame);
+  background: var(--color-ground);
+  outline: 1px dashed var(--color-hair);
+  outline-offset: -1px;
+  color: var(--color-ink-faint);
+  font-size: var(--text-caption);
+  text-align: center;
+}

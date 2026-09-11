@@ -13,28 +13,38 @@ interface Props {
 	module: Module;
 	class?: string;
 	loading?: 'eager' | 'lazy';
+	/**
+	 * `list` is the module's own screen — what the showcase rail wants. `detail`
+	 * is one record open, which is what the "Dolores" panels argue. Falls back to
+	 * the list capture where no detail one exists (the CMS editor already is one).
+	 */
+	variant?: 'list' | 'detail';
 }
 
-const { module, class: className = '', loading = 'lazy' } = Astro.props;
-const alt = `${module.name} en Manttio`;
+const { module, class: className = '', loading = 'lazy', variant = 'list' } = Astro.props;
+const shot = (variant === 'detail' && module.shotDetail) || module.shot;
+const alt =
+	variant === 'detail' && module.shotDetail
+		? `${module.name}: un registro abierto en Manttio`
+		: `${module.name} en Manttio`;
 ---
 
 {
-	module.shot ? (
+	shot ? (
 		module.shotKind === 'mobile' ? (
-			<div class={`mx-auto w-full max-w-[268px] ${className}`}>
+			<div class={`mx-auto w-full max-w-shot ${className}`}>
 				<Image
-					src={module.shot}
+					src={shot}
 					alt={alt}
 					widths={[268, 536]}
 					sizes="268px"
 					loading={loading}
-					class="w-full rounded-[2rem] shadow-e3"
+					class="w-full rounded-phone shadow-e3"
 				/>
 			</div>
 		) : (
 			<Image
-				src={module.shot}
+				src={shot}
 				alt={alt}
 				widths={[720, 1080, 1440, 1920, 2400]}
 				sizes="(min-width: 1024px) 92vw, 100vw"
