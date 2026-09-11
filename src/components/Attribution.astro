@@ -11,43 +11,48 @@ import { Icon } from "astro-icon/components";
  *    activos"), `crm/pages/dashboard/` — width is relative to the top row,
  *    floored at 4%, exactly as `channelBars()` computes it.
  *
+ * La ficha del lead se quitó (owner 2026-09-11): la sección enseña números, no
+ * un registro. Con ella se fueron el arreglo `LEADS`, la animación de entrada y
+ * el paso 3 vacío — las barras SON el paso 3 ahora.
+ *
  * Channels and their UTM tails come from `share-channels.const.ts`; the two
  * WhatsApp variants (profile/chat) are collapsed into one here. Source labels
  * are `CUSTOMER_SOURCE_LABELS`.
+ *
+ * Los chips van sin icono a propósito. Antes llevaban glifos de lucide como
+ * sustitutos de marca — un pulgar arriba por Facebook, una cámara por
+ * Instagram, `music-2` por TikTok — y un sustituto aproximado se lee peor que
+ * el nombre solo. Si algún día se quieren las marcas de verdad, van con
+ * `@iconify-json/simple-icons`, no con aproximaciones.
  */
 const CHANNELS = [
   {
     key: "facebook",
     label: "Facebook",
-    icon: "lucide:thumbs-up",
     query: "utm_source=facebook&utm_medium=social",
     source: "Facebook",
   },
   {
     key: "instagram",
     label: "Instagram",
-    icon: "lucide:camera",
     query: "utm_source=instagram&utm_medium=social",
     source: "Instagram",
   },
   {
     key: "tiktok",
     label: "TikTok",
-    icon: "lucide:music-2",
     query: "utm_source=tiktok&utm_medium=social",
     source: "TikTok",
   },
   {
     key: "whatsapp",
     label: "WhatsApp",
-    icon: "lucide:message-circle",
     query: "utm_source=whatsapp&utm_medium=chat",
     source: "WhatsApp",
   },
   {
     key: "webpage",
     label: "Página web",
-    icon: "lucide:globe",
     query: null,
     source: "Sitio web",
   },
@@ -114,7 +119,6 @@ const pct = (r: { leads: number; active: number }) =>
                 data-label={c.label}
                 aria-pressed={i === 0 ? "true" : "false"}
               >
-                <Icon name={c.icon} class="size-4 shrink-0" />
                 {c.label}
               </button>
             ))
@@ -132,7 +136,7 @@ const pct = (r: { leads: number; active: number }) =>
           <span
             class="grid size-9 shrink-0 place-items-center rounded-soft bg-brand-50 text-brand-ink"
           >
-            <Icon name={CHANNELS[0].icon} class="size-4" data-link-icon />
+            <Icon name="lucide:link" class="size-4" />
           </span>
           <div class="min-w-0 flex-1">
             <p class="text-caption font-medium" data-link-label>
@@ -141,7 +145,7 @@ const pct = (r: { leads: number; active: number }) =>
             <!-- Wraps rather than truncating (the superadmin row truncates): on a
 						     phone the UTM tail is the first thing an ellipsis eats, and it is the
 						     whole point of the row. The <wbr> puts the break right before the `?`. -->
-            <p class="font-mono text-caption break-all text-ink-faint">
+            <p class="font-mono text-caption break-words text-ink-faint">
               <span>{SITE}/contact-us</span><wbr /><span
                 class="text-brand-ink"
                 data-link-query>?{CHANNELS[0].query}</span
@@ -160,7 +164,7 @@ const pct = (r: { leads: number; active: number }) =>
         </div>
 
         <p class="mt-3 text-caption text-ink-faint">
-          Pruébalo: copia un enlace y observa cómo entra el lead.
+          Pruébalo: copia un enlace y observa cómo sube ese canal.
         </p>
         <p class="mt-6 text-caption text-ink-faint">
           Si inviertes en Google Ads no necesitas enlace: el <span
@@ -176,39 +180,7 @@ const pct = (r: { leads: number; active: number }) =>
             <span class="nums grid size-7 shrink-0 place-items-center rounded-full bg-brand-ink text-caption font-semibold text-paper">3</span>
             Ve los resultados
           </p>
-          <div class="mt-3 rounded-frame bg-mist p-4 shadow-ring" data-lead>
-            <div class="flex items-start justify-between gap-3">
-              <div class="min-w-0">
-                <p class="font-medium" data-lead-name>Laura Méndez</p>
-                <p
-                  class="mt-0.5 truncate text-caption text-ink-faint"
-                  data-lead-mail
-                >
-                  laura.mendez@correo.com
-                </p>
-              </div>
-              <span class="tag">Lead</span>
-            </div>
-            <dl
-              class="mt-4 flex items-baseline gap-2 border-t border-hair pt-3 text-caption"
-            >
-              <dt class="text-ink-faint">Origen</dt>
-              <dd class="font-medium text-brand-ink" data-lead-source>
-                Facebook
-              </dd>
-            </dl>
-            <p
-              class="mt-2 flex items-center gap-1.5 text-caption text-ink-faint"
-            >
-              <Icon name="lucide:lock" class="size-3.5 shrink-0" />
-              Se registra una sola vez y ya nadie lo puede modificar.
-            </p>
-          </div>
-        </div>
-
-        <div>
-          <p class="label">Canales de captación</p>
-          <ul class="mt-4 flex flex-col gap-4">
+              <ul class="mt-4 flex flex-col gap-4">
             {
               ROWS.map((r) => (
                 <li data-row={r.source}>
@@ -238,11 +210,22 @@ const pct = (r: { leads: number; active: number }) =>
             }
           </ul>
           <p class="mt-4 text-caption text-ink-faint">
-            Agosto a la fecha, contra julio completo.
+            Agosto a la fecha.
+          </p>
+          <!-- El argumento que la sección no puede perder: los números de arriba
+               dicen QUÉ trajo cada canal, esta línea dice por qué se pueden
+               creer. Venía dentro de la ficha del lead; al quitarla se quedó
+               sin sujeto, así que ahora lo nombra ("El origen"). -->
+          <p class="pledge">
+            <Icon name="lucide:lock" class="size-4 shrink-0" />
+            <span>
+              El origen se registra una sola vez y ya nadie lo puede modificar.
+            </span>
           </p>
         </div>
       </div>
     </div>
+
   </div>
   <p class="sr-only" role="status" data-status></p>
 </section>
@@ -262,22 +245,11 @@ const pct = (r: { leads: number; active: number }) =>
     const linkLabel = root.querySelector<HTMLElement>("[data-link-label]");
     const linkQuery = root.querySelector<HTMLElement>("[data-link-query]");
     const copyBtn = root.querySelector<HTMLButtonElement>("[data-copy]");
-    const lead = root.querySelector<HTMLElement>("[data-lead]");
-    const leadName = root.querySelector<HTMLElement>("[data-lead-name]");
-    const leadMail = root.querySelector<HTMLElement>("[data-lead-mail]");
-    const leadSource = root.querySelector<HTMLElement>("[data-lead-source]");
     const status = root.querySelector<HTMLElement>("[data-status]");
     const rows = Array.from(root.querySelectorAll<HTMLElement>("[data-row]"));
 
-    const LEADS = [
-      { name: "Ricardo Salinas", email: "ricardo.salinas@correo.com" },
-      { name: "Paola Rentería", email: "paola.renteria@correo.com" },
-      { name: "Iván Cortés", email: "ivan.cortes@correo.com" },
-      { name: "Mariana Ochoa", email: "mariana.ochoa@correo.com" },
-      { name: "Sergio Bañuelos", email: "sergio.banuelos@correo.com" },
-      { name: "Laura Méndez", email: "laura.mendez@correo.com" },
-    ];
-    let leadAt = 0;
+    /** Qué canal lleva el +1 de la simulación, para poder devolverlo. */
+    let simulated: string | null = null;
 
     /** Live counts, seeded from what the server rendered. */
     const counts = new Map(
@@ -335,7 +307,6 @@ const pct = (r: { leads: number; active: number }) =>
         linkQuery.textContent = chip.dataset.query
           ? `?${chip.dataset.query}`
           : "";
-      if (leadSource) leadSource.textContent = chip.dataset.source!;
       copyBtn?.setAttribute(
         "aria-label",
         `Copiar enlace de ${chip.dataset.label}`,
@@ -356,20 +327,24 @@ const pct = (r: { leads: number; active: number }) =>
       copyBtn?.setAttribute("data-done", "");
       window.setTimeout(() => copyBtn?.removeAttribute("data-done"), 1600);
 
+      /* La demo enseña UN lead entrando, no una cuenta que sube para siempre.
+         Antes cada copia sumaba +1 sin techo: a los doce clics Facebook pasaba
+         de 14 a 26 leads, las barras se reescalaban alrededor de un número
+         inventado por el visitante y el mes dejaba de cuadrar con el pie que
+         dice "Agosto a la fecha". Ahora se devuelve el lead anterior antes de
+         apuntar el nuevo, así que el panel siempre muestra el mes sembrado más
+         exactamente uno. */
       const source = current.dataset.source!;
+      if (simulated) {
+        const prev = counts.get(simulated);
+        if (prev) prev.leads -= 1;
+      }
       const row = counts.get(source);
       if (row) row.leads += 1;
+      simulated = source;
 
-      const next = LEADS[leadAt++ % LEADS.length];
-      if (leadName) leadName.textContent = next.name;
-      if (leadMail) leadMail.textContent = next.email;
-      if (lead) {
-        lead.removeAttribute("data-landing");
-        void lead.offsetWidth; // restart the animation
-        lead.setAttribute("data-landing", "");
-      }
       if (status)
-        status.textContent = `Enlace de ${current.dataset.label} copiado. Nuevo lead de ${source}: ${next.name}.`;
+        status.textContent = `Enlace de ${current.dataset.label} copiado. ${source} sube a ${counts.get(source)!.leads + counts.get(source)!.active}.`;
       paint();
     };
 
