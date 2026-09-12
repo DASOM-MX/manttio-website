@@ -10,7 +10,6 @@
 }
 
 .intro-title {
-  margin-top: 0.75rem;
   max-width: 19ch;
   font-size: var(--text-display);
   line-height: var(--text-display--line-height);
