@@ -192,6 +192,40 @@ Whichever lands, the ladder should end up at the ruler's: **400 body · 500
 labels · 600 headings and buttons · 700 wordmark.** And `styles.scss` should
 record the reversal with its date, the way it recorded the increase.
 
+### P2c — tenant text renders as authored *(decided, owner 2026-09-11)*
+
+**Keep the `eyebrow` field; drop the uppercase.** No content-model migration,
+no dead form input, and nothing a tenant typed disappears. It also aligns the
+tenant site with the rule `superadmin` has carried since 2026-07-07 —
+*"labels/headings render in the authored title/sentence case."*
+
+The decision generalises past the eyebrow, because the same transform is
+applied to other tenant strings:
+
+| Content | Component | Sites |
+|---|---|---|
+| `eyebrow` (CMS) | Services · Location · ServiceCatalog · Manufacturers · Clients | **10** — each renders twice |
+| `brand.slogan` | Hero · Footer | 2 |
+| `m.heading` (CMS hero metrics) | Hero | 1 (inside a `.map`) |
+
+**13 render sites**, all of them tenant-authored. The rule to write down:
+
+> Tenant-authored text renders exactly as the tenant typed it. Never
+> `text-transform` it. Hardcoded chrome labels may stay uppercase.
+
+Two things the implementation must get right:
+
+- **`tracking-caps` comes off with `uppercase`.** It is `0.18em`, an
+  uppercase-only idiom; left on Title Case it reads as spaced-out and broken.
+- **`text-transform: capitalize` is not the answer.** It would render a
+  tenant's "servicios de mantenimiento industrial" as "Servicios De
+  Mantenimiento Industrial". Render as authored; the shipped defaults
+  (`Servicios`, `Catálogo`, `Marcas`, `Ubicación`, `Clientes`) are already
+  Title Case.
+
+Staying uppercase: `Footer` "Sitio" and "Contacto directo" — hardcoded chrome,
+not competing with a title, not the tenant's words.
+
 ### P3 — radius, as a system
 Extend the `control` / `chip` / `card` tokens to `frontend` and `website`, then
 migrate raw `rounded-*` to them. ~213 call sites across three packages, so this
@@ -215,18 +249,13 @@ what a surface looks like.
   render a tenant's chosen face, and weight is not part of what a tenant picks
   — the catalog stores a family, not a ladder. So the ladder is Manttio's to
   set on all four. Confirm that reading.
-- **The `eyebrow` CMS field.** Four tenant-website eyebrows are CMS-authored,
-  not chrome: the field exists in the website types, the backend validator, the
-  superadmin DTO, and as an input in the home-editor. Options: retire the field
-  across all four (a content-model migration, and tenants lose what they
-  typed); keep rendering it and exempt tenant content from the uppercase ban;
-  or keep the field and drop the uppercase styling, so tenant text renders in
-  sentence case. **Needs the owner.**
 - **Uppercase `h2` section headings** in `frontend` (`my-visits` has four).
   Not eyebrows — they are the heading. In or out of the ban?
 - **`manttio-website` commit `b456902`** is already on `main` with the skill,
   the agent and the last eyebrow removed. Revert it to keep everything behind
   the plan, or let it stand as P1 landing early?
+- **The skill needs the tenant-text clause** added to its uppercase section,
+  alongside the correction below.
 - **The committed skill is now wrong** and needs amending either way: its
   typography table still lists `frontend` under Instrument Sans + Archivo. It
   should read `manttio-website` + `superadmin`, with `frontend` and `website`
