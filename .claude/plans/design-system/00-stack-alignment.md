@@ -105,9 +105,25 @@ face. Adding the family is what makes the default reachable, and it fixes that
 at the same time. Note it is a visible change for any tenant who already set a
 heading font — they start getting it.
 
-Token naming also wants settling while this is open: `superadmin` calls it
-`display`, `website` calls it `heading`, `manttio-website` calls it
-`--font-display`. Pick one name for the role across the stack.
+**Token name: `heading` everywhere** (decided, owner 2026-09-12). Three signals
+all point the same way, so this is not a taste call:
+
+1. **The data model already says `heading`.** `FontRole.Heading = 'heading'`,
+   `brand.font.heading`, `--brand-font-heading` — backend enum, DTO and CSS
+   variable agree. Naming the Tailwind family anything else means the stack
+   calls one role two things depending on which layer you are in.
+2. **It is the cheaper rename.** 19 call sites already use `font-heading`
+   (`website`) against 8 on `display` — 3 in `superadmin`, 5 here. Renaming 8
+   beats renaming 19.
+3. **`font-display` collides with a real CSS property.** `font-display: swap`
+   is emitted in both generated `@font-face` blocks
+   (`website/src/lib/theme.ts:45`, `frontend/.../brand-css.ts:44`). A utility
+   and a property sharing a name in one codebase is a trap — grepping for one
+   finds the other, which already happened while writing this plan.
+
+So: `font-heading` / `--font-heading`. `superadmin` renames its `display`
+family (3 sites), `manttio-website` renames `--font-display` (5 sites),
+`website` keeps what it has, and `frontend` gains the family it is missing.
 
 The tenant-website half is not a one-line change either — the tenant website's defaults are load-bearing in four
 places across two packages, plus an ops step:
