@@ -84,8 +84,32 @@ while P2+ are still being argued. **Already implemented.**
 **Manttio's own surfaces** (`manttio-website`, `superadmin`): Instrument Sans
 display + Archivo body/UI/numerals, outright.
 
-**Tenant surfaces** (`frontend`, `website`): only the *default* moves. This is
-not a one-line change — the tenant website's defaults are load-bearing in four
+**Tenant surfaces** (`frontend`, `website`): the same pair becomes the
+*default* behind the tenant variables (owner, re-confirmed 2026-09-12). A
+tenant who chose a face keeps it; a tenant who never did now gets Manttio's.
+
+Target for both:
+
+```
+heading / display : var(--brand-font-heading, "Instrument Sans Variable")
+body / sans       : var(--brand-font-body,    "Archivo Variable")
+```
+
+**`frontend` cannot express that today, and the gap is a live bug.**
+`app/theme/brand-css.ts:37` already emits *both* roles — it loops
+`['body','heading']` and falls heading back to body — but `tailwind.config.js`
+defines only `sans` and `data`. There is no `heading` family consuming the
+variable, so **a tenant who picks a distinct heading font sees it on their
+public site and not in the field app**; headings there just inherit the body
+face. Adding the family is what makes the default reachable, and it fixes that
+at the same time. Note it is a visible change for any tenant who already set a
+heading font — they start getting it.
+
+Token naming also wants settling while this is open: `superadmin` calls it
+`display`, `website` calls it `heading`, `manttio-website` calls it
+`--font-display`. Pick one name for the role across the stack.
+
+The tenant-website half is not a one-line change either — the tenant website's defaults are load-bearing in four
 places across two packages, plus an ops step:
 
 | What | Where |
