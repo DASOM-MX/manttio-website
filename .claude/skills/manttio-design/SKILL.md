@@ -14,28 +14,36 @@ software. This skill is what keeps them agreeing.
 convention conflict, the website wins and the package changes — *except* for
 the two things below, which are product features, not drift.
 
-## The two things the ruler does NOT govern
+## The one thing the ruler does NOT govern
 
-Getting this wrong breaks the product, so it comes first.
+**Colour. It belongs to branding.** `superadmin`, `frontend` and the tenant
+`website` build `primary`/`accent` from `--brand-primary-*` /
+`--brand-accent-*`, which the branding module sets at boot. Every tenant's app
+is *their* colour. `manttio-website`'s navy (`#153469`) governs the marketing
+site **only**. Never hard-code a hex into a themeable surface, and never flag
+one for "not matching the brand" — that is the feature working.
 
-1. **Per-tenant brand colour.** `superadmin`, `frontend` and the tenant
-   `website` build `primary`/`accent` from `--brand-primary-*` / `--brand-accent-*`,
-   which the branding module sets at boot. Every tenant's app is *their* colour.
-   `manttio-website`'s navy (`#153469`) governs the marketing site **only**.
-   Never hard-code a hex into a themeable surface.
-2. **Per-tenant typography on the tenant website.** That package reads
-   `var(--brand-font-heading, Rubik)` and `var(--brand-font-body, "Work Sans")`.
-   Tenants choose their faces. Do not replace those variables with Manttio's.
+Typography *is* governed, but on the two tenant-facing surfaces the rule sets
+the **default**, not the face: `frontend` and `website` read
+`var(--brand-font-heading, …)` / `var(--brand-font-body, …)`, so a tenant who
+chose a family keeps it and one who never did gets Manttio's pair.
 
 Everything else below is shared.
 
 ## Typography
 
-| Role | Face | Where |
+| Role | Face | How it applies |
 |---|---|---|
-| Display — `h1`, section `h2` | **Instrument Sans** (variable 400–700) | website, superadmin, frontend |
-| Body, UI, numerals | **Archivo** (variable 100–900) | website, superadmin, frontend |
-| Tenant site | tenant's own variables | tenant website only |
+| Headings — `h1`, section `h2` | **Instrument Sans** (variable **400–700**) | outright on `manttio-website` + `superadmin`; the default behind `--brand-font-heading` on `frontend` + `website` |
+| Body, UI, numerals | **Archivo** (variable 100–900) | same, behind `--brand-font-body` |
+
+The Tailwind family is **`heading`**, never `display` — it matches the data
+model (`FontRole.Heading`, `--brand-font-heading`) and avoids colliding with
+the real `font-display` CSS property, which is emitted in the generated
+`@font-face` blocks.
+
+Instrument Sans stops at **700**. Anything needing 800+ (a wordmark) stays on
+the body face, which reaches 900.
 
 **Self-host. No CDN, ever.** `superadmin` already states the reason and it
 applies stack-wide: offline, CSP, and no FOUT. In Angular use
@@ -47,6 +55,12 @@ headline claim is that it works with no signal.
 
 Set `font-synthesis-weight: none` on headings. Every weight you ask for must be
 a real face on the variable axis; a browser faking one is a defect.
+
+**Weight ladder: 400 body · 500 labels · 600 headings and buttons · 700
+wordmark** (owner 2026-09-11, reversing the +200 of 2026-08-27). In the Angular
+and tenant packages the named utilities are remapped in `tailwind.config.js`,
+so `font-bold` renders **600**, not 700 — reach for the semantic rung, not the
+number.
 
 ## Shape
 
@@ -91,10 +105,19 @@ of a template.
 `superadmin` has banned this since 2026-07-07 — *"Labels/headings render in the
 authored title/sentence case."* The rule is now stack-wide.
 
-**Still allowed**, because they are not competing with a title: table `<th>`
-headers, footer column headings, and micro-labels inside a data surface
-(a stat tile's caption). Uppercase for emphasis or warning is allowed when
-asked for explicitly.
+The ban covers section `h2`s too, not only the kicker above an `h1`.
+
+**Never `text-transform` tenant-authored text.** A CMS eyebrow, a brand
+slogan, a tenant's metric heading — render exactly what they typed. `capitalize`
+is not a softer option: it turns "servicios de mantenimiento industrial" into
+Title Case word by word. And when `uppercase` comes off, the letterspacing goes
+with it — `tracking-caps` is `0.18em`, an uppercase-only idiom that reads
+broken on sentence case.
+
+**Still allowed**, because they are neither competing with a title nor someone
+else's words: table `<th>` headers, footer column headings, hardcoded chrome
+labels, and micro-labels inside a data surface (a stat tile's caption).
+Uppercase for emphasis or warning is allowed when asked for explicitly.
 
 ## Descriptions belong in a tooltip, not under the title
 

@@ -35,7 +35,7 @@
      distintos y uno puede cambiar sin arrastrar al otro. Figtree salió del
      proyecto al pasar el cuerpo a Archivo: ya no la usaba nadie. */
   --font-sans: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-instrument), var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-instrument), var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
   --font-subhead: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
 
   /* Modular scale, ratio 1.25 from a 1rem base. Fluid only where the plan
@@ -191,7 +191,7 @@
 /* Section heading — the size/weight/tracking triple that every `h2` on the
    site shares. Pulled out of the templates so the hierarchy is declared once. */
 @utility section-title {
-  font-family: var(--font-display);
+  font-family: var(--font-heading);
   font-size: var(--text-h1);
   line-height: var(--text-h1--line-height);
   font-weight: 600;

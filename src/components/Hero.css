@@ -39,7 +39,7 @@
 .hero-title {
   font-size: var(--text-display);
   line-height: var(--text-display--line-height);
-  font-family: var(--font-display);
+  font-family: var(--font-heading);
   font-weight: 600;
   letter-spacing: var(--tracking-display);
 }

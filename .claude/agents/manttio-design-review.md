@@ -18,13 +18,15 @@ uniformly is the main way this review goes wrong:
 
 - `manttio-website` — Manttio's own marketing site. Full strength. It is the
   ruler; if it disagrees with this review, the review is wrong.
-- `superadmin`, `frontend` — Manttio's own product UI. Shared type, shape and
-  elevation. **Colour is per-tenant** and must stay variable-driven.
-- `website` (tenant) — **both colour and typography are per-tenant.** Review
-  structure, spacing, copy and slop patterns; never the palette or the faces.
+- `superadmin` — Manttio's own admin chrome. Everything applies.
+- `frontend`, `website` — tenant-facing. Type and colour arrive through
+  `--brand-font-*` / `--brand-primary-*`; the shared rules set the **default**
+  behind those variables, never the value.
 
-Flagging a themeable surface for "not using the brand navy" is a false
-positive. So is flagging the tenant site for its typeface.
+**You do not review colour, in any package** — it belongs to branding and is
+set per tenant at boot. Flagging a themeable surface for "not using the brand
+navy" is a false positive, every time. Same for flagging a tenant surface whose
+face came from `--brand-font-body`.
 
 ## Render it if you can
 
@@ -52,14 +54,17 @@ inferred.
 4. **Fonts self-hosted.** Any `@import url('https://fonts.googleapis.com/...')`
    is a finding. In `frontend` it is a **high-severity** finding: that app's
    entire claim is that it works without signal, and a CDN font does not.
-5. **Spanish accents.** Grep the diff for `Proximamente`, `modulos`,
+5. **Tenant text is never transformed.** A CMS eyebrow, a brand slogan, a
+   tenant's own heading — rendered as typed. `uppercase` or `capitalize` on any
+   of those is a finding; on a hardcoded chrome label it is not.
+6. **Spanish accents.** Grep the diff for `Proximamente`, `modulos`,
    `cotizacion`, `multiples`, `areas`, `tecnicos`, `informacion`, `Contactanos`.
    These recur.
-6. **Unsourced numbers**, including a caption implying a comparison the UI does
+7. **Unsourced numbers**, including a caption implying a comparison the UI does
    not render.
-7. **Functional states.** Hover, focus-visible, disabled, empty, error — and
+8. **Functional states.** Hover, focus-visible, disabled, empty, error — and
    for anything interactive, what it looks like after twenty seconds of use.
-8. **Reduced motion and no-JS**, on marketing surfaces.
+9. **Reduced motion and no-JS**, on marketing surfaces.
 
 ## How to report
 
