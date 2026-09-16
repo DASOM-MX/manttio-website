@@ -1,4 +1,6 @@
 ---
+import { Image } from "astro:assets";
+
 import { MODULES } from "../data/modules";
 import { USE_CASES } from "../data/use-cases";
 import AppShot from "./AppShot.astro";
@@ -30,7 +32,7 @@ const cases = USE_CASES.map((c) => {
 <section id="casos" class="cases">
   <div class="shell">
     <h2 class="section-title measure-head mt-3" data-reveal-c>
-      Utilizado en múltiples áreas de servicios técnicos.
+      Un mismo sistema, distintas formas de trabajar.
     </h2>
 
     <div class="cases-body" data-cases>
@@ -79,7 +81,18 @@ const cases = USE_CASES.map((c) => {
                 </ul>
               </div>
               <div class="panel-shot">
-                <AppShot module={c.shotModule} />
+                {c.art ? (
+                  <Image
+                    src={c.art}
+                    alt=""
+                    widths={[560, 860, 1200]}
+                    sizes="(min-width: 1024px) 47vw, 80vw"
+                    loading="lazy"
+                    class="panel-art"
+                  />
+                ) : (
+                  <AppShot module={c.shotModule} />
+                )}
               </div>
             </div>
           ))
