@@ -80,7 +80,7 @@ const cases = USE_CASES.map((c) => {
                   ))}
                 </ul>
               </div>
-              <div class="panel-shot">
+              <div class="panel-shot" data-shot>
                 {c.art ? (
                   <Image
                     src={c.art}
@@ -108,6 +108,20 @@ const cases = USE_CASES.map((c) => {
   import { reveal } from "../scripts/motion";
 
   reveal("[data-reveal-c]");
+
+  // El esqueleto se quita en cuanto la imagen está lista. Hace falta de verdad:
+  // `loading="lazy"` dentro de un panel en `display:none` no dispara, así que la
+  // descarga empieza al cambiar de pestaña y el hueco existe hasta que termina.
+  // También se quita en `error`, porque un esqueleto latiendo para siempre miente
+  // más que un hueco vacío.
+  document.querySelectorAll<HTMLImageElement>("[data-shot] img").forEach((img) => {
+    const done = () => img.closest("[data-shot]")?.setAttribute("data-loaded", "");
+    if (img.complete && img.naturalWidth > 0) done();
+    else {
+      img.addEventListener("load", done, { once: true });
+      img.addEventListener("error", done, { once: true });
+    }
+  });
 
   const root = document.querySelector<HTMLElement>("[data-cases]");
   if (root) {

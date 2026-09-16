@@ -151,3 +151,36 @@
   max-height: 24rem;
   object-fit: contain;
 }
+
+/* Esqueleto de carga.
+   No es decorativo: la imagen de un panel oculto no se descarga —`loading="lazy"`
+   dentro de `display:none` no dispara— así que al cambiar de pestaña hay un hueco
+   real hasta que baja el archivo. Como `<Image>` emite width/height, la caja ya
+   tiene su alto reservado y el esqueleto lo llena sin mover nada al terminar.
+   El bloque global de `prefers-reduced-motion` corta el latido y lo deja fijo. */
+.panel-shot {
+  position: relative;
+}
+.panel-shot::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-frame);
+  background: var(--color-brand-100);
+  animation: shot-skeleton 1400ms ease-in-out infinite;
+  pointer-events: none;
+}
+.panel-shot[data-loaded]::after {
+  animation: none;
+  opacity: 0;
+  transition: opacity 260ms var(--ease-out);
+}
+@keyframes shot-skeleton {
+  0%,
+  100% {
+    background: var(--color-brand-100);
+  }
+  50% {
+    background: var(--color-brand-50);
+  }
+}
