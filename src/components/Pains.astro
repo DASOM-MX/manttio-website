@@ -3,6 +3,11 @@ import type { ImageMetadata } from "astro";
 import { MODULES } from "../data/modules";
 import ArtSlot from "./ArtSlot.astro";
 
+import offlineArt from "../assets/pains/offline-pain.png";
+import quotesArt from "../assets/pains/quotes-pain.png";
+import remindersArt from "../assets/pains/reminders-pain.png";
+import reportsArt from "../assets/pains/reports-pain.png";
+
 /**
  * Pregunta → respuesta, en tarjetas.
  *
@@ -11,9 +16,10 @@ import ArtSlot from "./ArtSlot.astro";
  * los casos de uso, en la línea de tiempo y en /features, que es donde el
  * visitante ya quiere ver la app.
  *
- * ILUSTRACIONES PENDIENTES. Cada tarjeta tiene su hueco listo: en cuanto
- * exista el archivo, se importa arriba y se pone en `illustration`. El hueco lo
- * dibuja `ArtSlot`, que es el mismo que usa la línea de tiempo del roadmap.
+ * Las ilustraciones van en `src/assets/` y no en `public/`: ahí Astro las
+ * optimiza y emite `width`/`height`, que es lo que reserva el hueco. Son la
+ * misma familia que las de los casos de uso — isométricas, un solo azul de la
+ * escala de marca, fondo transparente.
  */
 const pairs: {
   module: string;
@@ -28,6 +34,7 @@ const pairs: {
     title: "Todo en un mismo reporte",
     answer:
       "Tus técnicos solo tienen que llenar el reporte con la firma del cliente y tu cliente recibe un PDF con el reporte. Nadie tiene que traspasarlo al llegar a la oficina ni acordarse de mandarlo.",
+    illustration: reportsArt,
   },
   {
     module: "cotizaciones",
@@ -35,6 +42,7 @@ const pairs: {
     title: "Cotiza y entrega de inmediato",
     answer:
       "Envía la cotización inmediatamente después de crearla en el sistema: el cliente la aprueba o la rechaza ahí mismo y el precio queda fijo desde ese momento. Siempre hay constancia de quién aprobó y cuándo.",
+    illustration: quotesArt,
   },
   {
     module: "campo",
@@ -42,6 +50,7 @@ const pairs: {
     title: "La app funciona sin internet",
     answer:
       "En sótanos, azoteas y naves industriales la app responde igual. El técnico captura ahí mismo y la información sube sola en cuanto recupera la red. Nadie tiene que volver a escribirla en la oficina.",
+    illustration: offlineArt,
   },
   {
     module: "contratos",
@@ -49,6 +58,7 @@ const pairs: {
     title: "El sistema te recuerda",
     answer:
       "Las pólizas por vencer, los seguimientos pendientes y la agenda de la semana aparecen desde que entras. Lo que hoy recuerdas tú, mañana lo recuerda el sistema.",
+    illustration: remindersArt,
   },
 ];
 
@@ -75,7 +85,7 @@ const cards = pairs.map((p) => {
             <h3 class="card-title h-16">{c.title}</h3>
             <p class="card-body">{c.answer}</p>
 
-            <ArtSlot illustration={c.illustration} class="w-full aspect-video" />
+            <ArtSlot illustration={c.illustration} class="w-full aspect-3/2" />
 
             <a class="card-link" href={`/features#${c.mod.id}`}>
               {c.mod.name}
